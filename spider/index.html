@@ -3,7 +3,7 @@
 <html lang=en>
 <head>
   <link rel="manifest" href="manifest.json">
-	<link rel="apple-touch-icon" href="sp192.png">
+	<link rel="apple-touch-icon" href="spider.png">
 	<meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="green">
   <meta name="apple-mobile-web-app-title" content="Spider Solitaire">
@@ -31,7 +31,7 @@
 </head>
   
 <body>
-  <p>One-Click Spider Solitaire 1.30
+	<p>One-Click Spider 1.4</p>
   <button onclick="shuffle(); deal(0)">New</button>
   <button onclick="deal()">Replay</button>
 <!--  <button onclick="undo()">Undo</button> -->
@@ -76,6 +76,7 @@ if ('serviceWorker' in navigator) {
 // Note - Unicode sets up 16 cards per suit, including two queens
 // Unlike the old game, I want to only use the DOM
 // Each move of n cards from x1, iy1 to x2, iy2 (an array of 5 items)
+	const expiry="Fri, 01 Jan 2038 00:00:01 GMT";
   cards = []; // array of card div svg objects
 	ndealt=0; // how many cards have been dealt?
 	moves = [];
@@ -84,7 +85,7 @@ if ('serviceWorker' in navigator) {
   nfoundation=0; // how many foundation piles have gone up?
   nempty = 0; // computed # empty cascades
   suits = ["&spadesuit;","&#9825;","&#9826;","&clubsuit;"];
-  nsuit = 1; // default is just one suit
+  nsuit = document.cookie.substr(5,1); if (nsuit=='') nsuit=2; // default is twp suits
   faces = ["&#x1F482","&#x1f478;","&#x1F451;"]; // emojis for facecards
   vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 	back= '<svg viewBox="0 0 200 280">'
@@ -97,7 +98,7 @@ if ('serviceWorker' in navigator) {
 	createCards();
 
 	// FUNCTIONS from top down	// make numbers bigger for phones
-  function setSuit(event) { nsuit=event.target.value; createCards();}
+  function setSuit(event) { nsuit=event.target.value; document.cookie="suit="+nsuit+';expires='+expiry+';path=/';.;createCards();}
 	function createCards(){ // creates 13, 26 or 52 dependuing on nsuit for spider
 		var size=( screen.width<600 ? 70 : 45);
     for (n=0;n<(13*nsuit);n++) { // create 52 svg cards as strings in this array - innerHTML for divs
