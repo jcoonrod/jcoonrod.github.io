@@ -31,7 +31,7 @@
 </head>
   
 <body>
-	<p>One-Click Spider 1.4</p>
+	<p>One-Click Spider 1.41 
   <button onclick="shuffle(); deal(0)">New</button>
   <button onclick="deal()">Replay</button>
 <!--  <button onclick="undo()">Undo</button> -->
@@ -98,7 +98,7 @@ if ('serviceWorker' in navigator) {
 	createCards();
 
 	// FUNCTIONS from top down	// make numbers bigger for phones
-  function setSuit(event) { nsuit=event.target.value; document.cookie="suit="+nsuit+';expires='+expiry+';path=/';.;createCards();}
+  function setSuit(event) { nsuit=event.target.value; document.cookie='suit='+nsuit+';expires='+expiry+';path=/'; createCards();}
 	function createCards(){ // creates 13, 26 or 52 dependuing on nsuit for spider
 		var size=( screen.width<600 ? 70 : 45);
     for (n=0;n<(13*nsuit);n++) { // create 52 svg cards as strings in this array - innerHTML for divs
