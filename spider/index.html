@@ -31,10 +31,10 @@
 </head>
   
 <body>
-	<p>1Click Spider 1.5
+	<p>1Click Spider 1.51
 		<button onclick="shuffle(); deal(0)">New</button>
 		<button onclick="deal()">Replay</button>
-		<button id=suitlist onclick="changeSuit()"></button>
+		<button id=suitlist onclick="changeSuits()"></button>
   </p>
 <div class=row>
   <div id=s0 class=s onclick="if(ndealt==0){shuffle();deal();}else{next10();}"></div> 
@@ -101,7 +101,7 @@ if ('serviceWorker' in navigator) {
 		if(nsuit==2) {nsuit=4;}
 		elseif(nsuit==4) {nsuit=1;}
 		else{nsuit=2;}
-		showSuite();
+		showSuits();
 	}
 	function showSuits() {
 		suitlist=suits[0];
