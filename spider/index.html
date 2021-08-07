@@ -75,15 +75,15 @@ if ('serviceWorker' in navigator) {
 // Unlike the old game, I want to only use the DOM
 // Each move of n cards from x1, iy1 to x2, iy2 (an array of 5 items)
 	const expiry="Fri, 01 Jan 2038 00:00:01 GMT";
-  cards = []; // array of card div svg objects
-	ndealt=0; // how many cards have been dealt?
-	moves = [];
-	toMove = []; // array of cards to move
-  deck = []; // sort order for the cards
+  var cards = []; // array of card div svg objects
+	var ndealt=0; // how many cards have been dealt?
+	var moves = [];
+	var toMove = []; // array of cards to move
+  var deck = []; // sort order for the cards
   nfoundation=0; // how many foundation piles have gone up?
   nempty = 0; // computed # empty cascades
-  suits = ["&spadesuit;","&#9825;","&#9826;","&clubsuit;"];
-  nsuit = document.cookie.substr(5,1); if (nsuit=='') nsuit=2; // default is twp suits
+  const suits = ["&spadesuit;","&#9825;","&#9826;","&clubsuit;"];
+  var nsuit = document.cookie.substr(5,1); if (nsuit=='') nsuit=2; // default is twp suits
   faces = ["&#x1F482","&#x1f478;","&#x1F451;"]; // emojis for facecards
   vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 	back= '<svg viewBox="0 0 200 280">'
@@ -102,6 +102,7 @@ if ('serviceWorker' in navigator) {
 		else if(nsuit==4) {nsuit=1;}
 		else{nsuit=2;}
 		showSuits();
+		document.cookie="suit="+nsuit;
 	}
 	function showSuits() {
 		suitlist=suits[0];
