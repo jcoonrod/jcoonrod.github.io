@@ -102,13 +102,14 @@ if ('serviceWorker' in navigator) {
 		else if(nsuit==4) {nsuit=1;}
 		else{nsuit=2;}
 		showSuits();
-		document.cookie=`suit=${nsuit}; expires=${expiry}`;
 	}
 	function showSuits() {
 		suitlist=suits[0];
 		if(nsuit>1) suitlist+=suits[1];
 		if(nsuit==4) suitlist+=suits[2]+suits[3];
 		document.getElementById("suitlist").innerHTML=suitlist;
+		document.cookie="suit=; expires=Thu, 01 Jan 1970 00:00:00";
+		document.cookie=`suit=${nsuit}; expires=${expiry}`;
 	}		
 	function createCards(){ // creates 13, 26 or 52 dependuing on nsuit for spider
 		var size=( screen.width<600 ? 70 : 45);
@@ -131,6 +132,7 @@ if ('serviceWorker' in navigator) {
 	
 	// a function to Fisher-Yate shuffle two decks together (104 cards);
   function shuffle(){
+		console.log('Shuffle with',nsuit);
     for(i=103; i>0; i--) { // do 100 random interchanges
       let j=Math.floor(Math.random()*(i+1));
 			[deck[i],deck[j]]=[deck[j],deck[i]];
