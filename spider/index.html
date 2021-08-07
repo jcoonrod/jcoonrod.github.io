@@ -31,7 +31,7 @@
 </head>
   
 <body>
-	<p>1Click Spider 1.55
+	<p>Spider 1.56
 		<button onclick="shuffle(); deal(0)">New</button>
 		<button onclick="deal()">Replay</button>
 		<button id=suitlist onclick="changeSuits()"></button>
@@ -102,6 +102,7 @@ if ('serviceWorker' in navigator) {
 		else if(nsuit==4) {nsuit=1;}
 		else{nsuit=2;}
 		showSuits();
+		createCards();
 	}
 	function showSuits() {
 		suitlist=suits[0];
