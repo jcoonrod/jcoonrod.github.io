@@ -31,12 +31,10 @@
 </head>
   
 <body>
-	<p>One-Click Spider 1.41 
-  <button onclick="shuffle(); deal(0)">New</button>
-  <button onclick="deal()">Replay</button>
-<!--  <button onclick="undo()">Undo</button> -->
-  Suits:<select onchange="setSuit(event);">
-    <option value="1">1</option><option value="2">2</option><option value="4">4</option></select>
+	<p>1Click Spider 1.5
+		<button onclick="shuffle(); deal(0)">New</button>
+		<button onclick="deal()">Replay</button>
+		<button id=suitlist onclick="changeSuit()"></button>
   </p>
 <div class=row>
   <div id=s0 class=s onclick="if(ndealt==0){shuffle();deal();}else{next10();}"></div> 
@@ -96,9 +94,21 @@ if ('serviceWorker' in navigator) {
   var flips=[];
 	document.getElementById("s0").innerHTML=back;
 	createCards();
-
+	showSuits();
+	
 	// FUNCTIONS from top down	// make numbers bigger for phones
-  function setSuit(event) { nsuit=event.target.value; document.cookie='suit='+nsuit+';expires='+expiry+';path=/'; createCards();}
+	function changeSuits(){
+		if(nsuit==2) {nsuit=4;}
+		elseif(nsuit==4) {nsuit=1;}
+		else{nsuit=2;}
+		showSuite();
+	}
+	function showSuits() {
+		suitlist=suits[0];
+		if(nsuit>1) suitlist+=suits[1];
+		if(nsuit==4) suitlist+=suits[2]+suits[3];
+		document.getElementById("suitlist").innerHTML=suitlist;
+	}		
 	function createCards(){ // creates 13, 26 or 52 dependuing on nsuit for spider
 		var size=( screen.width<600 ? 70 : 45);
     for (n=0;n<(13*nsuit);n++) { // create 52 svg cards as strings in this array - innerHTML for divs
