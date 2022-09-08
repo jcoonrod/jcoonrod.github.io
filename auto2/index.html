@@ -84,9 +84,7 @@ if ('serviceWorker' in navigator) {
   var nsuit = document.cookie.substr(5,1); if (nsuit=='') nsuit=2; // default is twp suits
   faces = ["&#x1F482","&#x1f478;","&#x1F451;"]; // emojis for facecards
   vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-	back= '<svg viewBox="0 0 200 280">'
-      + '<rect x="2" y="2" rx="20" ry="20" width="194" height="274" style="fill:lightblue;stroke:white;stroke-width:8;" />'
-      + '<text font-size="120" x="97" y="137" file="white" text-anchor="middle" alignment-baseline="central">🕸️</text></svg>';
+	back='<object data="./bob.svg" width=100% height=auto>';
   var first=0; // index within the nodes for the first that could be moved
   var last=0; // " the top card
   var flips=[];
