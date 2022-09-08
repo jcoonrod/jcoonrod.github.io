@@ -1,0 +1,15 @@
+{
+  "name": "Autoplay Spider Solitaire",
+  "short_name": "auto2",
+  "icons": [{
+    "src": "spider.png",
+      "sizes": "128x128 192x192 512x512",
+		"type": "image/png",
+        "purpose": "any maskable"
+		}],
+  "lang": "en-US",
+  "start_url": "/auto2/index.html",
+  "display": "standalone",
+  "background_color": "white",
+  "theme_color": "white"
+}
