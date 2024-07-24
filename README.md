@@ -14,6 +14,8 @@ ADDITIONAL thanks to kosamari for solving the problem of updating PWAs hosted on
 
 The icon is based on the open source twemoji file for the crown emoji
 
+## 2024 Update: v1.6 - prevent translation and search popups.
+
 # Roadmap
 0.2 - playable and described in medium.
 0.3 - limit the automatic moves to Foundations
