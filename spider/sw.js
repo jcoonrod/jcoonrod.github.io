@@ -4,7 +4,9 @@ var CACHE_NAME = APP_PREFIX + VERSION
 var URLS = [                            // Add URL you want to cache in this list.
   '/spider/index.html',
 	'/spider/manifest.json',
-	'/spider/spider.png'
+	'/spider/spider.png',
+	'/spider/confetti.js',
+	'/spider/sw.js'
 ]
 
 // Respond with cached resources
