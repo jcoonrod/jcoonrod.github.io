@@ -55,7 +55,9 @@
     var val = n % 13; if (val>10) val++;  // jump over the extra queen
     cards[n]=127137+suit*16+val;
   }
-
+	shuffle();
+	deal();
+	showStacks();
 
 // a function to shuffle the deck;
   function shuffle(){
