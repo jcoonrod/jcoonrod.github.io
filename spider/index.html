@@ -32,7 +32,7 @@
 </head>
   
 <body tabindex="-1">
-	<p>Spider 1.6
+	<p>Spider 1.7
 		<button onclick="shuffle(); deal(0)">New</button>
 		<button onclick="deal()">Replay</button>
 		<button id=suitlist onclick="changeSuits()"></button>
@@ -258,8 +258,9 @@ if ('serviceWorker' in navigator) {
   	  }
 			if(!nmove && v1!==12) trySame(toMove,c1,j); // first try moving to same suit
 			if(!nmove && nsuit>1 && v1!==12 ) tryStack(toMove,v1,j); // then consider not-same-suit columns
-  	  if(!nmove) nmove=tryEmpty(toMove,j); // then consider empty columns
-    }
+//  	  if(!nmove) nmove=tryEmpty(toMove,j); // then consider empty columns
+			trywin();
+		}
 	}
 	function topCardValue(m) { // return -1 on empty, or 0-12 value of top card
 	  cascade2=document.getElementById('c'+m);
@@ -280,15 +281,19 @@ if ('serviceWorker' in navigator) {
     }
     return nmove;
 	}
+	// 11/24 - include moves to empty in the same scan
 	function tryStack(toMove,v1,j) {
 	  nmove=0;
 	  k=1;  // first run through possible stack-to-stack moves
     while(k<10 && !nmove) {
       m=(j+k)%10; // next cascade to the right
       k++;
-			v2=topCardValue(m);
-			console.log("Stack k="+k+" v1="+v1+" v2="+v2);
-      if(v2==(v1+1)) nmove=moveStack(toMove,j,m);
+			if(topCardValue(m)==-1) {nmove=moveStack(toMove,j,m);}
+			else {
+				v2=topCardValue(m);
+				console.log("Stack k="+k+" v1="+v1+" v2="+v2);
+    	  if(v2==(v1+1)) nmove=moveStack(toMove,j,m);
+			}
     }
     return nmove;
 	}
