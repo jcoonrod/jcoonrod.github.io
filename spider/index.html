@@ -33,9 +33,7 @@
 		<button onclick="shuffle(); deal(0)">New</button>
 		<button onclick="deal()">Replay</button>
 		<button id=suitlist onclick="changeSuits()"></button>
-		<button id="demo" class="button" onclick="removeButton(event)">
-			demo
-		  </button>
+		<span id="demo" onclick="removeButton(event)"> </span>
   </p>
 <div class=row>
   <div id=s0 class=s onclick="if(ndealt==0){shuffle();deal();}else{next10();}"></div> 
