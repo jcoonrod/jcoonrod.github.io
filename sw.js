@@ -1,8 +1,12 @@
 var APP_PREFIX = 'jc-freecell_'     // Identifier for this app (this needs to be consistent across every cache update)
-var VERSION = 'v1.6'              // Version of the off-line cache (change this value everytime you want to update cache)
+var VERSION = 'v1.7'              // Version of the off-line cache (change this value everytime you want to update cache)
 var CACHE_NAME = APP_PREFIX + VERSION
 var URLS = [                            // Add URL you want to cache in this list.
-  '/index.html'            // add path to those files here
+  './index.html',            // add path to those files here
+  './confetti.min.js',
+  './spider.png',
+  './manifest.json',
+  './sw.js'
 ]
 
 // Respond with cached resources

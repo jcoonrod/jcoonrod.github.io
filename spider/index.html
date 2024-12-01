@@ -3,12 +3,9 @@
 <html lang=en>
 <head>
   <link rel="manifest" href="manifest.json">
-	<link rel="apple-touch-icon" href="spider.png">
-	<meta name="google" content="notranslate">
-	<meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="green">
-  <meta name="apple-mobile-web-app-title" content="Spider Solitaire">
-	<link rel="canonical" href="https://jcoonrod.github.io/spider" />
+\	<meta name="google" content="notranslate">
+	<meta name="mobile-web-app-capable" content="yes">
+  	<link rel="canonical" href="https://jcoonrod.github.io/spider" />
 	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 	<meta http-equiv="Pragma" content="no-cache" />
 	<meta http-equiv="Expires" content="0" />
@@ -36,6 +33,9 @@
 		<button onclick="shuffle(); deal(0)">New</button>
 		<button onclick="deal()">Replay</button>
 		<button id=suitlist onclick="changeSuits()"></button>
+		<button id="demo" class="button" onclick="removeButton(event)">
+			demo
+		  </button>
   </p>
 <div class=row>
   <div id=s0 class=s onclick="if(ndealt==0){shuffle();deal();}else{next10();}"></div> 
@@ -63,6 +63,20 @@
   <div id=c8 class=c></div>
   <div id=c9 class=c></div>
 </div>
+<script src="confetti.min.js"></script>
+    <script>
+      let confetti = new Confetti("demo");
+    </script>
+
+    <script>
+		const demo=document.getElementById("demo");
+      function removeButton(t) {
+        (t.target.style.opacity = 0),
+          setTimeout(() => {
+            (t.target.style.visibility = ""), (t.target.style.opacity = 1);
+          }, 5e3);
+      }
+    </script>
 
 <script>
 window.onload = () => { 'use strict'; // register service worker
@@ -93,6 +107,7 @@ if ('serviceWorker' in navigator) {
   var first=0; // index within the nodes for the first that could be moved
   var last=0; // " the top card
   var flips=[];
+
 	document.getElementById("s0").innerHTML=back;
 	createCards();
 	showSuits();
@@ -225,42 +240,50 @@ if ('serviceWorker' in navigator) {
 
 	function tryMove(cardNo) { // version .2 moves a stack by reading the z values
 	  console.log('cardNo='+cardNo);
-    if(flips[cardNo]) { // first, learn about the clicked card
-      c1=deck[cardNo];
-      v1=c1%13; // value of clicked card
-      id='v'+cardNo; // node id
-      card1=document.getElementById(id);
-      z1=card1.style.zindex; // index within the nodes
-      cascade1=card1.parentNode;
-      j=parseInt(cascade1.id.substr(1));
-      nodes=cascade1.childNodes;
-  	  z2=nodes.length; // get the # of child nodes
-  	  console.log('z1='+z1+' z2='+z2+' id='+id+' v1='+v1);
+      if(flips[cardNo]) { // first, learn about the clicked card
+      	c1=deck[cardNo];
+		v1=c1%13; // value of clicked card
+		id='v'+cardNo; // node id
+		card1=document.getElementById(id);
+		z1=card1.style.zindex; // index within the nodes
+		cascade1=card1.parentNode;
+		j=parseInt(cascade1.id.substr(1));
+		nodes=cascade1.childNodes;
+		z2=nodes.length; // get the # of child nodes
+		console.log('z1='+z1+' z2='+z2+' id='+id+' v1='+v1);
 
-  	  // next - if this is more than one card, are they in the correct order?
-  	  nmove=0;
-  	  z=z1; v=v1; c=c1;
-  	  while(z<z2 && !nmove) { // make sure items in stack can move together
-  	    c2=deck[parseInt(nodes[z].id.substr(1))];
-  	    console.log('Check z='+z+' c='+c+' c2='+c2);
-  	    if(c!==(c2+1)) nmove=1;
-  	    c=c2;
-  	    z++;
-  	  }
-  	  if(!nmove && (v1==12) && ((z2-z1)==12)) { // detect a winning stack
-  	    console.log('Winning stack '+j+' cardNo='+cardNo);
-  	    moveUp(j,cardNo);
-  	    nmove=13;
-  	  }
-  	  if(!nmove) {
-  	    toMove.length=0;
-  	    for(z=z1;z<=z2;z++) toMove.push( parseInt(nodes[z-1].id.substr(1)) );
-  	  }
-			if(!nmove && v1!==12) trySame(toMove,c1,j); // first try moving to same suit
-			if(!nmove && nsuit>1 && v1!==12 ) tryStack(toMove,v1,j); // then consider not-same-suit columns
-//  	  if(!nmove) nmove=tryEmpty(toMove,j); // then consider empty columns
-			trywin();
+		// next - if this is more than one card, are they in the correct order?
+		nmove=0;
+		z=z1; v=v1; c=c1;
+		while(z<z2 && !nmove) { // make sure items in stack can move together
+			c2=deck[parseInt(nodes[z].id.substr(1))];
+			console.log('Check z='+z+' c='+c+' c2='+c2);
+			if(c!==(c2+1)) nmove=1;
+			c=c2;
+			z++;
 		}
+		if(!nmove && (v1==12) && ((z2-z1)==12)) { // detect a winning stack
+			console.log('Winning stack '+j+' cardNo='+cardNo);
+			moveUp(j,cardNo);
+			nmove=13;
+		}
+		if(!nmove) {
+			toMove.length=0;
+			for(z=z1;z<=z2;z++) toMove.push( parseInt(nodes[z-1].id.substr(1)) );
+		}
+				if(!nmove && v1!==12) trySame(toMove,c1,j); // first try moving to same suit
+				if(!nmove && nsuit>1 && v1!==12 ) tryStack(toMove,v1,j); // then consider not-same-suit columns
+				if(!nmove) nmove=tryEmpty(toMove,j); // then consider empty columns
+		}
+		trywin();
+	}
+	function trywin(){
+		var win=0;
+		if(nfoundation==8) {
+			let clickEvent = new Event('click');
+			demo.dispatchEvent(clickEvent);
+		}
+
 	}
 	function topCardValue(m) { // return -1 on empty, or 0-12 value of top card
 	  cascade2=document.getElementById('c'+m);
@@ -344,6 +367,7 @@ if ('serviceWorker' in navigator) {
   const getSuit = s => Math.floor(parseInt(s.substring(1),10)/13);
   const getVal = s => parseInt(s.substring(1),10) % 13;
   const getColor = s => (getSuit(s)==0 || getSuit(s)==3) ? 'b' : 'r';
+
 </script>
 </body>
 </html>
