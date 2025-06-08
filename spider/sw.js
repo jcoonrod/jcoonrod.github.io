@@ -1,11 +1,11 @@
 var APP_PREFIX = 'spider_'     // Identifier for this app (this needs to be consistent across every cache update)
-var VERSION = 'v1.5'              // Version of the off-line cache (change this value everytime you want to update cache)
+var VERSION = 'v1.8'              // Version of the off-line cache (change this value everytime you want to update cache)
 var CACHE_NAME = APP_PREFIX + VERSION
 var URLS = [                            // Add URL you want to cache in this list.
   '/spider/index.html',
 	'/spider/manifest.json',
 	'/spider/spider.png',
-	'/spider/confetti.js',
+	'/spider/confetti.min.js',
 	'/spider/sw.js'
 ]
 
