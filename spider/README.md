@@ -4,6 +4,7 @@ This is a free, web-based, no-ad version based on some of the same code as my On
 
 # What's New
 
+* Version 1.8 - fix pwd bug and allow confetti
 * Version 1.27 - use emoji that work on Android 4.4
 * Version 1.24 - bug fix to kings don't stack on top of aces of the next suit
 * Version 1.2 - allow the game to start from clicking the "deal" deck
