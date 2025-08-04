@@ -26,10 +26,11 @@
 </head>
   
 <body tabindex="-1">
-	<p>Spider 1.8
+	<p>Spider 1.9
 		<button onclick="shuffle(); deal(0)">New</button>
 		<button onclick="deal()">Replay</button>
 		<button id=suitlist onclick="changeSuits()"></button>
+		<div id="sofar"></div>
 		<span id="demo" onclick="removeButton(event)"> </span>
   </p>
 <div class=row>
@@ -66,6 +67,7 @@
     <script>
 		const demo=document.getElementById("demo");
       function removeButton(t) {
+		wins++;
         (t.target.style.opacity = 0),
           setTimeout(() => {
             (t.target.style.visibility = ""), (t.target.style.opacity = 1);
@@ -85,7 +87,10 @@ if ('serviceWorker' in navigator) {
 // Unlike the old game, I want to only use the DOM
 // Each move of n cards from x1, iy1 to x2, iy2 (an array of 5 items)
 	const expiry="Fri, 01 Jan 2038 00:00:01 GMT";
-  var cards = []; // array of card div svg objects
+	const sofar=document.getElementById("sofar");
+	var times = 0;
+	var wins = 0;
+	var cards = []; // array of card div svg objects
 	var ndealt=0; // how many cards have been dealt?
 	var moves = [];
 	var toMove = []; // array of cards to move
@@ -106,8 +111,12 @@ if ('serviceWorker' in navigator) {
 	document.getElementById("s0").innerHTML=back;
 	createCards();
 	showSuits();
+	showScores();
 	
 	// FUNCTIONS from top down	// make numbers bigger for phones
+	function showScores(){
+		sofar.innerHTML=wins.toString()+'/'+times.toString();
+	}
 	function changeSuits(){
 		if(nsuit==2) {nsuit=4;}
 		else if(nsuit==4) {nsuit=1;}
@@ -145,6 +154,7 @@ if ('serviceWorker' in navigator) {
 	// a function to Fisher-Yate shuffle two decks together (104 cards);
   function shuffle(){
 		console.log('Shuffle with',nsuit);
+		times++;
     for(i=103; i>0; i--) { // do 100 random interchanges
       let j=Math.floor(Math.random()*(i+1));
 			[deck[i],deck[j]]=[deck[j],deck[i]];
