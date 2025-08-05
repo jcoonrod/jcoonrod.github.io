@@ -30,7 +30,7 @@
 		<button onclick="shuffle(); deal(0)">New</button>
 		<button onclick="deal()">Replay</button>
 		<button id=suitlist onclick="changeSuits()"></button>
-		<div id="sofar"></div>
+		<span id="sofar">      </span>
 		<span id="demo" onclick="removeButton(event)"> </span>
   </p>
 <div class=row>
@@ -67,7 +67,7 @@
     <script>
 		const demo=document.getElementById("demo");
       function removeButton(t) {
-		wins++;
+		wins++; showScores();
         (t.target.style.opacity = 0),
           setTimeout(() => {
             (t.target.style.visibility = ""), (t.target.style.opacity = 1);
@@ -88,8 +88,9 @@ if ('serviceWorker' in navigator) {
 // Each move of n cards from x1, iy1 to x2, iy2 (an array of 5 items)
 	const expiry="Fri, 01 Jan 2038 00:00:01 GMT";
 	const sofar=document.getElementById("sofar");
-	var times = 0;
-	var wins = 0;
+	if(localStorage.times==null) localStorage.times=0;
+	if(localStorage.wins==null) localStorage.wins=0;
+	if(localStorage.nsuit==null) localStorage.nsuit=2; //default number of suits
 	var cards = []; // array of card div svg objects
 	var ndealt=0; // how many cards have been dealt?
 	var moves = [];
@@ -98,7 +99,6 @@ if ('serviceWorker' in navigator) {
   nfoundation=0; // how many foundation piles have gone up?
   nempty = 0; // computed # empty cascades
   const suits = ["&spadesuit;","&#9825;","&#9826;","&clubsuit;"];
-  var nsuit = document.cookie.substr(5,1); if (nsuit=='') nsuit=2; // default is twp suits
   faces = ["&#x1F482","&#x1f478;","&#x1F451;"]; // emojis for facecards
   vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 	back= '<svg viewBox="0 0 200 280">'
@@ -115,26 +115,26 @@ if ('serviceWorker' in navigator) {
 	
 	// FUNCTIONS from top down	// make numbers bigger for phones
 	function showScores(){
-		sofar.innerHTML=wins.toString()+'/'+times.toString();
+		let w=localStorage.wins;
+		let t=localStorage.times;
+		sofar.innerHTML=localStorage.wins+'/'+localStorage.times;
 	}
 	function changeSuits(){
-		if(nsuit==2) {nsuit=4;}
-		else if(nsuit==4) {nsuit=1;}
-		else{nsuit=2;}
+		if(localStorage.nsuit==2) {localStorage.nsuit=4;}
+		else if(localStorage.nsuit==4) {localStorage.nsuit=1;}
+		else{localStorage.nsuit=2;}
 		showSuits();
 		createCards();
 	}
 	function showSuits() {
 		suitlist=suits[0];
-		if(nsuit>1) suitlist+=suits[1];
-		if(nsuit==4) suitlist+=suits[2]+suits[3];
+		if(localStorage.nsuit>1) suitlist+=suits[1];
+		if(localStorage.nsuit==4) suitlist+=suits[2]+suits[3];
 		document.getElementById("suitlist").innerHTML=suitlist;
-		document.cookie="suit=; expires=Thu, 01 Jan 1970 00:00:00";
-		document.cookie=`suit=${nsuit}; expires=${expiry}`;
 	}		
 	function createCards(){ // creates 13, 26 or 52 dependuing on nsuit for spider
 		var size=( screen.width<600 ? 70 : 45);
-    for (n=0;n<(13*nsuit);n++) { // create 52 svg cards as strings in this array - innerHTML for divs
+    for (n=0;n<(13*localStorage.nsuit);n++) { // create 52 svg cards as strings in this array - innerHTML for divs
 			var suit=Math.floor(n/13);
 			var f=''; if(suit==1 || suit==2) f=' fill="red"'; // optionally paint the red suits red
 			var val = n % 13;
@@ -146,15 +146,14 @@ if ('serviceWorker' in navigator) {
       + '<text x="'+(190-size)+'" y="'+size+'" font-size="'+size+'"'+f+'>'+suits[suit]+'</text></svg>';
 		}
 		for (i=0;i<104;i++) { // initialize the deck
-		  deck[i] = i % (nsuit*13) ; // this would run up to 13, 26 or 52
+		  deck[i] = i % (localStorage.nsuit*13) ; // this would run up to 13, 26 or 52
       flips[i]=0; // initially show only the backs
 		}
 	}
 	
 	// a function to Fisher-Yate shuffle two decks together (104 cards);
   function shuffle(){
-		console.log('Shuffle with',nsuit);
-		times++;
+		localStorage.times++; showScores();
     for(i=103; i>0; i--) { // do 100 random interchanges
       let j=Math.floor(Math.random()*(i+1));
 			[deck[i],deck[j]]=[deck[j],deck[i]];
