@@ -26,7 +26,7 @@
 </head>
   
 <body tabindex="-1">
-	<p>Spider 1.9
+	<p>Spider 2.0
 		<button onclick="shuffle(); deal(0)">New</button>
 		<button onclick="deal()">Replay</button>
 		<button id=suitlist onclick="changeSuits()"></button>
@@ -243,7 +243,7 @@ if ('serviceWorker' in navigator) {
 	
 
 	function tryMove(cardNo) { // version .2 moves a stack by reading the z values
-	  console.log('cardNo='+cardNo);
+//	  console.log('cardNo='+cardNo);
       if(flips[cardNo]) { // first, learn about the clicked card
       	c1=deck[cardNo];
 		v1=c1%13; // value of clicked card
@@ -254,20 +254,20 @@ if ('serviceWorker' in navigator) {
 		j=parseInt(cascade1.id.substr(1));
 		nodes=cascade1.childNodes;
 		z2=nodes.length; // get the # of child nodes
-		console.log('z1='+z1+' z2='+z2+' id='+id+' v1='+v1);
+//		console.log('z1='+z1+' z2='+z2+' id='+id+' v1='+v1);
 
 		// next - if this is more than one card, are they in the correct order?
 		nmove=0;
 		z=z1; v=v1; c=c1;
 		while(z<z2 && !nmove) { // make sure items in stack can move together
 			c2=deck[parseInt(nodes[z].id.substr(1))];
-			console.log('Check z='+z+' c='+c+' c2='+c2);
+//			console.log('Check z='+z+' c='+c+' c2='+c2);
 			if(c!==(c2+1)) nmove=1;
 			c=c2;
 			z++;
 		}
 		if(!nmove && (v1==12) && ((z2-z1)==12)) { // detect a winning stack
-			console.log('Winning stack '+j+' cardNo='+cardNo);
+//			console.log('Winning stack '+j+' cardNo='+cardNo);
 			moveUp(j,cardNo);
 			nmove=13;
 		}
@@ -276,7 +276,7 @@ if ('serviceWorker' in navigator) {
 			for(z=z1;z<=z2;z++) toMove.push( parseInt(nodes[z-1].id.substr(1)) );
 		}
 				if(!nmove && v1!==12) trySame(toMove,c1,j); // first try moving to same suit
-				if(!nmove && nsuit>1 && v1!==12 ) tryStack(toMove,v1,j); // then consider not-same-suit columns
+				if(!nmove && localStorage.nsuit>1 && v1!==12 ) tryStack(toMove,v1,j); // then consider not-same-suit columns
 				if(!nmove) nmove=tryEmpty(toMove,j); // then consider empty columns
 		}
 		trywin();
@@ -303,7 +303,7 @@ if ('serviceWorker' in navigator) {
 			m=(j+k)%10; // next cascade to the right
       k++;
 			c2=deck[topCardId(m).substr(1)];
-			console.log("Same k="+k+" c1="+c1+" c2="+c2);
+//			console.log("Same k="+k+" c1="+c1+" c2="+c2);
 			if(c2==(c1+1)) nmove=moveStack(toMove,j,m);
     }
     return nmove;
@@ -318,7 +318,7 @@ if ('serviceWorker' in navigator) {
 			if(topCardValue(m)==-1) {nmove=moveStack(toMove,j,m);}
 			else {
 				v2=topCardValue(m);
-				console.log("Stack k="+k+" v1="+v1+" v2="+v2);
+//				console.log("Stack k="+k+" v1="+v1+" v2="+v2);
     	  if(v2==(v1+1)) nmove=moveStack(toMove,j,m);
 			}
     }
@@ -334,7 +334,7 @@ if ('serviceWorker' in navigator) {
 	}
 
 	function moveStack(toMove,j,m){
-		console.log("moveStack j="+j+" m="+m);
+//		console.log("moveStack j="+j+" m="+m);
 	  cascade1=document.getElementById('c'+j);
 	  for(i=0;i<toMove.length;i++) cascade1.removeChild(cascade1.lastChild);
 	  for(i=0;i<toMove.length;i++) appendCard(toMove[i],m,1);
