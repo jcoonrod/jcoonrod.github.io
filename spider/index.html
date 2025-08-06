@@ -26,7 +26,7 @@
 </head>
   
 <body tabindex="-1">
-	<p>Spider 2.0
+	<p>Spider 2.1
 		<button onclick="shuffle(); deal(0)">New</button>
 		<button onclick="deal()">Replay</button>
 		<button id=suitlist onclick="changeSuits()"></button>
@@ -67,7 +67,6 @@
     <script>
 		const demo=document.getElementById("demo");
       function removeButton(t) {
-		wins++; showScores();
         (t.target.style.opacity = 0),
           setTimeout(() => {
             (t.target.style.visibility = ""), (t.target.style.opacity = 1);
@@ -284,6 +283,8 @@ if ('serviceWorker' in navigator) {
 	function trywin(){
 		var win=0;
 		if(nfoundation==8) {
+			localStorage.wins++;
+			showScores();
 			let clickEvent = new Event('click');
 			demo.dispatchEvent(clickEvent);
 		}
