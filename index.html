@@ -32,7 +32,7 @@
 </head>
   
 <body tabindex="-1">
-  <p>One-Click FreeCell 1.6 &#x1F482;
+  <p>One-Click FreeCell 1.6t &#x1F482;
   <button onclick="shuffle(); deal()">New Game</button>
   <button onclick="deal()">Replay</button>
   <button onclick="undo()">Undo</button>
@@ -188,6 +188,7 @@ if ('serviceWorker' in navigator) {
       i=1; // cascades beyond k
       while(i<8 && !nmove) {
         k=(j+i) % 8;
+				alert("k="+k);
         destId=topCardId(k); val2=getVal(destId); color2=getColor(destId);
         if((color!==color2 && val+1==val2)) {
           nmove++;
