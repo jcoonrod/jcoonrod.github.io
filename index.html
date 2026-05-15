@@ -32,10 +32,11 @@
 </head>
   
 <body tabindex="-1">
-  <p>One-Click FreeCell 1.6t &#x1F482;
+  <p>One-Click FreeCell 1.7 &#x1F482;
   <button onclick="shuffle(); deal()">New Game</button>
   <button onclick="deal()">Replay</button>
   <button onclick="undo()">Undo</button>
+	<span id=xt>  </span>
   </p>
   <div class=row>
   <div id=s0 class=s onclick="dropFree(0)"></div>
@@ -144,6 +145,8 @@ if ('serviceWorker' in navigator) {
   }
 	
   function popStack(j) { // a cascade has been clicked
+		xtp=document.getElementById("xt");
+		xtp.textContent="j="+j;
     stackable(j);
     if (!tryMove(j)) {
       if(!tryEmpty(j)) tryFreeCells(j);} // try either moving a cascade or a car to a freecell
@@ -188,7 +191,6 @@ if ('serviceWorker' in navigator) {
       i=1; // cascades beyond k
       while(i<8 && !nmove) {
         k=(j+i) % 8;
-				alert("k="+k);
         destId=topCardId(k); val2=getVal(destId); color2=getColor(destId);
         if((color!==color2 && val+1==val2)) {
           nmove++;
