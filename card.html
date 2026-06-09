@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servo SVG Demo</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        svg {
+            width: 128px;
+            height: 128px;
+            margin: 0 auto;
+            display: block;
+        }
+        p {
+            margin-top: 1.5rem;
+            color: #374151;
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Inline SVG element supported by Servo's resvg engine -->
+        <svg viewBox="0 0 200 280" fill="none">
+	<rect x="2" y="2" rx="20" ry="20" width="194" height="274" style="fill:white;stroke:black;stroke-width:4;" /> 
+	<text font-size="120" x="97" y="137" text-anchor="middle" alignment-baseline="central"</text>
+	<text x="15" y="25" font-size="25"></text>
+	<text x="165" y="25" font-size="25">X</text>
+            <circle cx="8" cy="8" r="7" stroke="black" stroke-width="0.3"/>
+<circle cx="5" cy="8" r="0.6" fill="black"/>
+<circle cx="11" cy="8" r="0.6" fill="black"/>
+<path d="M5 11Q8 13 11 11" stroke="black" stroke-width="0.4"/>
+<path d="M1.5 5 H14.5 L16 0L12 3L8 0L4 3L0 0z" fill="gold"/>
+<path d="M8 16L10 13H6z" fill="black"/>
+        </svg>
+        <p>Inline SVG works perfectly in Servo!</p>
+    </div>
+
+</body>
+</html>
+
+
+
+
+

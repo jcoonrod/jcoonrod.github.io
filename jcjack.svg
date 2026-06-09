@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="800px" height="800px" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="8" cy="8" r="7" stroke="black" stroke-width="0.3"/>
+<circle cx="5" cy="8" r="0.6" fill="black"/>
+<circle cx="11" cy="8" r="0.6" fill="black"/>
+<path d="M5 11Q8 13 11 11" stroke="black" stroke-width="0.4"/>
+<path d="M6 10 Q7 11 8 10Q9 11 10 10" stroke="black" stroke-width="0.4"/>
+<path d="M0 6Q8 -7 16 6z" fill="brown"/>
+</svg>
