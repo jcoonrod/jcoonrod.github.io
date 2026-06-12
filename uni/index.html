@@ -18,12 +18,15 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
 </head>
 <body>
-  <p><a href=/>&#9776;</a> Unicode Freecell 1<button onclick="startGame()">Shuffle</button></p>
+  <p><a href=/>&#9776;</a> Unicode Freecell 1
+    <button onclick="startGame()">Shuffle</button>
+  <button onclick="deal()">Replay</button>
+  <button onclick="undo()">Undo</button></p>
   <div class=row>
-  <div id=s0 class=s></div>
-  <div id=s1 class=s"></div>
-  <div id=s2 class=s"></div>
-  <div id=s3 class=s"></div>
+  <div id=s0 class=s onclick="dropFree(0)"></div>
+  <div id=s1 class=s onclick="dropFree(1)"></div>
+  <div id=s2 class=s onclick="dropFree(2)"></div>
+  <div id=s3 class=s onclick="dropFree(3)"></div>
   <div id=s4 class=s"></div>
   <div id=s5 class=s"></div>
   <div id=s6 class=s"></div>
@@ -31,14 +34,14 @@
 </div>
 <div class=row><h2>&nbsp;</h2></div>
 <div class=row>
-  <div id=c0 class=c></div>
-  <div id=c1 class=c></div>
-  <div id=c2 class=c></div>
-  <div id=c3 class=c></div>
-  <div id=c4 class=c></div>
-  <div id=c5 class=c></div>
-  <div id=c6 class=c></div>
-  <div id=c7 class=c></div>
+ <div id=c0 class=c onclick="popStack(0)"></div>
+  <div id=c1 class=c onclick="popStack(1)"></div>
+  <div id=c2 class=c onclick="popStack(2)"></div>
+  <div id=c3 class=c onclick="popStack(3)"></div>
+  <div id=c4 class=c onclick="popStack(4)"></div>
+  <div id=c5 class=c onclick="popStack(5)"></div>
+  <div id=c6 class=c onclick="popStack(6)"></div>
+  <div id=c7 class=c onclick="popStack(7)"></div>
 </div>
 <script>
 // Set up a 1-d array of the unicode values for the cards 0-51
