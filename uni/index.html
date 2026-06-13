@@ -4,9 +4,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>Unicode Cards</title>
+  <title>Unicode Freecell</title>
   <style>
-    body {background:green;padding:0;margin:0;font-family:sans-serif;}
+		@font-face {
+  font-family: 'Noto Sans Symbols 2';
+  src: url('NotoSansSymbols2-Regular.ttf') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: 'MyCustomFont', sans-serif;
+}
+    body {font-family: 'Noto Sans Symbols 2'; background:green;padding:0;margin:0;}
     p, p>a {color:white;}
   div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;}
   div.a {position:absolute;background:red;color:white;top:40%;left:40%;padding:1vw;font-size:3vw;}
