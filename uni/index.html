@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <!-- Freecell using Unicode-6 symbols for the cards -->
+ <!-- Keep as similar to the main index as possible, note differences-->
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>Unicode Freecell</title>
+  <!-- the fontface is different from base-->
   <style>
 		@font-face {
 			font-family: 'Noto Sans Symbols 2';
@@ -17,13 +19,13 @@
   div.a {position:absolute;background:red;color:white;top:40%;left:40%;padding:1vw;font-size:3vw;}
   div.s {width:10%;height:14vw; background:lightgreen;}
   div.c {height:80vw;width:10%;position:relative;}
-  div.r {line-height:85%; letter-spacing:80%; font-size:14vw; color:red; background:white;}
-  div.b {line-height:85%; letter-spacing:80%; font-size:14vw; background:white;}
+  div.r {line-height:85%; letter-spacing:80%; font-size:18vw; color:red; background:white;}
+  div.b {line-height:85%; letter-spacing:80%; font-size:18vw; background:white;}
   </style>
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
 </head>
 <body>
-  <p><a href=/>&#9776;</a> Unicode Freecell 0.2
+  <p><a href=/>&#9776;</a> Unicode Freecell 0.4
     <button onclick="startGame()">Shuffle</button>
   <button onclick="deal()">Replay</button>
   <button onclick="undo()">Undo</button><span id=xt>  </span></p>
@@ -56,7 +58,8 @@
   aces = [[],[],[],[]]; // 2-d stacks in the aces positions
   freecells = [-1,-1,-1,-1]; // 4 free cells -1 indicates they are free
   stacks = [[],[],[],[],[],[],[],[]]; // 8 column stacks of cards
-
+  moves=[]; 
+<!-- this is the main difference to the base-->
   for (n=0;n<52;n++) {
     deck[n]=n; // start out without a shuffle
     var suit=Math.floor(n/13);
@@ -101,11 +104,12 @@ function showStack(stack,j){
     var cardNo=stack[i];
     var c='b'; if(cardNo>12 && cardNo<39) c='r'; // are the cards red or black?
     card.className=c;
+// this next line is difference as is y muliplier
     uni="&#"+cards[cardNo]+";";
     card.innerHTML=uni;
     card.style.zindex=i.toString();
     card.style.position='absolute';
-    y=i*3;
+    y=i*4;
     card.style.top=y.toString()+"vw";
     column.appendChild(card);
   }
@@ -131,6 +135,7 @@ function clearBoard(){
   }
 	
   function popStack(j) { // a cascade has been clicked
+    console.log("popstack:"+j);
 		xtp=document.getElementById("xt");
 		xtp.textContent="j="+j;
     stackable(j);
@@ -154,6 +159,7 @@ function clearBoard(){
   }
   
   function removeStack(j,m) {
+    console.log("removeStack:"+j+" "+m);
     tomove.length=0; // clear it off
     cascade=document.getElementById("c"+j);
     for(n=m;n<=last;n++) {
@@ -167,6 +173,7 @@ function clearBoard(){
   }
 
   function tryMove(j) { // attempt to move a cascade to another
+    console.log("tryMove:"+j);
     tomove = []; // array to hold cards that will move
     computeFree();
     if(nmax<(last-first+1)) first=last-nmax+1; // limit range
@@ -373,9 +380,11 @@ function clearBoard(){
 
   // Move a card from one place to another
   function popCard(j,srcId,destId){
+    console.log("popCard:"+j+" "+srcId+" "+destId);
     cascade=document.getElementById("c"+j);
     src=document.getElementById(srcId);
     dest=document.getElementById(destId);
+    console.log("src:"+src);
     if(dest) dest.innerHTML=src.innerHTML;
     cascade.removeChild(cascade.lastChild);
     return 1;
