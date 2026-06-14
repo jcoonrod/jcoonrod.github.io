@@ -14,7 +14,8 @@
   <meta name="description" content="FreeCell Game by John Coonrod using DIV instead of images"/>
 	<title>Freecell via DIV</title>
   <style>
-    body {background:green;padding:0;margin:0;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "ModernEmoji", sans-serif; font-weight:bold;}
+    @font-face {font-family: 'ModernEmoji'; src: url('twemoji.woff2') format('woff2'); unicode-range: U+1F000-1FFFF;}
+    body {background:green;padding:0;margin:0;font-family: "ModernEmoji", sans-serif; font-weight:bold;}
     p, p>a {color:white;}
     div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;}
     div.a {position:absolute;background:red;color:white;top:40%;left:40%;padding:1vw;font-size:3vw;}
@@ -36,7 +37,7 @@
 </head>
   
 <body tabindex="-1">
-  <p>FreeCell via DIV 0.3 &#x1F482;
+  <p>FreeCell via DIV 0.4 &#x1F482;
   <button onclick="shuffle(); deal()">New Game</button>
   <button onclick="deal()">Replay</button>
   <button onclick="undo()">Undo</button>
