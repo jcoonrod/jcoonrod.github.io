@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!-- FreeCell using div and emoji 1.1 for the cards - all in one HTML page -->
- <!-- Explanation of differences from base as they occur-->
+<!-- Explanation of differences from base as they occur-->
+<!-- Includes a workaround for Servo to ensure row and cards all have lower z-index than the column onclick-->
 <html lang=en>
 <head>
   <link rel="canonical" href="https://jcoonrod.github.io/div" />
@@ -14,12 +15,16 @@
   <meta name="description" content="FreeCell Game by John Coonrod using DIV instead of images"/>
 	<title>Freecell via DIV</title>
   <style>
-    @font-face {font-family: 'ModernEmoji'; src: url('twemoji.woff2') format('woff2'); unicode-range: U+1F000-1FFFF;}
-    body {background:green;padding:0;margin:0;font-family: "ModernEmoji", sans-serif; font-weight:bold;}
+@font-face {
+			font-family: 'Noto Sans Symbols 2';
+			src: url('NotoSansSymbols2-Regular.ttf') format('truetype');
+			font-weight: normal;font-style: normal;font-display: swap;
+		}
+   body {font-family: 'Noto Sans Symbols 2'; background:green;padding:0;margin:0;}
     p, p>a {color:white;}
-    div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;}
+    div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;z-index:0;}
     div.a {position:absolute;background:red;color:white;top:40%;left:40%;padding:1vw;font-size:3vw;}
-    div.c {height:80vw;width:11%;position:relative;}
+    div.c {height:80vw;width:12.5vw;position:relative;z-index:200;padding:0;border:0;margin:0;}
     .r {color:red;}
     .b {color:black;}
     h2{font-size:3vw;padding:0;margin:0;font-weight:bold;}
@@ -30,14 +35,14 @@
       border-style: solid;
       border-radius: 1vw;
       border-color:black; border-width:0.5vw;
-      width:100%; 
+      width:11vw; 
       height:17vw;
       }
   </style>
 </head>
   
 <body tabindex="-1">
-  <p>FreeCell via DIV 0.4 &#x1F482;
+  <p>FreeCell via DIV 0.51 
   <button onclick="shuffle(); deal()">New Game</button>
   <button onclick="deal()">Replay</button>
   <button onclick="undo()">Undo</button>
@@ -272,7 +277,7 @@
     card.classList.add("card");
     card.innerHTML=cards[cardNo];
     card.id="v"+cardNo;
-    card.style.zindex=z.toString();
+    card.style.zIndex=z.toString();
     card.style.position='absolute';
     card.style.width='100%';
     y=(z-1)*5;
