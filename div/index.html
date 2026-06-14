@@ -36,7 +36,7 @@
 </head>
   
 <body tabindex="-1">
-  <p>FreeCell via DIV 0.1 &#x1F482;
+  <p>FreeCell via DIV 0.2 &#x1F482;
   <button onclick="shuffle(); deal()">New Game</button>
   <button onclick="deal()">Replay</button>
   <button onclick="undo()">Undo</button>
@@ -274,7 +274,7 @@
     card.style.zindex=z.toString();
     card.style.position='absolute';
     card.style.width='100%';
-    y=(screen.width < 600 ? (z-1)*4 :  (z-1)*3);
+    y=(z-1)*5;
     card.style.top=y.toString()+"vw";
     cascade.appendChild(card);
 	}
