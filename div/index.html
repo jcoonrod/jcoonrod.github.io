@@ -1,50 +1,57 @@
 <!DOCTYPE html>
-<!-- FreeCell using svg for the cards - all in one HTML page -->
+<!-- FreeCell using div and emoji 1.1 for the cards - all in one HTML page -->
+ <!-- Explanation of differences from base as they occur-->
 <html lang=en>
 <head>
   <link rel="icon" type="image/png" href="jc.png"/>
-	<link rel="manifest" href="/manifest.json">
-	<link rel="apple-touch-icon" href="jc192.png">
-	<meta name="mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-status-bar-style" content="green">
-  <meta name="mobile-web-app-title" content="FreeCell">
-	<link rel="canonical" href="https://jcoonrod.github.io" />
+  <link rel="canonical" href="https://jcoonrod.github.io/div" />
 	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 	<meta name="google" content="notranslate">
 	<meta http-equiv="Pragma" content="no-cache" />
 	<meta http-equiv="Expires" content="0" />
-  <link rel='shortcut icon' href='/jc.png'>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <meta name="theme-color" content="green"/>
-  <meta name="description" content="One-Click FreeCell Game by John Coonrod"/>
-	<title>1-Click Freecell</title>
+  <meta name="description" content="FreeCell Game by John Coonrod using DIV instead of images"/>
+	<title>Freecell via DIV</title>
   <style>
-    body {background:green;padding:0;margin:0;font-family:sans-serif;font-weight:normal;}
+    body {background:green;padding:0;margin:0;font-family:sans-serif;font-weight:bold;}
     p, p>a {color:white;}
     div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;}
     div.a {position:absolute;background:red;color:white;top:40%;left:40%;padding:1vw;font-size:3vw;}
-    div.s {width:11%;height:14vw; background:lightgreen;}
     div.c {height:80vw;width:11%;position:relative;}
+    .r {color:red;}
+    .b {color:black;}
+    h2{font-size:2vw;padding:0;margin:0;font-weight:normal;}
+    h1{font-size:8vw;padding:0;margin:0;font-weight:normal;text-align: center;}
+    .card {
+      background: white;
+      padding: 0.5vw;
+      border-style: solid;
+      border-radius: 1vw;
+      border-color:black; border-width:0.5vw;
+      width:100%; 
+      height:17vw;
+      }
   </style>
 </head>
   
 <body tabindex="-1">
-  <p>One-Click FreeCell 1.8 &#x1F482;
+  <p>FreeCell via DIV 0.1 &#x1F482;
   <button onclick="shuffle(); deal()">New Game</button>
   <button onclick="deal()">Replay</button>
   <button onclick="undo()">Undo</button>
 	<span id=xt>  </span>
   </p>
   <div class=row>
-  <div id=s0 class=s onclick="dropFree(0)"></div>
-  <div id=s1 class=s onclick="dropFree(1)"></div>
-  <div id=s2 class=s onclick="dropFree(2)"></div>
-  <div id=s3 class=s onclick="dropFree(3)"></div>
-  <div id=a0 class=s></div>
-  <div id=a1 class=s></div>
-  <div id=a2 class=s></div>
-  <div id=a3 class=s></div>
+  <div id=s0 class=card onclick="dropFree(0)"></div>
+  <div id=s1 class=card onclick="dropFree(1)"></div>
+  <div id=s2 class=card onclick="dropFree(2)"></div>
+  <div id=s3 class=card onclick="dropFree(3)"></div>
+  <div id=a0 class=card></div>
+  <div id=a1 class=card></div>
+  <div id=a2 class=card></div>
+  <div id=a3 class=card></div>
 </div>
 <div class=row>&nbsp;</div>
 <div class=row>
@@ -59,12 +66,6 @@
 </div>
 
 <script>
-window.onload = () => { 'use strict'; // register service worker
-if ('serviceWorker' in navigator) {
-   navigator.serviceWorker.register('./sw.js');
-  }
-}
-
 // Set up a 1-d array of the unicode values for the cards 0-51
 // Note - Unicode sets up 16 cards per suit, including two queens
 // Unlike the old game, I want to only use the DOM
@@ -78,7 +79,7 @@ if ('serviceWorker' in navigator) {
   nempty = 0; // computed # empty cascades
   aces = [-1,-1,-1,-1]; // holds the card value if filled
   suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
-  faces = ["&#x1F482","&#x1F478;","&#x1F934;"]; // emojis for facecards
+  faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
   vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
   var nodes = []; // this gets defined by stackable
   var first=0; // index within the nodes for the first that could be moved
@@ -88,17 +89,19 @@ if ('serviceWorker' in navigator) {
 	// FUNCTIONS from top down	// make numbers bigger for phones
 	function createCards(){
 		var size=( screen.width<600 ? 70 : 45);	
-    for (n=0;n<52;n++) { // create 52 svg cards as strings in this array - innerHTML for divs
+    for (n=0;n<52;n++) { // create 52 cards as strings in this array - innerHTML for divs
       deck[n]=n; // initialize the deck pre-shuffle
 			var suit=Math.floor(n/13); 
-			var f=''; if(suit==1 || suit==2) f=' fill="red"'; // optionally paint the red suits red
+			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
 			var val = n % 13;
 			var ctr = (val<10) ? suits[suit] : faces[val-10];
-			cards[n]='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">'
-      + '<rect x="2" y="2" rx="20" ry="20" width="194" height="274" style="fill:white;stroke:black;stroke-width:4;" />'
-      + '<text font-size="120" x="97" y="137" text-anchor="middle" alignment-baseline="central"'+f+'>'
-      + ctr+'</text><text x="15" y="'+size+'" font-size="'+size+'"'+f+'>'+vals[val]+'</text>'
-      + '<text x="'+(190-size)+'" y="'+size+'" font-size="'+size+'"'+f+'>'+suits[suit]+'</text></svg>';
+// create card as contents of a div instead of an svg
+			cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
+//      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">'
+//      + '<rect x="2" y="2" rx="20" ry="20" width="194" height="274" style="fill:white;stroke:black;stroke-width:4;" />'
+//      + '<text font-size="120" x="97" y="137" text-anchor="middle" alignment-baseline="central"'+f+'>'
+//      + ctr+'</text><text x="15" y="'+size+'" font-size="'+size+'"'+f+'>'+vals[val]+'</text>'
+//      + '<text x="'+(190-size)+'" y="'+size+'" font-size="'+size+'"'+f+'>'+suits[suit]+'</text></svg>';
 		}
 	}
 	
@@ -266,6 +269,7 @@ if ('serviceWorker' in navigator) {
 		const cascade=document.getElementById("c"+j);
 		z=cascade.childElementCount+1;
     var card=document.createElement("div");
+    card.classList.add("card");
     card.innerHTML=cards[cardNo];
     card.id="v"+cardNo;
     card.style.zindex=z.toString();
