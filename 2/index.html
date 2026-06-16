@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<!-- FreeCell using div and emoji 1.1 for the cards - all in one HTML page -->
+<!-- move onclick to each card-->
+<html lang=en>
+<head>
+  <link rel="canonical" href="https://jcoonrod.github.io/2" />
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta name="google" content="notranslate">
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="theme-color" content="green"/>
+  <meta name="description" content="FreeCell Game by John Coonrod using DIV instead of images"/>
+	<title>DIV test 2</title>
+  <style>
+@font-face {
+			font-family: 'Noto Sans Symbols 2';
+			src: url('NotoSansSymbols2-Regular.ttf') format('truetype');
+			font-weight: normal;font-style: normal;font-display: swap;
+		}
+   body {font-family: sans-serif,'Noto Sans Symbols 2'; background:green;padding:0;margin:0;}
+    p, p>a {color:white;}
+    div.row {display:flex; position:relative; justify-content:space-evenly;}
+    div.a {position:absolute;background:red;color:white;top:40%;left:40%;padding:1vw;font-size:3vw;}
+    div.c {height:80vw;width:12.5vw;position:relative;padding:0;border:0;margin:0;}
+    .r {color:red;}
+    .b {color:black;}
+    h2{font-size:3vw;padding:0;margin:0;font-weight:bold;}
+    h1{font-size:8vw;padding:0;margin:0;font-weight:normal;text-align: center;}
+    .card {
+      background: white;
+      padding: 0.5vw;margin:0;
+      border-style: solid;
+      border-radius: 1vw;
+      border-color:black; border-width:0.5vw;
+      width:10vw; 
+      height:17vw;
+      }
+  </style>
+</head>
+  
+<body tabindex="-1">
+  <p>Test onclick on each card
+  <button onclick="shuffle(); deal()">New Game</button>
+  <button onclick="deal()">Replay</button>
+  <button onclick="undo()">Undo</button>
+	<span id=xt>  </span>
+  </p>
+  <div class=row>
+  <div id=s0 class=card onclick="dropFree(0)"></div>
+  <div id=s1 class=card onclick="dropFree(1)"></div>
+  <div id=s2 class=card onclick="dropFree(2)"></div>
+  <div id=s3 class=card onclick="dropFree(3)"></div>
+  <div id=a0 class=card></div>
+  <div id=a1 class=card></div>
+  <div id=a2 class=card></div>
+  <div id=a3 class=card></div>
+</div>
+<div class=row>&nbsp;</div>
+<div class=row>
+  <div id=c0 class=c></div>
+  <div id=c1 class=c></div>
+  <div id=c2 class=c></div>
+  <div id=c3 class=c></div>
+  <div id=c4 class=c></div>
+  <div id=c5 class=c></div>
+  <div id=c6 class=c></div>
+  <div id=c7 class=c></div>
+</div>
+
+<script>
+// Set up a 1-d array of the unicode values for the cards 0-51
+// Note - Unicode sets up 16 cards per suit, including two queens
+// Unlike the old game, I want to only use the DOM
+// Each move of n cards from x1, iy1 to x2, iy2 (an array of 5 items) 
+  cards = []; // array of card div svg objects
+	moves = []; // stack of moves that can then be undone
+  tomove = []; // array of cards to move
+  deck = []; // sort order for the cards
+  freecells = [-1,-1,-1,-1]; // holds the cardNo if filled
+  nopen = 0; // computed # open freecells
+  nempty = 0; // computed # empty cascades
+  aces = [-1,-1,-1,-1]; // holds the card value if filled
+  suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
+  faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
+  vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+  var nodes = []; // this gets defined by stackable
+  var first=0; // index within the nodes for the first that could be moved
+  var last=0; // " the top card
+  createCards();
+
+	// FUNCTIONS from top down	// make numbers bigger for phones
+	function createCards(){
+		var size=( screen.width<600 ? 70 : 45);	
+    for (n=0;n<52;n++) { // create 52 cards as strings in this array - innerHTML for divs
+      deck[n]=n; // initialize the deck pre-shuffle
+			var suit=Math.floor(n/13); 
+			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
+			var val = n % 13;
+			var ctr = (val<10) ? suits[suit] : faces[val-10];
+// create card as contents of a div instead of an svg
+			cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
+//      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">'
+//      + '<rect x="2" y="2" rx="20" ry="20" width="194" height="274" style="fill:white;stroke:black;stroke-width:4;" />'
+//      + '<text font-size="120" x="97" y="137" text-anchor="middle" alignment-baseline="central"'+f+'>'
+//      + ctr+'</text><text x="15" y="'+size+'" font-size="'+size+'"'+f+'>'+vals[val]+'</text>'
+//      + '<text x="'+(190-size)+'" y="'+size+'" font-size="'+size+'"'+f+'>'+suits[suit]+'</text></svg>';
+		}
+	}
+	
+	// a function to shuffle the deck;
+  function shuffle(){
+    for(i=0; i<100; i++) { // do 100 random interchanges
+      j=Math.floor(52*Math.random());
+      k=Math.floor(52*Math.random());
+      m=deck[j]; deck[j]=deck[k]; deck[k]=m;
+    }
+  }
+
+  function deal(){
+    clearBoard();
+    var i=0;
+		var m = setInterval(frame,50);
+    function frame() { // use interval to deal the cards slowly
+      if(i==52) {
+        clearInterval(m);
+        tryAce();
+      }else{
+        j=i%8;
+        appendCard(deck[i],j);
+        i++;
+      }
+    }
+  }
+
+  function clearBoard(){
+		moves.length=0; // clear these working arrays
+		nodes.length=0;
+    for(j=0;j<8;j++) { // clear cascades
+      const cascade=document.getElementById("c"+j);
+      while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
+    }
+	  for(j=0;j<4;j++) { // clear freecells and aces piles
+			aces[j]=-1;
+			document.getElementById("a"+j).innerHTML='';
+			freecells[j]=-1;
+			document.getElementById("s"+j).innerHTML='';
+		}
+  }
+	
+  function popStack(j) { // a cascade has been clicked
+		xtp=document.getElementById("xt");
+		xtp.textContent="j="+j;
+    stackable(j);
+    if (!tryMove(j)) {
+      if(!tryEmpty(j)) tryFreeCells(j);} // try either moving a cascade or a car to a freecell
+    tryAce();
+  }
+  
+  function tryEmpty(j) { // attempt to move cascade to an open column
+    nmove=0; i=1;
+    while(!nmove && i<8) {
+      k=(j+i) % 8;
+      if(cascadeEmpty(k)) {
+        nmove++;
+        removeStack(j,first); // unlink these cards into the tomove array
+        appendStack(k,first);
+      }
+      i++;
+    }
+    return nmove;
+  }
+  
+  function removeStack(j,m) {
+    tomove.length=0; // clear it off
+    cascade=document.getElementById("c"+j);
+    for(n=m;n<=last;n++) {
+      l=nodes[n].id;
+      tomove.push(l.substring(1)); // cardNo
+    }
+    for(n=m;n<=last;n++) cascade.removeChild(cascade.lastElementChild);
+  }
+  function appendStack(k,m) {
+    for(n=m;n<=last;n++) appendCard(tomove[n-m],k);
+  }
+
+  function tryMove(j) { // attempt to move a cascade to another
+    tomove = []; // array to hold cards that will move
+    computeFree();
+    if(nmax<(last-first+1)) first=last-nmax+1; // limit range
+    nmove=0; m=first; // we'll march down the cascade until something moves
+    cascade=document.getElementById("c"+j);
+    while(!nmove && m<=last) { // loop from the first of the stackables to whatever will move
+      srcId=nodes[m].id; val=getVal(srcId); color=getColor(srcId);
+      i=1; // cascades beyond k
+      while(i<8 && !nmove) {
+        k=(j+i) % 8;
+        destId=topCardId(k); val2=getVal(destId); color2=getColor(destId);
+        if((color!==color2 && val+1==val2)) {
+          nmove++;
+					moves.push(['c',j,'c',k,last-m+1]); // this defines a move from one cascade to another
+          removeStack(j,m);
+          appendStack(k,m);
+        }
+        i++;
+      }
+      m++;
+    }
+    return nmove;
+  }
+
+	function undo(){ // at the moment, this just works for cascade to cascade
+		if(moves.length) {
+			cardid=-1;
+			move=moves.pop();
+			cj=move[0]; j=move[1]; ck=move[2]; k=move[3]; n=move[4];
+			if(cj=='c' && ck=='c') {
+				tomove.length=0; // clear this array - a bit like remove stack
+				nodes=document.getElementById('c'+k).childNodes;
+				last=nodes.length-1; m=last-n+1;
+				removeStack(k,m);
+				appendStack(j,m);
+			} else if(ck=='f') {
+				cardid=freecells[k];
+				document.getElementById("s"+k).innerHTML="";
+				freecells[k]=-1;
+			} else if(ck=='a') {
+				cardid=aces[k]+13*k;
+				aces[k]--;
+				if(aces[k]==-1) {card="";} else {card=cards[cardid-1];}
+				document.getElementById("a"+k).innerHTML=card;				
+			}
+			if(cardid>-1 && cj=='c') {
+				appendCard(cardid,j);
+			}
+		}
+	}
+
+	function computeFree() { // What is the biggest move we can make
+	  nopen=0;
+	  for(k=0;k<4;k++) if(freecells[k]==-1) nopen++;
+	  nempty=0;
+	  for(j=0;j<8;j++) if(cascadeEmpty(j)) nempty++;
+	  nmax=1+(nopen+nempty);
+	}
+
+	function stackable(j) { // return the global values of first and last
+	  nodes=document.getElementById("c"+j).childNodes;
+	  last=nodes.length-1; // index of top node in node list
+	  if(last<1) {
+	    first=last;
+	  }else{
+      first=last-1; // index on how many can be stacked
+      match=1; // test to see whether it can be stacked
+      while(first>-1 && match) {
+        id1=nodes[first].id; id2=nodes[first+1].id;
+        val1=getVal(id1); val2=getVal(id2);
+        color1=getColor(id1); color2=getColor(id2); // returns 'r' or 'b'
+        match=(val1==(val2+1) && color1!==color2); // true or false
+        first--;
+ //       console.log("F "+first+" L "+last+" M "+match)
+      }
+      first=(first==-1 && match) ? 0 : first+2;
+    }
+	}
+
+	function cascadeEmpty(j) {
+	  return (document.getElementById("c"+j).childElementCount==0)
+	}
+function createElementFromString(htmlString) {
+  const template = document.createElement('template');
+  template.innerHTML = htmlString.trim(); // Trim prevents accidental empty text nodes
+  return template.content.firstElementChild;
+}
+function showme(ss){
+  alert(ss);
+}
+
+	function appendCard(cardNo,j) { // add a card to the end of cascade j
+		const cascade=document.getElementById("c"+j);
+		const z=cascade.childElementCount+1;
+    const myString='<div id="v'+cardNo+'" class="card" style="position: absolute; z-index: '+z+';top: '+(z-1)*5+'vw;"} onclick="popStack('+j+')";>'+cards[cardNo]+"</div>";
+    console.log(myString);
+    cascade.appendChild(createElementFromString(myString));
+	}
+	function dropFree(k){ // Drop the card from freecell k to a cascade
+		var cardNo=freecells[k];
+		if(cardNo>-1) {
+			suit=Math.floor(cardNo/13); val=cardNo % 13; color=(suit==0 || suit==3) ? 'b' : 'r';
+			// run through the top cards to see if it can drop down to them
+			j=0;nmove=0;
+			while(j<8 && nmove==0){
+				destId=topCardId(j); destVal=getVal(destId); destSuit=getSuit(destId);
+				destColor=(destSuit==0 || destSuit==3) ? 'b' : 'r';
+				if((val==destVal-1) && (color !== destColor)) {
+					moves.push(['f',k,'c',j,1]); // this defines a move from freecell to cascade
+					appendCard(cardNo,j);
+					freecells[k]=-1;
+					document.getElementById("s"+k).innerHTML="";
+					nmove=1;
+				}
+				j++;
+			}
+			j=0; // if nothing moved to a full cascade, try empty cascades!
+			while(j<8 && nmove==0) {
+			  if(cascadeEmpty(j)) {
+					moves.push(['f',k,'c',j,1]); // this defines a move from freecell to cascade
+ 					appendCard(cardNo,j);
+					freecells[k]=-1;
+					document.getElementById("s"+k).innerHTML="";
+					nmove=1;
+			  }
+			  j++;
+			}
+		}
+		tryAce(); // after making a move, see if any cards can jump up to foundation
+	}
+
+  // Run through to see if any top cards can jump to the ace pile
+  function topCardId(j){
+    cascade=document.getElementById("c"+j);
+    topCard = cascade.lastChild;
+    return (topCard) ? topCard.id : ''; // what card is it? v0...
+  }
+  // simple functions to convert id to values
+  const getSuit = s => Math.floor(parseInt(s.substring(1),10)/13);
+  const getVal = s => parseInt(s.substring(1),10) % 13;
+  const getColor = s => (getSuit(s)==0 || getSuit(s)==3) ? 'b' : 'r';
+  
+  // check if anything can jump to the aces piles automatically
+  function tryAce() { // this will repeat as long as it moves something
+    var nmove=1; // This gets incremented and returned
+    var m=setInterval(frame2,100);
+    function frame2() {
+      if (nmove==0) {
+        clearInterval(m);
+        showFoundations();
+      } else {
+  			nmove=0;
+	      for(j=0;j<8;j++) { // try pop from the cascades
+	        topID=topCardId(j);
+  	      if(topID) { // is there a top card in this cascade?
+    	      suit=getSuit(topID);
+      	    val=getVal(topID);
+          	if(aces[suit]==(val-1)) {
+            	nmove++;
+							moves.push(['c',j,'a',suit,1]); // this defines a move from freecell to cascade
+            	aces[suit]++;
+              cascade=document.getElementById("c"+j);
+  	          cascade.removeChild(cascade.lastChild);
+          	}
+  				}
+        }
+      
+        for(j=0;j<4;j++) { // try pop from freecells
+          cardNo=freecells[j];
+          if(cardNo>-1) {
+            val=cardNo % 13; suit=Math.floor(cardNo/13);
+            if(aces[suit]==(val-1)) {
+              nmove++;
+							moves.push(['f',j,'a',suit,1]); // this defines a move from freecell to cascade
+              aces[suit]=val;
+              freecells[j]=-1;
+              document.getElementById("s"+j).innerHTML="";
+            }
+          }
+        }
+      }
+    }  // end frame
+  } // end try aces
+  function showFoundations(){
+    for(i=0;i<4;i++) {
+      if(aces[i]>-1) {
+        var card=cards[i*13+aces[i]];
+        document.getElementById("a"+i).innerHTML=card;
+      }
+    }
+  }
+
+  function tryFreeCells(j){
+    free=-1;
+    for(k=0;k<4;k++) if(freecells[k]==-1) free=k;
+    if(free>-1) {
+      t=topCardId(j);
+			moves.push(['c',j,'f',free,1]); // this defines a move from cascade to freecell
+      freecells[free]=parseInt(t.substring(1)); // place the cardno in there for easy move later
+      popCard(j,t,"s"+free);
+      return 1;
+    }else{
+      return 0;
+    }
+  }
+
+  // Move a card from one place to another
+  function popCard(j,srcId,destId){
+    cascade=document.getElementById("c"+j);
+    src=document.getElementById(srcId);
+    dest=document.getElementById(destId);
+    if(dest) dest.innerHTML=src.innerHTML;
+    cascade.removeChild(cascade.lastChild);
+    return 1;
+  }
+</script>
+</body>
+</html>
