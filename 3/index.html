@@ -3,7 +3,7 @@
 <!-- move onclick to each card-->
 <html lang=en>
 <head>
-  <link rel="canonical" href="https://jcoonrod.github.io/2" />
+  <link rel="canonical" href="https://jcoonrod.github.io/3" />
 	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 	<meta name="google" content="notranslate">
 	<meta http-equiv="Pragma" content="no-cache" />
@@ -12,7 +12,7 @@
   <meta name="viewport" content="width=device-width">
   <meta name="theme-color" content="green"/>
   <meta name="description" content="FreeCell Game by John Coonrod using DIV instead of images"/>
-	<title>DIV test 2</title>
+	<title>DIV test 3</title>
   <style>
 @font-face {
 			font-family: 'Noto Sans Symbols 2';
@@ -41,7 +41,7 @@
 </head>
   
 <body tabindex="-1">
-  <p>Test onclick on each card
+  <p>Test onclick on the row of columns
   <button onclick="shuffle(); deal()">New Game</button>
   <button onclick="deal()">Replay</button>
   <button onclick="undo()">Undo</button>
@@ -58,7 +58,7 @@
   <div id=a3 class=card></div>
 </div>
 <div class=row>&nbsp;</div>
-<div class=row;>
+<div class=row onclick="showme();">
   <div id=c0 class=c></div>
   <div id=c1 class=c></div>
   <div id=c2 class=c></div>
@@ -273,14 +273,14 @@ function createElementFromString(htmlString) {
   template.innerHTML = htmlString.trim(); // Trim prevents accidental empty text nodes
   return template.content.firstElementChild;
 }
-function showme(ss){
-  alert(ss);
+function showme(){
+  alert('Coords:'+event.clientX+' of '+clientWidth);
 }
 
 	function appendCard(cardNo,j) { // add a card to the end of cascade j
 		const cascade=document.getElementById("c"+j);
 		const z=cascade.childElementCount+1;
-    const myString='<div id="v'+cardNo+'" class="card" style="position: absolute; z-index: '+z+';top: '+(z-1)*5+'vw;" onclick="popStack('+j+')";>'+cards[cardNo]+"</div>";
+    const myString='<div id="v'+cardNo+'" class="card" style="position: absolute; z-index: '+z+';top: '+(z-1)*5+'vw;"} onclick="popStack('+j+')";>'+cards[cardNo]+"</div>";
     console.log(myString);
     cascade.appendChild(createElementFromString(myString));
 	}
