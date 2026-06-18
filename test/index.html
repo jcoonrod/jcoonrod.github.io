@@ -10,18 +10,12 @@
   <meta name="viewport" content="width=device-width">
   <meta name="theme-color" content="green"/>
   <meta name="description" content="FreeCell Game by John Coonrod using DIV instead of images"/>
-	<title>Freecell via DIV</title>
+	<title>Minimal Div Onclick Test</title>
   <style>
-  @font-face {
-			font-family: 'Noto Sans Symbols 2';
-			src: url('NotoSansSymbols2-Regular.ttf') format('truetype');
-			font-weight: normal;font-style: normal;font-display: swap;
-		}
-   body {font-family: sans-serif,'Noto Sans Symbols 2'; background:green;padding:0;margin:0;}
+   body {font-family: sans-serif; background:green;padding:0;margin:0;}
     p, p>a {color:white;}
     div.row {display:flex; position:relative; justify-content:space-evenly;}
-    div.a {position:absolute;background:red;color:white;top:40%;left:40%;padding:1vw;font-size:3vw;}
-    div.c {height:80vw;width:12.5vw;position:relative;padding:0;border:0;margin:0;tabindex="1";}
+    div.column {height:20vw;width:12.5vw;position:relative;padding:0;border:0;margin:0;}
     .r {color:red;}
     .b {color:black;}
     h2{font-size:3vw;padding:0;margin:0;font-weight:bold;}
@@ -36,19 +30,31 @@
       height:17vw;
       }
   </style>
+  <script>
+    function showMe(x){alert(x);}
+  </script>
 </head>
-  
-<body tabindex="-1">
-<script>
-  function popStack(j){
-    xtp=document.getElementById("xt");
-		xtp.textContent="j="+j;
-  }
-</script>
-  <p>Onclick Test</p>
-  <div class="row">
-    <div class="c" onclick="popStack(3);">
+<body>
+  <h2>Minimal Div Onclick Test</h2>
+  <p onclick="showMe('Clicked on p tag');">First test it on a p tag</p>
+  <div onclick="showMe('Clicked on singular div tag');">First test it on singular div tag</div>
+  <div class="row" onclick="showMe('Clicked on top level div');">
+    <div class="column" ">
       <div class="card">
+        <h2>On row</h2>
+        <h2 id="xt">click me...</h2>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="column" onclick="showMe('Clicked on second level div');">
+      <div class="card">
+        <h2>Test</h2>
+        <h2 id="xt">click me...</h2>
+      </div>
+    </div>
+    <div class="column">
+      <div class="card" onclick="showMe('Clicked on third level div');">
         <h2>Test</h2>
         <h2 id="xt">click me...</h2>
       </div>
