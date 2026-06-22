@@ -30,9 +30,7 @@ function removeButton(t) {
   const suits = ["&spadesuit;","&#9825;","&#9826;","&clubsuit;"];
   faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
   vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-	back= '<svg viewBox="0 0 200 280">'
-      + '<rect x="2" y="2" rx="20" ry="20" width="194" height="274" style="fill:lightblue;stroke:white;stroke-width:8;" />'
-      + '<text font-size="120" x="97" y="137" file="white" text-anchor="middle" alignment-baseline="central">🕸️</text></svg>';
+	back= '<img src=spider.jpg width=100% height=auto>';
   var first=0; // index within the nodes for the first that could be moved
   var last=0; // " the top card
   var flips=[];
@@ -66,7 +64,7 @@ function removeButton(t) {
 		var size=( screen.width<600 ? 70 : 45);
     for (n=0;n<(13*localStorage.nsuit);n++) { // create 52 svg cards as strings in this array - innerHTML for divs
 			var suit=Math.floor(n/13);
-			var f=''; if(suit==1 || suit==2) f=' fill="red"'; // optionally paint the red suits red
+			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
 			var val = n % 13;
 			var ctr = (val<10) ? suits[suit] : faces[val-10];
 			cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
