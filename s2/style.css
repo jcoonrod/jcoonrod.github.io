@@ -5,12 +5,14 @@
 		}
    body {font-family: sans-serif,'Noto Sans Symbols 2'; background:green;padding:0;margin:0;}
     p, p>a {color:white;}
-    div.row {display:flex; position:relative; justify-content:space-evenly;}
+    div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;}
     div.a {position:absolute;background:red;color:white;top:40%;left:40%;padding:1vw;font-size:3vw;}
-    div.c {height:80vw;width:12.5vw;position:relative;padding:0;border:0;margin:0;}
+    div.s {width:9%;height:14vw; background:lightgreen;}
+    div.x {width:9%;height:14vw;}
+    div.c {height:80vw;width:9%;position:relative;}
     .r {color:red;}
     .b {color:black;}
-    h2{font-size:4.5vw;padding:0;margin:0;font-weight:bold;position:relative; top:-0.5vw;}
+    h2{font-size:3.5vw;padding:0;margin:0;font-weight:bold;position:relative; top:-0.5vw;}
     h1{font-size:8vw;padding:0;margin:0;font-weight:normal;text-align: center;position:relative; top:-2vw;}
     .card {
       background: white;
@@ -18,7 +20,7 @@
       border-style: solid;
       border-radius: 1vw;
       border-color:black; border-width:0.5vw;
-      width:10vw; 
-      height:17vw;
+      width:8vw; 
+      height:14vw;
       }
 
