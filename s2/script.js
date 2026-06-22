@@ -5,11 +5,6 @@ function removeButton(t) {
       (t.target.style.visibility = ""), (t.target.style.opacity = 1);
     }, 5e3);
 }
-//window.onload = () => { 'use strict'; // register service worker
-//if ('serviceWorker' in navigator) {
-//   navigator.serviceWorker.register('./sw.js');
-//  }
-//}
 
 // Set up a 1-d array of the unicode values for the cards 0-103 (two decks)
 // Note - Unicode sets up 16 cards per suit, including two queens
@@ -27,7 +22,7 @@ function removeButton(t) {
   var deck = []; // sort order for the cards
   nfoundation=0; // how many foundation piles have gone up?
   nempty = 0; // computed # empty cascades
-  const suits = ["&spadesuit;","&#9825;","&#9826;","&clubsuit;"];
+  const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
   faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
   vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 	back= '<img src=spider.jpg width=100% height=auto>';
