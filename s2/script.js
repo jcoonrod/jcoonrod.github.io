@@ -28,7 +28,7 @@ function removeButton(t) {
   nfoundation=0; // how many foundation piles have gone up?
   nempty = 0; // computed # empty cascades
   const suits = ["&spadesuit;","&#9825;","&#9826;","&clubsuit;"];
-  faces = ["&#x1F482","&#x1f478;","&#x1F451;"]; // emojis for facecards
+  faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
   vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 	back= '<svg viewBox="0 0 200 280">'
       + '<rect x="2" y="2" rx="20" ry="20" width="194" height="274" style="fill:lightblue;stroke:white;stroke-width:8;" />'
