@@ -2,15 +2,9 @@
   "name": "One-Click Freecell",
   "short_name": "Freecell",
   "icons": [{
-    "src": "jc.png",
-      "sizes": "128x128"
-		}, {
-      "src": "jc192.png",
-      "sizes": "144x144 152x152 192x192"
-    }, {
-      "src": "jc512.png",
-      "sizes": "256x256 512x512"
-    }],
+    "src": "jc192.png",
+      "sizes": "128x128 144x144 152x152 192x192 256x256 512x512"
+		}],
   "lang": "en-US",
   "start_url": "/index.html",
   "display": "standalone",
