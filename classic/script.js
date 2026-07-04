@@ -194,8 +194,8 @@ function removeButton(t) {
 			toMove.length=0;
 			for(z=z1;z<=z2;z++) toMove.push( parseInt(nodes[z-1].id.substr(1)) );
 		}
-				if(!nmove && v1!==12) trySame(toMove,c1,j); // first try moving to same suit
-				if(!nmove && localStorage.nsuit>1 && v1!==12 ) tryStack(toMove,v1,j); // then consider not-same-suit columns
+//				if(!nmove && v1!==12) trySame(toMove,c1,j); // first try moving to same suit
+				if(!nmove && v1!==12 ) tryStack(toMove,v1,j); // then consider not-same-suit columns
 				if(!nmove) nmove=tryEmpty(toMove,j); // then consider empty columns
 		}
 		trywin();
