@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- One-click Spider Solitaire using div for the cards - all in one HTML page - not a pwa -->
+<!-- Classic Solitaire using div for the cards - not a pwa for now -->
 <html lang=en>
 <head>
 <!--  <link rel="manifest" href="manifest.json"> -->
@@ -17,23 +17,21 @@
   
 <body tabindex="-1">
 	<p>Classic Solidaire
-		<button onclick="shuffle(); deal(0)">New</button>
-		<button onclick="deal()">Replay</button>
+		<button onclick="shuffle(); deal();">New</button>
+		<button onclick="deal();">Replay</button>
 		<button id=suitlist onclick="changeSuits()"></button>
 		<span id="sofar">      </span>
 		<span id="demo" onclick="removeButton(event)"> </span>
   </p>
 <div class=row>
-  <div id=s0 class=s onclick="if(ndealt==0){shuffle();deal();}else{next10();}"></div> 
-  <div id=s1 class=x></div>
-  <div id=f0 class=s></div>
-  <div id=f1 class=s></div>
-  <div id=f2 class=s></div>
-  <div id=f3 class=s></div>
-  <div id=f4 class=s></div>
-  <div id=f5 class=s></div>
-  <div id=f6 class=s></div>
-  <div id=f7 class=s></div>
+  <div id=s0 class=card onclick="if(ndealt==0){shuffle();deal();}else{next3();}"></div> 
+  <div id=f0 class="card blueborder"></div>
+  <div id=f1 class="card blueborder"></div>
+  <div id=f2 class="card blueborder"></div>
+  <div id=d0 class="card redborder"></div>
+  <div id=d1 class="card redborder"></div>
+  <div id=d2 class="card redborder"></div>
+  <div id=d3 class="card redborder"></div>
 </div>
 <div class=row>&nbsp;</div>
 
@@ -45,9 +43,6 @@
   <div id=c4 class=c></div>
   <div id=c5 class=c></div>
   <div id=c6 class=c></div>
-  <div id=c7 class=c></div>
-  <div id=c8 class=c></div>
-  <div id=c9 class=c></div>
 </div>
 </body>
 </html>

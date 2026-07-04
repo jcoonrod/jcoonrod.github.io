@@ -1,8 +1,9 @@
-window.onload = () => { 'use strict'; // register service worker
-if ('serviceWorker' in navigator) {
-   navigator.serviceWorker.register('./sw.js');
-  }
-}
+// PWA disabled for development
+//window.onload = () => { 'use strict'; // register service worker
+//if ('serviceWorker' in navigator) {
+//   navigator.serviceWorker.register('./sw.js');
+//  }
+//}
 
 cards = []; // array of card div svg objects
 	moves = []; // stack of moves that can then be undone

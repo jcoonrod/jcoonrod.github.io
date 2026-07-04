@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <!-- FreeCell using div for the cards - all in one HTML page -->
+<!-- PWA disabled for development here and script-->
 <html lang=en>
 <head>
   <link rel="icon" type="image/png" href="jc.png"/>
-	<link rel="manifest" href="/manifest.json">
+<!--	<link rel="manifest" href="/manifest.json"> -->
 	<link rel="apple-touch-icon" href="jc192.png">
 	<meta name="mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-status-bar-style" content="green">
@@ -24,28 +25,23 @@
 </head>
   
 <body tabindex="-1">
-  <p>One-Click FreeCell 
-  <details>
-    <summary>☰</summary>
-    <a href='Classic'>classic</a>
-    <a href="Freecell">freecell</a>
-    <a href="Klondike">klondike</a>
-    <a href="Spider">spider</a>
-  </details>
+  <p>FreeCell 
   <button onclick="shuffle(); deal()">New Game</button>
   <button onclick="deal()">Replay</button>
   <button onclick="undo()">Undo</button>
+    <a href='classic'>Classic</a>
+    <a href="spider">Spider</a>
 	<span id=xt>  </span>
   </p>
   <div class=row>
-  <div id=s0 class=card onclick="dropFree(0)"></div>
-  <div id=s1 class=card onclick="dropFree(1)"></div>
-  <div id=s2 class=card onclick="dropFree(2)"></div>
-  <div id=s3 class=card onclick="dropFree(3)"></div>
-  <div id=a0 class=card></div>
-  <div id=a1 class=card></div>
-  <div id=a2 class=card></div>
-  <div id=a3 class=card></div>
+  <div id=s0 class="card redborder" onclick="dropFree(0)"></div>
+  <div id=s1 class="card redborder" onclick="dropFree(1)"></div>
+  <div id=s2 class="card redborder" onclick="dropFree(2)"></div>
+  <div id=s3 class="card redborder" onclick="dropFree(3)"></div>
+  <div id=a0 class="card blueborder"></div>
+  <div id=a1 class="card blueborder"></div>
+  <div id=a2 class="card blueborder"></div>
+  <div id=a3 class="card blueborder"></div>
 </div>
 <div class=row>&nbsp;</div>
 <div class=row>

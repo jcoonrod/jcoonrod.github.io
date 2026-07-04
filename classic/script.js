@@ -1,12 +1,11 @@
-const demo=document.getElementById("demo");
-function removeButton(t) {
-  (t.target.style.opacity = 0),
-    setTimeout(() => {
-      (t.target.style.visibility = ""), (t.target.style.opacity = 1);
-    }, 5e3);
-}
+// Version adapted from Spider for Classic Solitaire
+// Requires changes to TryMove, Deal, spider next10 becomes next3...
+// Note "CardNo" refers to the position in the deck, not of cards
+// 
 
-// Set up a 1-d array of the unicode values for the cards 0-103 (two decks)
+const ncards=52; // This game just uses one deck
+var nreserve=24; // after initial deal there are 24 cards in reserve
+// Set up a 1-d array of the unicode values for the cards
 // Note - Unicode sets up 16 cards per suit, including two queens
 // Unlike the old game, I want to only use the DOM
 // Each move of n cards from x1, iy1 to x2, iy2 (an array of 5 items)
@@ -29,99 +28,78 @@ function removeButton(t) {
   var first=0; // index within the nodes for the first that could be moved
   var last=0; // " the top card
   var flips=[];
-
-	document.getElementById("s0").innerHTML=back;
+	const demo=document.getElementById("demo");
+	document.getElementById("s0").innerHTML="<img src=back.jpg>";
 	createCards();
-	showSuits();
-	showScores();
-	
-	// FUNCTIONS from top down	// make numbers bigger for phones
-	function showScores(){
-		let w=localStorage.wins;
-		let t=localStorage.times;
-		sofar.innerHTML=localStorage.wins+'/'+localStorage.times;
+//	showScores(); // maybe add this later
+
+// MODIFIED FUNCTIONS FOR CLASSIC
+function next3(){
+	for(i=0;i<3;i++) {
+		if (ndealt<ncards) {
+			document.getElementById("f"+i).innerHTML=cards[deck[ndealt]];
+			ndealt++;
+		}else if(nfoundation<ncards){ // repeat remaining undeal cards
+			ndealt=24-nfoundation;
+		}
 	}
-	function changeSuits(){
-		if(localStorage.nsuit==2) {localStorage.nsuit=4;}
-		else if(localStorage.nsuit==4) {localStorage.nsuit=1;}
-		else{localStorage.nsuit=2;}
-		showSuits();
-		createCards();
-	}
-	function showSuits() {
-		suitlist=suits[0];
-		if(localStorage.nsuit>1) suitlist+=suits[1];
-		if(localStorage.nsuit==4) suitlist+=suits[2]+suits[3];
-		document.getElementById("suitlist").innerHTML=suitlist;
-	}		
-// MODIFIED TO USE DIFS INSTEAD OF SVG for S2
-    function createCards(){ // creates 13, 26 or 52 dependuing on nsuit for spider
-		var size=( screen.width<600 ? 70 : 45);
-    for (n=0;n<(13*localStorage.nsuit);n++) { // create 52 svg cards as strings in this array - innerHTML for divs
+
+}
+
+
+// FUNCTIONS from top down	// make numbers bigger for phones
+function removeButton(t) {
+  (t.target.style.opacity = 0),
+    setTimeout(() => {
+      (t.target.style.visibility = ""), (t.target.style.opacity = 1);
+    }, 5e3);
+}
+
+// MODIFIED TO USE DIFS INSTEAD OF SVG
+    function createCards(){
+    for (n=0;n<ncards;n++) { // create 52 svg cards as strings in this array - innerHTML for divs
 			var suit=Math.floor(n/13);
 			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
 			var val = n % 13;
 			var ctr = (val<10) ? suits[suit] : faces[val-10];
 			cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
-		}
-		for (i=0;i<104;i++) { // initialize the deck
-		  deck[i] = i % (localStorage.nsuit*13) ; // this would run up to 13, 26 or 52
-      flips[i]=0; // initially show only the backs
+			deck[n]=n;
+			flips[n]=0;
 		}
 	}
 	
 	// a function to Fisher-Yate shuffle two decks together (104 cards);
   function shuffle(){
-    for(i=103; i>0; i--) { // do 100 random interchanges
+	console.log("Shuffle "+ncards);
+    for(i=(ncards-1); i>0; i--) { // do lots random interchanges
       let j=Math.floor(Math.random()*(i+1));
 			[deck[i],deck[j]]=[deck[j],deck[i]];
     }
   }
-
-  function deal(){ // does different things if the game has not already started
-	    clearBoard();
-			var i=0;
-			var m = setInterval(frame,30);
-	    function frame() { // use interval to deal the cards slowly
-  	    if(i==44) {
-	        clearInterval(m);
-					ndealt=44;
-  	      next10();
-      	}else{
-        	j=i%10;
-        	appendCard(i,j,0); // here i is the position in the deck, 0 means face down
-        	i++;
-      	}
-    	}
+// for now, we won's us frame - deal 7,6,5,4,3,2,1
+  function deal(){ 
+	console.log("deal "+ndealt);
+	ndealt=0;
+	for (j=0;j<7;j++){ // j here indicated which cascade
+		appendCard(ndealt,j,1); // first card face up
+		flips[ndealt]=1;
+		ndealt++;
+		for (i=j+1;i<7;i++){ // the rest of the row takes default face down
+			appendCard(ndealt,i,0);
+			ndealt++;
+		}
+	}
   }
-  function next10() { // put the next 10 face up
-    if(ndealt<104) { // only do this if there are cards left
-      var i=ndealt;
-      var m = setInterval(frame,30);
-      function frame() {
-        if(i==(ndealt+10)) {
-          clearInterval(m);
-          ndealt=i;
-          if(ndealt==104) document.getElementById("s0").innerHTML="";
-        }else{
-          j=i%10;
-          appendCard(i,j,1);
-          i++;
-        }
-      }
-    }
-  }
-
   function clearBoard(){
     nfoundation=0; // how many foundation piles have gone up?
 		moves.length=0; // clear these working arrays
 		toMove.length=0;
 		document.getElementById('s0').innerHTML=back;
-    for(j=0;j<10;j++) { // clear cascades
+    for(j=0;j<7;j++) { // clear cascades
       const cascade=document.getElementById("c"+j);
       while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
     }
-    for(j=0;j<8;j++) document.getElementById("f"+j).innerHTML="";
+    for(j=0;j<3;j++) document.getElementById("f"+j).innerHTML="";
   }
 	
   function faceUp(j) { // make sure top card is face up on this cascade
@@ -149,14 +127,6 @@ function removeButton(t) {
 				appendCard(cardid,j);
 			}
 		}
-	}
-	
-	function moveUp(j,cardNo) { // move a whole stack of 13 cards to a foundation
-	  cascade=document.getElementById('c'+j);
-	  document.getElementById('f'+nfoundation).innerHTML=cards[deck[cardNo]];
-	  nfoundation++;
-	  for(i=0;i<13;i++) cascade.removeChild(cascade.lastChild);
-	  faceUp(j);
 	}
 	
 
