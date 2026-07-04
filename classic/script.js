@@ -72,7 +72,6 @@ function removeButton(t) {
 	
 	// a function to Fisher-Yate shuffle two decks together (104 cards);
   function shuffle(){
-		localStorage.times++; showScores();
     for(i=103; i>0; i--) { // do 100 random interchanges
       let j=Math.floor(Math.random()*(i+1));
 			[deck[i],deck[j]]=[deck[j],deck[i]];
