@@ -9,7 +9,7 @@ const sofar=document.getElementById("sofar");
 if(localStorage.times==null) localStorage.times=0;
 if(localStorage.wins==null) localStorage.wins=0;
 if(localStorage.nsuit==null) localStorage.nsuit=2; //default number of suits
-var cards = []; // array of card div svg objects
+var cards = []; // array of card div objects
 var ndealt=0; // how many cards have been dealt?
 var moves = [];
 var toMove = []; // array of cards to move
