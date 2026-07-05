@@ -4,11 +4,13 @@
 //   navigator.serviceWorker.register('./sw.js');
 //  }
 //}
-
+ncards=52;
+ndealt=0;
 cards = []; // array of card div svg objects
 	moves = []; // stack of moves that can then be undone
   tomove = []; // array of cards to move
   deck = []; // sort order for the cards
+  flips = [];
   freecells = [-1,-1,-1,-1]; // holds the cardNo if filled
   nopen = 0; // computed # open freecells
   nempty = 0; // computed # empty cascades
@@ -20,30 +22,22 @@ cards = []; // array of card div svg objects
   var first=0; // index within the nodes for the first that could be moved
   var last=0; // " the top card
   createCards();
-  shuffle();
-  deal();
 
-	// FUNCTIONS from top down	// make numbers bigger for phones
-	function createCards(){
-		var size=( screen.width<600 ? 70 : 45);	
-    for (n=0;n<52;n++) { // create 52 cards as strings in this array - innerHTML for divs
-      deck[n]=n; // initialize the deck pre-shuffle
-			var suit=Math.floor(n/13); 
+    function createCards(){
+    for (n=0;n<ncards;n++) { // create 52 svg cards as strings in this array - innerHTML for divs
+			var suit=Math.floor(n/13);
 			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
 			var val = n % 13;
 			var ctr = (val<10) ? suits[suit] : faces[val-10];
-// create card as contents of a div instead of an svg
 			cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
-//      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">'
-//      + '<rect x="2" y="2" rx="20" ry="20" width="194" height="274" style="fill:white;stroke:black;stroke-width:4;" />'
-//      + '<text font-size="120" x="97" y="137" text-anchor="middle" alignment-baseline="central"'+f+'>'
-//      + ctr+'</text><text x="15" y="'+size+'" font-size="'+size+'"'+f+'>'+vals[val]+'</text>'
-//      + '<text x="'+(190-size)+'" y="'+size+'" font-size="'+size+'"'+f+'>'+suits[suit]+'</text></svg>';
+			deck[n]=n;
+			flips[n]=0;
 		}
 	}
 	
 	// a function to shuffle the deck;
   function shuffle(){
+    ndealt=0;
     for(i=0; i<100; i++) { // do 100 random interchanges
       j=Math.floor(52*Math.random());
       k=Math.floor(52*Math.random());
@@ -66,6 +60,34 @@ cards = []; // array of card div svg objects
       }
     }
   }
+
+  // MODIFIED FUNCTIONS FOR CLASSIC
+function next3(){
+	for(i=0;i<3;i++) {
+		if (ndealt<ncards) {
+			document.getElementById("f"+i).innerHTML=cards[deck[ndealt]];
+			ndealt++;
+		}else if(nfoundation<ncards){ // repeat remaining undeal cards
+			ndealt=24-nfoundation;
+		}
+	}
+
+}
+// for now, we won's us frame - deal 7,6,5,4,3,2,1
+  function dealClassic(){ 
+	console.log("dealClassic "+ndealt);
+	ndealt=0;
+	for (j=0;j<7;j++){ // j here indicated which cascade
+		appendCard(ndealt,j,1); // first card face up
+		flips[ndealt]=1;
+		ndealt++;
+		for (i=j+1;i<7;i++){ // the rest of the row takes default face down
+			appendCard(ndealt,i,0);
+			ndealt++;
+		}
+	}
+  }
+
 
   function clearBoard(){
 		moves.length=0; // clear these working arrays

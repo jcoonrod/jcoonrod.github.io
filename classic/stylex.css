@@ -8,8 +8,8 @@
     img {width:100%;}
     div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;}
     div.a {position:absolute;background:red;color:white;top:40%;left:40%;padding:1vw;font-size:3vw;}
-    div.s {width:10vw;height:14vw; background:lightgreen;}
-    div.x {width:10vw;height:14vw;}
+    div.s {width:9vw;height:13vw; background:lightgreen;}
+    div.x {width:9vw;height:13vw;}
     div.c {height:80vw;width:9%;position:relative;}
     .r {color:red;}
     .b {color:black;}
