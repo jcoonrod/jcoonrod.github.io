@@ -1,100 +1,87 @@
-const demo=document.getElementById("demo");
-function removeButton(t) {
-  (t.target.style.opacity = 0),
-    setTimeout(() => {
-      (t.target.style.visibility = ""), (t.target.style.opacity = 1);
-    }, 5e3);
-}
-
+// Functions and actions in Spider
 // Set up a 1-d array of the unicode values for the cards 0-103 (two decks)
 // Note - Unicode sets up 16 cards per suit, including two queens
 // Unlike the old game, I want to only use the DOM
 // Each move of n cards from x1, iy1 to x2, iy2 (an array of 5 items)
-	const expiry="Fri, 01 Jan 2038 00:00:01 GMT";
-	const sofar=document.getElementById("sofar");
-	if(localStorage.times==null) localStorage.times=0;
-	if(localStorage.wins==null) localStorage.wins=0;
-	if(localStorage.nsuit==null) localStorage.nsuit=2; //default number of suits
-	var cards = []; // array of card div svg objects
-	var ndealt=0; // how many cards have been dealt?
-	var moves = [];
-	var toMove = []; // array of cards to move
-  var deck = []; // sort order for the cards
-  nfoundation=0; // how many foundation piles have gone up?
-  nempty = 0; // computed # empty cascades
-  const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
-  faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
-  vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-	back= '<img src=spider.jpg width=100% height=auto>';
-  var first=0; // index within the nodes for the first that could be moved
-  var last=0; // " the top card
-  var flips=[];
+const demo=document.getElementById("demo");
+const expiry="Fri, 01 Jan 2038 00:00:01 GMT";
+const sofar=document.getElementById("sofar");
+if(localStorage.times==null) localStorage.times=0;
+if(localStorage.wins==null) localStorage.wins=0;
+if(localStorage.nsuit==null) localStorage.nsuit=2; //default number of suits
+var cards = []; // array of card div svg objects
+var ndealt=0; // how many cards have been dealt?
+var moves = [];
+var toMove = []; // array of cards to move
+var deck = []; // sort order for the cards
+nfoundation=0; // how many foundation piles have gone up?
+nempty = 0; // computed # empty cascades
+const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
+faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
+vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];	back= '<img src=/back.jpg width=100% height=auto>';
+var first=0; // index within the nodes for the first that could be moved
+var last=0; // " the top card
+var flips=[];	document.getElementById("s0").innerHTML=back;
+createCards();
+showSuits();
+showScores();
 
-	document.getElementById("s0").innerHTML=back;
-	createCards();
+// FUNCTIONS from top down	// make numbers bigger for phones
+function showScores(){
+	let w=localStorage.wins;
+	let t=localStorage.times;
+	sofar.innerHTML=localStorage.wins+'/'+localStorage.times;
+}
+function changeSuits(){
+	if(localStorage.nsuit==2) {localStorage.nsuit=4;}
+	else if(localStorage.nsuit==4) {localStorage.nsuit=1;}
+	else{localStorage.nsuit=2;}
 	showSuits();
-	showScores();
-	
-	// FUNCTIONS from top down	// make numbers bigger for phones
-	function showScores(){
-		let w=localStorage.wins;
-		let t=localStorage.times;
-		sofar.innerHTML=localStorage.wins+'/'+localStorage.times;
+	createCards();
+}
+function showSuits() {
+	suitlist=suits[0];
+	if(localStorage.nsuit>1) suitlist+=suits[1];
+	if(localStorage.nsuit==4) suitlist+=suits[2]+suits[3];
+	document.getElementById("suitlist").innerHTML=suitlist;
+}		
+// MODIFIED TO USE DIFS INSTEAD OF SVG
+function createCards(){ // creates 13, 26 or 52 dependuing on nsuit for spider
+	var size=( screen.width<600 ? 70 : 45);
+for (n=0;n<(13*localStorage.nsuit);n++) { // create 52 svg cards as strings in this array - innerHTML for divs
+		var suit=Math.floor(n/13);
+		var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
+		var val = n % 13;
+		var ctr = (val<10) ? suits[suit] : faces[val-10];
+		cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
 	}
-	function changeSuits(){
-		if(localStorage.nsuit==2) {localStorage.nsuit=4;}
-		else if(localStorage.nsuit==4) {localStorage.nsuit=1;}
-		else{localStorage.nsuit=2;}
-		showSuits();
-		createCards();
+	for (i=0;i<104;i++) { // initialize the deck
+	  deck[i] = i % (localStorage.nsuit*13) ; // this would run up to 13, 26 or 52
+  flips[i]=0; // initially show only the backs
 	}
-	function showSuits() {
-		suitlist=suits[0];
-		if(localStorage.nsuit>1) suitlist+=suits[1];
-		if(localStorage.nsuit==4) suitlist+=suits[2]+suits[3];
-		document.getElementById("suitlist").innerHTML=suitlist;
-	}		
-// MODIFIED TO USE DIFS INSTEAD OF SVG for S2
-    function createCards(){ // creates 13, 26 or 52 dependuing on nsuit for spider
-		var size=( screen.width<600 ? 70 : 45);
-    for (n=0;n<(13*localStorage.nsuit);n++) { // create 52 svg cards as strings in this array - innerHTML for divs
-			var suit=Math.floor(n/13);
-			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
-			var val = n % 13;
-			var ctr = (val<10) ? suits[suit] : faces[val-10];
-			cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
-		}
-		for (i=0;i<104;i++) { // initialize the deck
-		  deck[i] = i % (localStorage.nsuit*13) ; // this would run up to 13, 26 or 52
-      flips[i]=0; // initially show only the backs
-		}
-	}
-	
-	// a function to Fisher-Yate shuffle two decks together (104 cards);
-  function shuffle(){
-		localStorage.times++; showScores();
-    for(i=103; i>0; i--) { // do 100 random interchanges
-      let j=Math.floor(Math.random()*(i+1));
-			[deck[i],deck[j]]=[deck[j],deck[i]];
-    }
-  }
+}
 
-  function deal(){ // does different things if the game has not already started
-	    clearBoard();
-			var i=0;
-			var m = setInterval(frame,30);
-	    function frame() { // use interval to deal the cards slowly
-  	    if(i==44) {
-	        clearInterval(m);
-					ndealt=44;
-  	      next10();
-      	}else{
-        	j=i%10;
-        	appendCard(i,j,0); // here i is the position in the deck, 0 means face down
-        	i++;
-      	}
-    	}
+// a function to Fisher-Yate shuffle two decks together (104 cards);
+function shuffle(){		localStorage.times++; showScores();
+  for(i=103; i>0; i--) { // do 100 random interchanges
+    let j=Math.floor(Math.random()*(i+1));			[deck[i],deck[j]]=[deck[j],deck[i]];
   }
+}
+function deal(){ // does different things if the game has not already started
+ 	clearBoard();
+	var i=0;
+	var m = setInterval(frame,30);
+	function frame() { // use interval to deal the cards slowly
+	if(i==44) {
+		clearInterval(m);					ndealt=44;
+	    next10();
+    }else{
+      	j=i%10;
+      	appendCard(i,j,0); // here i is the position in the deck, 0 means face down
+      	i++;
+    	}
+  	}
+}
   function next10() { // put the next 10 face up
     if(ndealt<104) { // only do this if there are cards left
       var i=ndealt;
@@ -268,7 +255,7 @@ function removeButton(t) {
 	    const cascade=document.getElementById("c"+j);
 		z=cascade.childElementCount+1;
     var card=document.createElement("div");
-    if(up) {card.innerHTML=cards[deck[i]];flips[i]=1;}else{card.innerHTML=back;flips[i]=0;}
+    if(up) {card.innerHTML=cards[deck[i]];flips[i]=1;}else{card.innerHTML="<img width=100% src=/back.jpg>";flips[i]=0;}
     card.id="v"+i;
     card.classList.add("card");
     card.style.zindex=z.toString();
