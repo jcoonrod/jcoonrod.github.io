@@ -1,7 +1,7 @@
-// Version adapted from Spider for Classic Solitaire
+// Version adapted from both Freecell and Spider for Classic Solitaire
 // Requires changes to TryMove, Deal, spider next10 becomes next3...
 // Note "CardNo" refers to the position in the deck, not of cards
-// 
+// We use the notion of Freecells just like in Freecell
 
 const ncards=52; // This game just uses one deck
 var nreserve=24; // after initial deal there are 24 cards in reserve
@@ -14,6 +14,7 @@ var nreserve=24; // after initial deal there are 24 cards in reserve
 	if(localStorage.times==null) localStorage.times=0;
 	if(localStorage.wins==null) localStorage.wins=0;
 	if(localStorage.nsuit==null) localStorage.nsuit=2; //default number of suits
+	var freecells=[-1,-1,-1]; // Initial the cardno of the three we turn over
 	var cards = []; // array of card div svg objects
 	var ndealt=0; // how many cards have been dealt?
 	var moves = [];
@@ -24,12 +25,12 @@ var nreserve=24; // after initial deal there are 24 cards in reserve
   const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
   faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
   vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-	back= '<img src=back.jpg width=100% height=auto>';
+	back= '<img src=/back.jpg width=100% height=auto>';
   var first=0; // index within the nodes for the first that could be moved
   var last=0; // " the top card
   var flips=[];
 	const demo=document.getElementById("demo");
-	document.getElementById("s0").innerHTML="<img src=back.jpg>";
+	document.getElementById("r0").innerHTML="<img src=back.jpg>";
 	createCards();
 //	showScores(); // maybe add this later
 
@@ -37,16 +38,17 @@ var nreserve=24; // after initial deal there are 24 cards in reserve
 function next3(){
 	for(i=0;i<3;i++) {
 		if (ndealt<ncards) {
-			document.getElementById("f"+i).innerHTML=cards[deck[ndealt]];
+			document.getElementById("s"+i).innerHTML=cards[deck[ndealt]];
+			freecells[i]=deck[ndealt];
 			ndealt++;
 		}else if(nfoundation<ncards){ // repeat remaining undeal cards
 			ndealt=24-nfoundation;
 		}
 	}
-
+	console.log[freecells];
 }
 
-
+/*
 // FUNCTIONS from top down	// make numbers bigger for phones
 function removeButton(t) {
   (t.target.style.opacity = 0),
@@ -54,7 +56,7 @@ function removeButton(t) {
       (t.target.style.visibility = ""), (t.target.style.opacity = 1);
     }, 5e3);
 }
-
+*/
 // MODIFIED TO USE DIFS INSTEAD OF SVG
     function createCards(){
     for (n=0;n<ncards;n++) { // create 52 svg cards as strings in this array - innerHTML for divs
@@ -77,7 +79,8 @@ function removeButton(t) {
     }
   }
 // for now, we won's us frame - deal 7,6,5,4,3,2,1
-  function deal(){ 
+  function deal(){
+	document.getElementById("r0").innterHTML=back; 
 	console.log("deal "+ndealt);
 	ndealt=0;
 	for (j=0;j<7;j++){ // j here indicated which cascade
@@ -94,7 +97,7 @@ function removeButton(t) {
     nfoundation=0; // how many foundation piles have gone up?
 		moves.length=0; // clear these working arrays
 		toMove.length=0;
-		document.getElementById('s0').innerHTML=back;
+		document.getElementById('r0').innerHTML=back;
     for(j=0;j<7;j++) { // clear cascades
       const cascade=document.getElementById("c"+j);
       while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
@@ -131,7 +134,7 @@ function removeButton(t) {
 	
 
 	function tryMove(cardNo) { // version .2 moves a stack by reading the z values
-//	  console.log('cardNo='+cardNo);
+	  console.log('cardNo='+cardNo);
       if(flips[cardNo]) { // first, learn about the clicked card
       	c1=deck[cardNo];
 		v1=c1%13; // value of clicked card
@@ -142,7 +145,7 @@ function removeButton(t) {
 		j=parseInt(cascade1.id.substr(1));
 		nodes=cascade1.childNodes;
 		z2=nodes.length; // get the # of child nodes
-//		console.log('z1='+z1+' z2='+z2+' id='+id+' v1='+v1);
+		console.log('z1='+z1+' z2='+z2+' id='+id+' v1='+v1);
 
 		// next - if this is more than one card, are they in the correct order?
 		nmove=0;
@@ -250,13 +253,46 @@ function removeButton(t) {
 	}
 
 	function dropFree(k){ // Drop the card from freecell k to a cascade
+		var cardNo=freecells[k];
+		if(cardNo>-1) {
+			suit=Math.floor(cardNo/13); val=cardNo % 13; color=(suit==0 || suit==3) ? 'b' : 'r';
+			// run through the top cards to see if it can drop down to them
+			j=0;nmove=0;
+			while(j<8 && nmove==0){
+				destId=topCardId(j); destVal=getVal(destId); destSuit=getSuit(destId);
+				destColor=(destSuit==0 || destSuit==3) ? 'b' : 'r';
+				if((val==destVal-1) && (color !== destColor)) {
+					moves.push(['f',k,'c',j,1]); // this defines a move from freecell to cascade
+					appendCard(cardNo,j);
+					freecells[k]=-1;
+					document.getElementById("s"+k).innerHTML="";
+					nmove=1;
+				}
+				j++;
+			}
+			j=0; // if nothing moved to a full cascade, try empty cascades!
+			while(j<8 && nmove==0) {
+			  if(cascadeEmpty(j)) {
+					moves.push(['f',k,'c',j,1]); // this defines a move from freecell to cascade
+ 					appendCard(cardNo,j);
+					freecells[k]=-1;
+					document.getElementById("s"+k).innerHTML="";
+					nmove=1;
+			  }
+			  j++;
+			}
+		}
+		tryAce(); // after making a move, see if any cards can jump up to foundation
 	}
+
 
   // Run through to see if any top cards can jump to the ace pile
   function topCardId(j){
+	console.log("topCardId from j="+j);
     cascade=document.getElementById("c"+j);
-    topCard = cascade.lastChild;
-    return (topCard) ? topCard.id : ''; // what card is it? v0...
+    id = cascade.lastChild.id;
+	console.log("topCardId="+id);
+    return (id); // what card is it? v0...	
   }
   // simple functions to convert id to values
   const getSuit = s => Math.floor(parseInt(s.substring(1),10)/13);

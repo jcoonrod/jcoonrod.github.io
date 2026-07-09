@@ -11,28 +11,28 @@
   	<meta name="theme-color" content="green"/>
   	<meta name="description" content="Classic Solitaire Game by John Coonrod"/>
 	<title>Classic Solitaire</title>
-	<link rel="stylesheet" href="/style.css">
+	<link rel="stylesheet" href="style.css">
   <script>let game='Classic';</script>
-  <script src="/script.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
   
 <body tabindex="-1">
 	<p>Classic Solitaire
-		<button onclick="shuffle(); dealClassic();">New</button>
+		<button onclick="shuffle(); deal();">New</button>
 		<button onclick="deal();">Replay</button>
     <a href="/">Freecell</a>
 		<span id="sofar">      </span>
 		<span id="demo" onclick="removeButton(event)"> </span>
   </p>
 <div class=row>
-  <div id=s0 class=card onclick="if(ndealt==0){shuffle();dealClassic();}else{next3();}"></div> 
-  <div id=f0 class="card blueborder"></div>
-  <div id=f1 class="card blueborder"></div>
-  <div id=f2 class="card blueborder"></div>
-  <div id=d0 class="card redborder"></div>
-  <div id=d1 class="card redborder"></div>
-  <div id=d2 class="card redborder"></div>
-  <div id=d3 class="card redborder"></div>
+  <div id=r0 class=card onclick="if(ndealt==0){shuffle();deal();}else{next3();}"></div> 
+  <div id=s0 class="card blueborder" onclick="dropFree(0)"></div>
+  <div id=s1 class="card blueborder" onclick="dropFree(1)"></div>
+  <div id=s2 class="card blueborder" onclick="dropFree(2)"></div>
+  <div id=a0 class="card redborder"></div>
+  <div id=a1 class="card redborder"></div>
+  <div id=a2 class="card redborder"></div>
+  <div id=a3 class="card redborder"></div>
 </div>
 <div class=row>&nbsp;</div>
 
@@ -44,6 +44,6 @@
   <div id=c4 class=c></div>
   <div id=c5 class=c></div>
   <div id=c6 class=c></div>
-</div>
+</div
 </body>
 </html>
