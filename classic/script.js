@@ -14,7 +14,9 @@ var nreserve=24; // after initial deal there are 24 cards in reserve
 	if(localStorage.times==null) localStorage.times=0;
 	if(localStorage.wins==null) localStorage.wins=0;
 	if(localStorage.nsuit==null) localStorage.nsuit=2; //default number of suits
+	// I called the turned-over-from-reserve freecell as they behave similarly
 	var freecells=[-1,-1,-1]; // Initial the cardno of the three we turn over
+	var foundations=[-1,-1,-1,-1]; // order for each suit 
 	var cards = []; // array of card div svg objects
 	var ndealt=0; // how many cards have been dealt?
 	var moves = [];
@@ -134,10 +136,13 @@ function removeButton(t) {
 	
 
 	function tryMove(cardNo) { // version .2 moves a stack by reading the z values
-	  console.log('cardNo='+cardNo);
+	// The rule in classic is that colors must not match
+	  console.log('tryMove cardNo='+cardNo);
       if(flips[cardNo]) { // first, learn about the clicked card
       	c1=deck[cardNo];
 		v1=c1%13; // value of clicked card
+		suit=Math.floor(cardNo/13); 
+		c1=(suit==0 || suit==3) ? 'b' : 'r'; // color of clicked card
 		id='v'+cardNo; // node id
 		card1=document.getElementById(id);
 		z1=card1.style.zindex; // index within the nodes
@@ -157,21 +162,59 @@ function removeButton(t) {
 			c=c2;
 			z++;
 		}
-		if(!nmove && (v1==12) && ((z2-z1)==12)) { // detect a winning stack
-//			console.log('Winning stack '+j+' cardNo='+cardNo);
-			moveUp(j,cardNo);
-			nmove=13;
-		}
 		if(!nmove) {
 			toMove.length=0;
 			for(z=z1;z<=z2;z++) toMove.push( parseInt(nodes[z-1].id.substr(1)) );
 		}
-//				if(!nmove && v1!==12) trySame(toMove,c1,j); // first try moving to same suit
 				if(!nmove && v1!==12 ) tryStack(toMove,v1,j); // then consider not-same-suit columns
 				if(!nmove) nmove=tryEmpty(toMove,j); // then consider empty columns
 		}
-		trywin();
+//		trywin();
 	}
+
+  // check if anything can jump to the aces piles automatically
+  function tryAce() { // this will repeat as long as it moves something
+    var nmove=1; // This gets incremented and returned
+    var m=setInterval(frame2,100);
+    function frame2() {
+      if (nmove==0) {
+        clearInterval(m);
+        showFoundations();
+      } else {
+  			nmove=0;
+	      for(j=0;j<8;j++) { // try pop from the cascades
+	        topID=topCardId(j);
+  	      if(topID) { // is there a top card in this cascade?
+    	      suit=getSuit(topID);
+      	    val=getVal(topID);
+          	if(aces[suit]==(val-1)) {
+            	nmove++;
+							moves.push(['c',j,'a',suit,1]); // this defines a move from freecell to cascade
+            	aces[suit]++;
+              cascade=document.getElementById("c"+j);
+  	          cascade.removeChild(cascade.lastChild);
+          	}
+  				}
+        }
+      
+        for(j=0;j<4;j++) { // try pop from freecells
+          cardNo=freecells[j];
+          if(cardNo>-1) {
+            val=cardNo % 13; suit=Math.floor(cardNo/13);
+            if(aces[suit]==(val-1)) {
+              nmove++;
+							moves.push(['f',j,'a',suit,1]); // this defines a move from freecell to cascade
+              aces[suit]=val;
+              freecells[j]=-1;
+              document.getElementById("s"+j).innerHTML="";
+            }
+          }
+        }
+      }
+    }  // end frame
+  } // end try aces
+
+
 	function trywin(){
 		var win=0;
 		if(nfoundation==8) {
@@ -254,16 +297,17 @@ function removeButton(t) {
 
 	function dropFree(k){ // Drop the card from freecell k to a cascade
 		var cardNo=freecells[k];
+		console.log("dropFree k="+k+"cardNo="+cardNo);
 		if(cardNo>-1) {
 			suit=Math.floor(cardNo/13); val=cardNo % 13; color=(suit==0 || suit==3) ? 'b' : 'r';
 			// run through the top cards to see if it can drop down to them
 			j=0;nmove=0;
-			while(j<8 && nmove==0){
+			while(j<7 && nmove==0){
 				destId=topCardId(j); destVal=getVal(destId); destSuit=getSuit(destId);
 				destColor=(destSuit==0 || destSuit==3) ? 'b' : 'r';
 				if((val==destVal-1) && (color !== destColor)) {
 					moves.push(['f',k,'c',j,1]); // this defines a move from freecell to cascade
-					appendCard(cardNo,j);
+					appendCard(cardNo,j,1);
 					freecells[k]=-1;
 					document.getElementById("s"+k).innerHTML="";
 					nmove=1;
