@@ -219,10 +219,6 @@ function next3(){
       first=(first==-1 && match) ? 0 : first+2;
     }
 	}
-
-	function cascadeEmpty(j) {
-	  return (document.getElementById("c"+j).childElementCount==0)
-	}
 	
 	function appendCard(cardNo,j) { // add a card to the end of cascade j
 		const cascade=document.getElementById("c"+j);
@@ -240,8 +236,8 @@ function next3(){
 	function dropFree(k){ // Drop the card from freecell k to a cascade
 		var cardNo=freecells[k];
 		if(cardNo>-1) {
-			suit=Math.floor(cardNo/13); val=cardNo % 13; color=(suit==0 || suit==3) ? 'b' : 'r';
-			// run through the top cards to see if it can drop down to them
+      console.log("dropFree k="+k+" suit="+suit+" color="+color+" val="+val);
+      // run through the top cards to see if it can drop down to them
 			j=0;nmove=0;
 			while(j<8 && nmove==0){
 				destId=topCardId(j); destVal=getVal(destId); destSuit=getSuit(destId);

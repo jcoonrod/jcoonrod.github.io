@@ -2,9 +2,13 @@
 // Requires changes to TryMove, Deal, spider next10 becomes next3...
 // Note "CardNo" refers to the position in the deck, not of cards
 // We use the notion of Freecells just like in Freecell
+// Big difference is that here cards are dealt face down except the last line.
 
 const ncards=52; // This game just uses one deck
 var nreserve=24; // after initial deal there are 24 cards in reserve
+const ncol=7; //maximum width
+const nfree=3; // how many dropable cards are turned over?
+const nfoundations=4; // as distinct from freecell where there are 8
 // Set up a 1-d array of the unicode values for the cards
 // Note - Unicode sets up 16 cards per suit, including two queens
 // Unlike the old game, I want to only use the DOM
@@ -16,7 +20,7 @@ var nreserve=24; // after initial deal there are 24 cards in reserve
 	if(localStorage.nsuit==null) localStorage.nsuit=2; //default number of suits
 	// I called the turned-over-from-reserve freecell as they behave similarly
 	var freecells=[-1,-1,-1]; // Initial the cardno of the three we turn over
-	var foundations=[-1,-1,-1,-1]; // order for each suit 
+	var aces=[-1,-1,-1,-1]; // order for each suit 
 	var cards = []; // array of card div svg objects
 	var ndealt=0; // how many cards have been dealt?
 	var moves = [];
@@ -135,14 +139,16 @@ function removeButton(t) {
 	}
 	
 
-	function tryMove(cardNo) { // version .2 moves a stack by reading the z values
+	function tryMove(cardNo) { // simplify for now - just move bottom card singly
 	// The rule in classic is that colors must not match
-	  console.log('tryMove cardNo='+cardNo);
-      if(flips[cardNo]) { // first, learn about the clicked card
-      	c1=deck[cardNo];
-		v1=c1%13; // value of clicked card
-		suit=Math.floor(cardNo/13); 
-		c1=(suit==0 || suit==3) ? 'b' : 'r'; // color of clicked card
+	// For now, make sure we only take last in this column
+		
+
+	if(flips[cardNo]) { // first, learn about the clicked card
+      	card1=deck[cardNo];
+		val1=card1%13; // value of clicked card
+		suit=Math.floor(card1/13);
+		color1=(suit==0 || suit==3) ? 'b' : 'r'; // color of clicked card
 		id='v'+cardNo; // node id
 		card1=document.getElementById(id);
 		z1=card1.style.zindex; // index within the nodes
@@ -154,14 +160,15 @@ function removeButton(t) {
 
 		// next - if this is more than one card, are they in the correct order?
 		nmove=0;
-		z=z1; v=v1; c=c1;
+		z=z1; v=v1; color=color1;
 		while(z<z2 && !nmove) { // make sure items in stack can move together
 			c2=deck[parseInt(nodes[z].id.substr(1))];
-//			console.log('Check z='+z+' c='+c+' c2='+c2);
+			console.log('Check z='+z+' c='+c+' c2='+c2);
 			if(c!==(c2+1)) nmove=1;
 			c=c2;
 			z++;
 		}
+		// If none have moved yet, keep trying
 		if(!nmove) {
 			toMove.length=0;
 			for(z=z1;z<=z2;z++) toMove.push( parseInt(nodes[z-1].id.substr(1)) );
@@ -171,6 +178,17 @@ function removeButton(t) {
 		}
 //		trywin();
 	}
+
+// Redisplay foundations
+  function showFoundations(){
+    for(i=0;i<nfoundations;i++) {
+      if(aces[i]>-1) {
+        var card=cards[i*13+aces[i]];
+		console.log("showFoundations card="+card+" i="+i);
+        document.getElementById("a"+i).innerHTML=card;
+      }
+    }
+  }
 
   // check if anything can jump to the aces piles automatically
   function tryAce() { // this will repeat as long as it moves something
@@ -182,22 +200,21 @@ function removeButton(t) {
         showFoundations();
       } else {
   			nmove=0;
-	      for(j=0;j<8;j++) { // try pop from the cascades
+	      for(j=0;j<ncol;j++) { // try pop from the cascades
 	        topID=topCardId(j);
   	      if(topID) { // is there a top card in this cascade?
     	      suit=getSuit(topID);
       	    val=getVal(topID);
           	if(aces[suit]==(val-1)) {
             	nmove++;
-							moves.push(['c',j,'a',suit,1]); // this defines a move from freecell to cascade
+				moves.push(['c',j,'a',suit,1]); // this defines a move from freecell to cascade
             	aces[suit]++;
-              cascade=document.getElementById("c"+j);
-  	          cascade.removeChild(cascade.lastChild);
+            	cascade=document.getElementById("c"+j);
+  	        	cascade.removeChild(cascade.lastChild);
           	}
-  				}
-        }
-      
-        for(j=0;j<4;j++) { // try pop from freecells
+  		}
+    }  
+        for(j=0;j<nfree;j++) { // try pop from freecells
           cardNo=freecells[j];
           if(cardNo>-1) {
             val=cardNo % 13; suit=Math.floor(cardNo/13);
@@ -232,18 +249,6 @@ function removeButton(t) {
 	  if(card) v2=deck[ parseInt(card.id.substr(1))]%13;
 	  return v2;
 	}
-	function trySame(toMove,c1,j) { // Try moving stack to the same suit
-	  nmove=0;
-	  k=1;  // first run through possible stack-to-stack moves
-    while(k<10 && !nmove) {
-			m=(j+k)%10; // next cascade to the right
-      k++;
-			c2=deck[topCardId(m).substr(1)];
-//			console.log("Same k="+k+" c1="+c1+" c2="+c2);
-			if(c2==(c1+1)) nmove=moveStack(toMove,j,m);
-    }
-    return nmove;
-	}
 	// 11/24 - include moves to empty in the same scan
 	function tryStack(toMove,v1,j) {
 	  nmove=0;
@@ -277,7 +282,13 @@ function removeButton(t) {
     faceUp( parseInt(cascade1.id.substr(1)) ); // flip the top card in cascade j if not already flipped
     return 1;
   }
-// CHANGE FOR S2 MAKE CARD CLASS CARD	
+  // Check if the column is now empty.
+  function cascadeEmpty(j) {
+	console.log("cascadeEmpty j="+j);
+	  return (document.getElementById("c"+j).childElementCount==0);
+	}
+
+  // CHANGE FOR S2 MAKE CARD CLASS CARD	
 	function appendCard(i,j,up) { // add a card position i in the deck to the end of cascade j
 	  //when i>43, deal face up
 	    const cascade=document.getElementById("c"+j);
@@ -300,9 +311,9 @@ function removeButton(t) {
 		console.log("dropFree k="+k+"cardNo="+cardNo);
 		if(cardNo>-1) {
 			suit=Math.floor(cardNo/13); val=cardNo % 13; color=(suit==0 || suit==3) ? 'b' : 'r';
-			// run through the top cards to see if it can drop down to them
+			console.log("color="+color+" val="+val);
 			j=0;nmove=0;
-			while(j<7 && nmove==0){
+			while(j<ncol && nmove==0){
 				destId=topCardId(j); destVal=getVal(destId); destSuit=getSuit(destId);
 				destColor=(destSuit==0 || destSuit==3) ? 'b' : 'r';
 				if((val==destVal-1) && (color !== destColor)) {
@@ -315,7 +326,8 @@ function removeButton(t) {
 				j++;
 			}
 			j=0; // if nothing moved to a full cascade, try empty cascades!
-			while(j<8 && nmove==0) {
+			// try to make this generic by puting ncol as a constant
+			while(j<ncol && nmove==0) {
 			  if(cascadeEmpty(j)) {
 					moves.push(['f',k,'c',j,1]); // this defines a move from freecell to cascade
  					appendCard(cardNo,j);
