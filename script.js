@@ -112,6 +112,10 @@ function next3(){
       if(!tryEmpty(j)) tryFreeCells(j);} // try either moving a cascade or a car to a freecell
     tryAce();
   }
+
+  function cascadeEmpty(j) {
+	  return (document.getElementById("c"+j).childElementCount==0)
+	}
   
   function tryEmpty(j) { // attempt to move cascade to an open column
     nmove=0; i=1;

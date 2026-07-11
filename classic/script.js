@@ -1,5 +1,6 @@
 // Serious refactor so that when clicking either a freecell or cascade cell the functions work
 // the same - eg, we deal with the element id card element id just the cardNo.
+// In cascade, we only add the onclick on faceup cards.
 
 const ncards=52; // This game just uses one deck
 const ncol=7; //maximum width
@@ -19,18 +20,19 @@ const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const back= '<img src=/back.jpg width=100% height=auto>';
 var flips=[];
 
-// Start the game
+// Start the game without waiting
 createCards();
 shuffle();
 deal();
 
+// When you click on the reserve, it flips up to 3 cards
 function next3(){ // this now only gets called if there are cards to deal
 	for(i=0;i<3;i++) {
 		if (ireserve<ncards) {
 			document.getElementById("s"+i).innerHTML=cards[deck[ireserve]];
 			freecells[i]=ireserve;
 			ireserve++;
-			if(ireserve>ncards) ireserve=nreserve; // loop around
+			if(ireserve==ncards) ireserve=nreserve; // loop around
 		}else{
 			document.getElementById("s"+i).innerHTML="";
 		}
