@@ -7,6 +7,7 @@
 const ncards=52;
 var ndealt=0;
 const ncol=8;
+const nfree=4;
 cards = []; // array of card div objects
 	moves = []; // stack of moves that can then be undone
   tomove = []; // array of cards to move
@@ -94,8 +95,8 @@ function next3(){
   }
 
   function clearBoard(){
-	//	moves.length=0; // clear these working arrays
-	//	nodes.length=0;
+		moves.length=0; // clear these working arrays
+		nodes.length=0;
     for(j=0;j<ncol;j++) { // clear cascades
       const cascade=document.getElementById("c"+j);
       console.log("cascade c"+j);

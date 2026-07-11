@@ -60,7 +60,7 @@ function createCards(){
 function faceUp(cardNo){
 	card=document.getElementById("v"+cardNo);
 	card.innerHTML=cards[deck[cardNo]];
-	card.onclick=tryMove(self);
+	card.setAttribute("onclick","tryMove('v"+cardNo+"');");
 }
 
 // a function to Fisher-Yate shuffle two decks together (104 cards);
@@ -92,7 +92,8 @@ function clearBoard(){	document.getElementById('r0').innerHTML=back;
     const cascade=document.getElementById("c"+j);
     while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
   }
-  for(j=0;j<nfree;j++) document.getElementById("f"+j).innerHTML="";
+  for(j=0;j<nfree;j++) document.getElementById("s"+j).innerHTML="";
+  for(j=0;j<4;j++) document.getElementById("a"+j).innerHTML="";
 }
 
 // when a "freecell" is clicked, see if it will map to a column
@@ -137,18 +138,23 @@ function tryStack(cardNo,value,color){
 }
 
 
-function tryCascade(event) { // can the clicked card move to end of a cascade?
-	j=0;
-	cardNo=parseInt(event.id.substring(1,2));
+function tryMove(event) { // can the clicked card move to end of a cascade?
+	nmove=0; // nothing has moved yet
+	eventId=event.getAttribute('id');
+	console.log("tryMove eventId"+eventId);
+	cardNo=parseInt(eventId.substring(1,2));
+	console.log("tryMove cardNo"+cardNo);
 	cardId=deck[cardNo];
 	var suit1=getSuit(cardId);
 	var color1=getColor(cardId); // optionally paint the red suits red
 	var value1=getVal(cardId); 
-	while (j<ncol) {
-		cardId2=document.getElementById("c"+j);
-
-
+	nmove=tryAce(value1,suit1);
+	if (!nmove) nmove=tryStack(event,value1,color1); // if not, try end of a cascade 
+	if(nmove) {
+		parent=event.parentNode;
+		parent.removeChild(event);
 	}
+
 }
 
 
@@ -193,7 +199,7 @@ function appendCard(i,j,up) { // add a card position i in the deck to the end of
     card.style.width='100%';
 	y=(screen.width < 600 ? (z-1)*4 :  (z-1)*3);
     card.style.top=y.toString()+"vw";
-	if(up) card.onclick=tryMove(this);
+	if(up) card.setAttribute("onclick","tryMove('v"+i+"');");
     cascade.appendChild(card);
 }
 function topCardId(j){
