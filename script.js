@@ -4,9 +4,10 @@
 //   navigator.serviceWorker.register('./sw.js');
 //  }
 //}
-ncards=52;
-ndealt=0;
-cards = []; // array of card div svg objects
+const ncards=52;
+var ndealt=0;
+const ncol=8;
+cards = []; // array of card div objects
 	moves = []; // stack of moves that can then be undone
   tomove = []; // array of cards to move
   deck = []; // sort order for the cards
@@ -44,28 +45,32 @@ cards = []; // array of card div svg objects
       m=deck[j]; deck[j]=deck[k]; deck[k]=m;
     }
   }
+// convert cardId
+const getSuit = cardId => Math.floor(cardId/13);
+const getVal = cardId => cardId % 13;
+const getColor = cardId => (getSuit(cardId)==0 || getSuit(cardId)==3) ? 'b' : 'r';
 
-  function deal(){
-    clearBoard();
-    var i=0;
-		var m = setInterval(frame,50);
-    function frame() { // use interval to deal the cards slowly
-      if(i==52) {
-        clearInterval(m);
-        tryAce();
-      }else{
-        j=i%8;
-        appendCard(deck[i],j);
-        i++;
-      }
+function deal(){
+  clearBoard();
+  var i=0;
+	var m = setInterval(frame,50);
+  function frame() { // use interval to deal the cards slowly
+    if(i==52) {
+      clearInterval(m);
+      tryAce();
+    }else{
+      j=i%8;
+      appendCard(deck[i],j);
+      i++;
     }
   }
+}
 
   // MODIFIED FUNCTIONS FOR CLASSIC
 function next3(){
 	for(i=0;i<3;i++) {
 		if (ndealt<ncards) {
-			document.getElementById("f"+i).innerHTML=cards[deck[ndealt]];
+			document.getElementById("s"+i).innerHTML=cards[deck[ndealt]];
 			ndealt++;
 		}else if(nfoundation<ncards){ // repeat remaining undeal cards
 			ndealt=24-nfoundation;
@@ -88,20 +93,23 @@ function next3(){
 	}
   }
 
-
   function clearBoard(){
-		moves.length=0; // clear these working arrays
-		nodes.length=0;
-    for(j=0;j<8;j++) { // clear cascades
+	//	moves.length=0; // clear these working arrays
+	//	nodes.length=0;
+    for(j=0;j<ncol;j++) { // clear cascades
       const cascade=document.getElementById("c"+j);
+      console.log("cascade c"+j);
       while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
     }
 	  for(j=0;j<4;j++) { // clear freecells and aces piles
 			aces[j]=-1;
+      console.log("ace a"+j);
 			document.getElementById("a"+j).innerHTML='';
-			freecells[j]=-1;
-			document.getElementById("s"+j).innerHTML='';
 		}
+    for(j=0;j<nfree;j++){
+      console.log("freecell s"+j);
+      document.getElementById("s"+j).innerHTML='';
+    }
   }
 	
   function popStack(j) { // a cascade has been clicked
@@ -240,10 +248,14 @@ function next3(){
 	function dropFree(k){ // Drop the card from freecell k to a cascade
 		var cardNo=freecells[k];
 		if(cardNo>-1) {
-      console.log("dropFree k="+k+" suit="+suit+" color="+color+" val="+val);
+      cardId=deck[cardNo];
+      suit=getSuit(cardId);
+      color=getColor(cardId);
+      val=getVal(cardId)
+      console.log("dropFree cardId="+cardId+" suit="+suit+" color="+color+" val="+val);
       // run through the top cards to see if it can drop down to them
 			j=0;nmove=0;
-			while(j<8 && nmove==0){
+			while(j<ncol && nmove==0){
 				destId=topCardId(j); destVal=getVal(destId); destSuit=getSuit(destId);
 				destColor=(destSuit==0 || destSuit==3) ? 'b' : 'r';
 				if((val==destVal-1) && (color !== destColor)) {
@@ -276,10 +288,6 @@ function next3(){
     topCard = cascade.lastChild;
     return (topCard) ? topCard.id : ''; // what card is it? v0...
   }
-  // simple functions to convert id to values
-  const getSuit = s => Math.floor(parseInt(s.substring(1),10)/13);
-  const getVal = s => parseInt(s.substring(1),10) % 13;
-  const getColor = s => (getSuit(s)==0 || getSuit(s)==3) ? 'b' : 'r';
   
   // check if anything can jump to the aces piles automatically
   function tryAce() { // this will repeat as long as it moves something

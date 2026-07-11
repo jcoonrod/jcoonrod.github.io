@@ -25,6 +25,11 @@ createCards();
 shuffle();
 deal();
 
+// convert cardId
+const getSuit = cardId => Math.floor(cardId/13);
+const getVal = cardId => cardId % 13;
+const getColor = cardId => (getSuit(cardId)==0 || getSuit(cardId)==3) ? 'b' : 'r';
+
 // When you click on the reserve, it flips up to 3 cards
 function next3(){ // this now only gets called if there are cards to deal
 	for(i=0;i<3;i++) {
@@ -49,10 +54,16 @@ function createCards(){
 			cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
 			deck[n]=n;
 			flips[n]=0;
-		}
 	}
-	
-	// a function to Fisher-Yate shuffle two decks together (104 cards);
+}
+// flip over card in cascade and put onclick in it
+function faceUp(cardNo){
+	card=document.getElementById("v"+cardNo);
+	card.innerHTML=cards[deck[cardNo]];
+	card.onclick=tryMove(self);
+}
+
+// a function to Fisher-Yate shuffle two decks together (104 cards);
 function shuffle(){
 	console.log("Shuffle "+ncards);
 	for(i=0; i<ncards; i++) { // do lots random interchanges
@@ -62,8 +73,8 @@ function shuffle(){
     }
   }
 // for now, we won's us frame - deal 7,6,5,4,3,2,1
-  function deal(){
-//	clearBoard(); // resets everything
+function deal(){
+	clearBoard(); // resets everything
 	ndealt=0;
 	for (j=0;j<7;j++){ // j here indicated which cascade
 		appendCard(ndealt,j,1); // first card face up
@@ -74,7 +85,8 @@ function shuffle(){
 			ndealt++;
 		}
 	}
-  }
+}
+
 function clearBoard(){	document.getElementById('r0').innerHTML=back;
   for(j=0;j<ncol;j++) { // clear cascades
     const cascade=document.getElementById("c"+j);
@@ -88,25 +100,50 @@ function tryDrop(event){
 	nmove=0; // nothing has moved yet
 	cardNo=parseInt(event.id.substring(1,2));
 	cardId=deck[cardNo];
-	var suit1=Math.floor(cardId/13);
-	var color1='b'; if(suit1==1 || suit1==2) color1='r'; // optionally paint the red suits red
-	var value1 = cardId % 13;
-	if(aces[suit1]==(value1-1)){ // if it stacks, move it there
-		document.getElementById("a"+suit1)=cards[cardId];
-		event.innerHTML="";
+	var suit1=getSuit(cardId);
+	var color1=getColor(cardId); // optionally paint the red suits red
+	var value1=getVal(cardId); 
+	nmove=tryAce(value1,suit1);
+	if (!nmove) nmove=tryStack(event,value1,color1); // if not, try end of a cascade 
+	if(nmove) {event.innerHTML="";}
+}
+function tryAce(value,suit){
+	nmove=0;
+	if(aces[suit]==(value-1)){ // if it stacks, move it there
+		document.getElementById("a"+suit).innerHTML=cards[cardId];
 		aces[suit1]++;
 		nmove=1;
 	}
-	if(!nmove) nmove=tryCascade(event); // if not, try end of a cascade 
+	return nmove;
 }
+
+function tryStack(cardNo,value,color){
+	nmove=0;
+	j=event.parentNode;
+	i=1; // start with 1 to the right
+	while(i<ncol && !nmove) {
+		k=j+i; // scan cascades to the right of the current one, yet loop around
+		if(k>ncol) k=0;
+		whi
+		cascade=document.getElementById("c"+k);
+		topCardId = deck[cascade.lastChild.id];
+		value2=getVal(topCarId);
+		color2=getColor(topCardId);
+		if(value2==(value-1) && color!=color2) {
+			appendCard(cardNo,k,1);
+			nmove++;
+		}else{i++;}
+	}	
+}
+
 
 function tryCascade(event) { // can the clicked card move to end of a cascade?
 	j=0;
 	cardNo=parseInt(event.id.substring(1,2));
 	cardId=deck[cardNo];
-	var suit1=Math.floor(cardId/13);
-	var color1='b'; if(suit1==1 || suit1==2) color1='r'; // optionally paint the red suits red
-	var value1 = cardId % 13;
+	var suit1=getSuit(cardId);
+	var color1=getColor(cardId); // optionally paint the red suits red
+	var value1=getVal(cardId); 
 	while (j<ncol) {
 		cardId2=document.getElementById("c"+j);
 
@@ -156,16 +193,13 @@ function appendCard(i,j,up) { // add a card position i in the deck to the end of
     card.style.width='100%';
 	y=(screen.width < 600 ? (z-1)*4 :  (z-1)*3);
     card.style.top=y.toString()+"vw";
+	if(up) card.onclick=tryMove(this);
     cascade.appendChild(card);
 }
-  function topCardId(j){
+function topCardId(j){
 	console.log("topCardId from j="+j);
     cascade=document.getElementById("c"+j);
     id = cascade.lastChild.id;
 	console.log("topCardId="+id);
     return (id); // what card is it? v0...	
-  }
-  // simple functions to convert id to values
-  const getSuit = s => Math.floor(parseInt(s.substring(1),10)/13);
-  const getVal = s => parseInt(s.substring(1),10) % 13;
-  const getColor = s => (getSuit(s)==0 || getSuit(s)==3) ? 'b' : 'r';
+}
