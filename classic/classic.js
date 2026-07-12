@@ -1,19 +1,22 @@
 // Serious refactor so that when clicking either a freecell or cascade cell the functions work
 // the same - eg, we deal with the element id card element id just the cardNo.
 // In cascade, we only add the onclick on faceup cards.
+// Once we deal the original cards, we move the rest to a reserve deck.
+// When a reserve card goes to the tableau, it is sliced out of the reserve
 
 const ncards=52; // This game just uses one deck
 const ncol=7; //maximum width
 const nfree=3; // how many dropable cards are turned over?
 const nfoundations=4; // as distinct from freecell where there are 8
+var nmove=0; // make this global
 
 var freecells=[-1,-1,-1]; // Initial the cardno of the three we turn over
 var aces=[-1,-1,-1,-1]; // order for each suit 
 var cards = []; // array of card div svg objects
 var ndealt=0; // how many cards have been dealt?
-var ireserve=24; // cursor within the reserve pile
-var nreserve=24; // total currently in reserve
 var deck = []; // sort order for the cards
+var reserve = []; // get created after the deal
+var ireserve = 0; // the cursor into the reserve deck
 const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
 const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
 const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -33,16 +36,16 @@ const getColor = cardId => (getSuit(cardId)==0 || getSuit(cardId)==3) ? 'b' : 'r
 // When you click on the reserve, it flips up to 3 cards
 function next3(){ // this now only gets called if there are cards to deal
 	for(i=0;i<3;i++) {
-		if (ireserve<ncards) {
-			document.getElementById("s"+i).innerHTML=cards[deck[ireserve]];
-			freecells[i]=ireserve;
+		if (ireserve<reserve.length) {
+			document.getElementById("s"+i).innerHTML=cards[deck[reserve[ireserve]]];
+			freecells[i]=reserve[ireserve];
 			ireserve++;
-			if(ireserve==ncards) ireserve=nreserve; // loop around
+			if(ireserve==reserve.length) ireserve=0; // loop around
 		}else{
 			document.getElementById("s"+i).innerHTML="";
 		}
 	}
-	console.log("next 3 ireserve="+ireserve+" nreserve="+nreserve+" freecells="+freecells);
+	console.log("next 3 ireserve="+ireserve+" freecells="+freecells);
 }
 
 function createCards(){
@@ -68,10 +71,10 @@ function shuffle(){
 	console.log("Shuffle "+ncards);
 	for(i=0; i<ncards; i++) { // do lots random interchanges
 		j=Math.floor(Math.random() * 52);
-	[deck[i],deck[j]]=[deck[j],deck[i]];
-//	console.log("i,j="+i+','+j);
+		[deck[i],deck[j]]=[deck[j],deck[i]];
+		//	console.log("i,j="+i+','+j);
     }
-  }
+}
 // for now, we won's us frame - deal 7,6,5,4,3,2,1
 function deal(){
 	clearBoard(); // resets everything
@@ -85,6 +88,7 @@ function deal(){
 			ndealt++;
 		}
 	}
+	for (i=24;i<52;i++) reserve[i-24]=i; // we now have to do a double index to find the actual card
 }
 
 function clearBoard(){	document.getElementById('r0').innerHTML=back;
@@ -109,8 +113,14 @@ function tryDrop(event){ // this is called with argument "this";
 	var value1=getVal(cardId); 
 	console.log("tryDrop eventId="+eventId+" cardNo="+cardNo+" cardId="+cardId+" value1="+value1+ "suit1="+suit1);
 	nmove=tryAce(value1,suit1);
-	if (!nmove) nmove=tryStack(event,value1,color1); // if not, try end of a cascade 
-	if(nmove) {event.innerHTML="";freecells[freecellId]=-1;}
+	if (!nmove) nmove=tryStack(cardNo,value1,color1); // if not, try end of a cascade 
+	if(nmove) {
+		console.log("tryDrop nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
+		document.getElementById(eventId).innerHTML="";
+		freecells[freecellId]=-1;
+		reserve.splice(reserve.indexOf[cardNo],1); // 
+		console.log("new length of reserve=".reserve.length);
+	};
 }
 function tryAce(value,suit){
 	nmove=0;
@@ -123,30 +133,10 @@ function tryAce(value,suit){
 	return nmove;
 }
 
-function tryStack(cardNo,value,color){ // check
-	nmove=0;
-	j=event.parentNode;
-	i=1; // start with 1 to the right
-	while(i<ncol && !nmove) {
-		k=j+i; // scan cascades to the right of the current one, yet loop around
-		if(k>ncol) k=0;
-		cascade=document.getElementById("c"+k);
-		topCardNo=cascade.lastChild.id;
-		console.log("try stack k="+k+" topCardNo="+topCardNo);
-		topCardId = deck[topCardNo];
-		value2=getVal(topCardId);
-		color2=getColor(topCardId);
-		console.log("tryStack topCardId="+topCardId+" value2="+value2+" color2="+color2);
-		if(value2==(value-1) && color!=color2) {
-			appendCard(cardNo,k,1);
-			nmove++;
-		}else{i++;}
-	}	
-}
 
-
-function tryMove(event) { // let's try it with "this"
-	eventId=event.id;
+function tryMove(event) { // When cascade card is clicked. 
+	eventId=event.id; // which card was clicked?
+	j=event.parentNode.id.substring(1);
 	nmove=0; // nothing has moved yet
 	console.log("tryMove eventId "+eventId);
 	cardNo=parseInt(eventId.substring(1,3));
@@ -156,13 +146,41 @@ function tryMove(event) { // let's try it with "this"
 	var color1=getColor(cardId); // optionally paint the red suits red
 	var value1=getVal(cardId); 
 	nmove=tryAce(value1,suit1);
-	if (!nmove) nmove=tryStack(event,value1,color1); // if not, try end of a cascade 
+	if (!nmove) nmove=tryStack(cardNo,value1,color1); // if not, try end of a cascade 
 	if(nmove) {
 		parent=event.parentNode;
 		parent.removeChild(event);
+		nextChild=parent.lastChild;
+		if(nextChild)flipup(nextChild);
 	}
 }
 
+
+
+function tryStack(cardNo,value,color){ // check
+	nmove=0;
+	j=0; // scan all the columns
+	while(j<ncol && !nmove) {
+		topCardNo=document.getElementById("c"+j).lastChild.id;
+		console.log("try stack j="+j+" topCardNo="+topCardNo);
+		topCardId = deck[topCardNo.substring(1)]; // runs 0 to ncards
+		value2=getVal(topCardId);
+		color2=getColor(topCardId);
+		console.log("tryStack j="+j+" topCardId="+topCardId+" value2="+value2+" color2="+color2);
+		if(value2==(value+1) && color!=color2) {
+			appendCard(cardNo,j,1);
+			nmove++;
+		}else{j++;}
+	}
+	return nmove;	
+}
+
+function flipup(child){ // id shold be v0 to v51
+	console.log("flipup id="+child.id);
+	cardNo=child.id.substring(1);
+	child.innerHTML=cards[deck[cardNo]];
+	child.setAttribute("onclick","tryMove(self)");
+}
 
 // Redisplay foundations
   function showFoundations(){
@@ -174,7 +192,6 @@ function tryMove(event) { // let's try it with "this"
       }
     }
   }
-
 
 // try to make this work for both the freeCell and cascade
 function removeFromCascade(j){ // removed last child
