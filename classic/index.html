@@ -23,7 +23,7 @@
   </p>
 <!--First row is the reserve (r0) dealt from reserve (s0-2) and foundation piles (a0-3)-->
 <div class=row>
-  <div id=r0 class=card onclick="if(ndealt<ncards)next3();"><img src=/back.jpg width=100% height=auto></div> 
+  <div id=r0 class=card onclick="if(ndealt<ncards)next3();"><img src=/back.jpg draggable="false" width=100% height=100%></div> 
   <div id=s0 class="card blueborder" onclick="tryDrop(this);"></div>
   <div id=s1 class="card blueborder" onclick="tryDrop(this);"></div>
   <div id=s2 class="card blueborder" onclick="tryDrop(this);"></div>
@@ -32,7 +32,8 @@
   <div id=a2 class="card redborder"></div>
   <div id=a3 class="card redborder"></div>
 </div>
-<div class=row>&nbsp;</div>
+<!-- make sure the blank row has some space-->
+<div class=row><h1>&nbsp;</h1></div>
 
 <div class=row>
   <div id=c0 class=c></div>

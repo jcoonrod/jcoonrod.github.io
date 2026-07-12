@@ -3,17 +3,19 @@
 // In cascade, we only add the onclick on faceup cards.
 // Once we deal the original cards, we move the rest to a reserve deck.
 // When a reserve card goes to the tableau, it is sliced out of the reserve
+// Discovery - I don't need z!
 
 const ncards=52; // This game just uses one deck
 const ncol=7; //maximum width
 const nfree=3; // how many dropable cards are turned over?
 const nfoundations=4; // as distinct from freecell where there are 8
 var nmove=0; // make this global
-
+var cascades=[-1,-1,-1,-1,-1,-1,-1]; // compute cascase size rather than using child count and z
 var freecells=[-1,-1,-1]; // Initial the cardno of the three we turn over
 var aces=[-1,-1,-1,-1]; // order for each suit 
 var cards = []; // array of card div svg objects
 var ndealt=0; // how many cards have been dealt?
+var nmove=0; // how many cards moved in this turn?
 var deck = []; // sort order for the cards
 var reserve = []; // get created after the deal
 var ireserve = 0; // the cursor into the reserve deck
@@ -87,6 +89,7 @@ function deal(){
 			appendCard(ndealt,i,0);
 			ndealt++;
 		}
+		console.log("Append ndealt="+ndealt+" j="+j+" cascades="+cascades);
 	}
 	for (i=24;i<52;i++) reserve[i-24]=i; // we now have to do a double index to find the actual card
 }
@@ -101,6 +104,8 @@ function clearBoard(){	document.getElementById('r0').innerHTML=back;
 }
 
 // when a "freecell" is clicked, see if it will map to a column
+// i though i could share the scan with tryMove but that didn't work
+// maybe we could share the "test j" parts?
 function tryDrop(event){ // this is called with argument "this";
 	eventId=event.id; // This should be like s0, s1, s2  
 	nmove=0; // nothing has moved yet
@@ -108,24 +113,44 @@ function tryDrop(event){ // this is called with argument "this";
 	console.log("tryDrop eventId="+eventId+" freecellId="+freecellId);	
 	cardNo=freecells[freecellId];
 	cardId=deck[cardNo];
-	var suit1=getSuit(cardId);
-	var color1=getColor(cardId); // optionally paint the red suits red
-	var value1=getVal(cardId); 
+	const suit1=getSuit(cardId);
+	const color1=getColor(cardId); // optionally paint the red suits red
+	const value1=getVal(cardId); 
 	console.log("tryDrop eventId="+eventId+" cardNo="+cardNo+" cardId="+cardId+" value1="+value1+ "suit1="+suit1);
 	nmove=tryAce(value1,suit1);
-	if (!nmove) nmove=tryStack(cardNo,value1,color1); // if not, try end of a cascade 
+	j=0;
+	while (!nmove && j<7) {
+		const topCard=document.getElementById("c"+j).lastChild;
+		console.log("Try from ace to cascade j="+j);
+		if(topCard==null && value1==12) { //is the cascade empty and our card a king?
+			console.log("Append a King to "+j);
+			appendCard(j,cardNo,1);
+			nmove++;
+		} else if (topCard!=null) {
+			topCardId=deck[topCard.id.substring(1)];
+			const color2=getColor(topCardId);
+			const value2=getVal(topCardId); 
+			if( (value2==(value1+1))&&(color2!=color1)){
+				console.log("Append a King to "+j);
+				appendCard(j,cardNo,1);
+				nmove++;
+			}					
+		}
+		j++;
+	}
 	if(nmove) {
 		console.log("tryDrop nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
 		document.getElementById(eventId).innerHTML="";
 		freecells[freecellId]=-1;
 		reserve.splice(reserve.indexOf[cardNo],1); // 
-		console.log("new length of reserve=".reserve.length);
+		console.log("new length of reserve="+reserve.length);
 	};
 }
 function tryAce(value,suit){
 	nmove=0;
-	console.log('tryAce value='+value+" suit="+suit);
+	console.log('tryAce aces='+aces+' value='+value+" suit="+suit);
 	if(aces[suit]==(value-1)){ // if it stacks, move it there
+		cardId=suit*13+value;
 		document.getElementById("a"+suit).innerHTML=cards[cardId];
 		aces[suit]++;
 		nmove=1;
@@ -133,25 +158,34 @@ function tryAce(value,suit){
 	return nmove;
 }
 
-
-function tryMove(event) { // When cascade card is clicked. 
-	eventId=event.id; // which card was clicked?
-	j=event.parentNode.id.substring(1);
+// this is where a tableau card goes when clicked
+// it must determine if is the last card in the stack or not
+// 
+function tryMove(event) { // When cascade card is clicked.
 	nmove=0; // nothing has moved yet
-	console.log("tryMove eventId "+eventId);
-	cardNo=parseInt(eventId.substring(1,3));
+	eventId=event.id; // which card was clicked?
+	cardNo=parseInt(eventId.substring(1,3)); // learn all about the clicked card
 	console.log("tryMove cardNo "+cardNo);
 	cardId=deck[cardNo];
 	var suit1=getSuit(cardId);
 	var color1=getColor(cardId); // optionally paint the red suits red
 	var value1=getVal(cardId); 
-	nmove=tryAce(value1,suit1);
-	if (!nmove) nmove=tryStack(cardNo,value1,color1); // if not, try end of a cascade 
-	if(nmove) {
-		parent=event.parentNode;
-		parent.removeChild(event);
-		nextChild=parent.lastChild;
-		if(nextChild)flipup(nextChild);
+	cascade=event.parentNode; // we can only consider an ace if it is not the last child
+	j=cascade.id;
+	topCard=cascade.lastChild; // get the last card in the column
+	if(topCard==event) nmove=tryAce(value1,suit1); // only clicked last cards can move to an ace}
+	if(nmove) cascades[j]--;
+	if (!nmove) nmove=tryStack(cardNo,value1,color1); // try stack moves from clicked to end
+	if(nmove) { // if we moved the stack, remove the stack
+		gotme=0;
+		while(!gotme){
+			nextChild=cascade.lastChild;
+			cascade.removeChild(nextChild);
+			cascades[j]--;
+			if(nextChild==event)gotme=1;
+		}
+		nextChild=cascade.lastChild;
+		if(nextChild) flipup(nextChild);
 	}
 }
 
@@ -161,16 +195,23 @@ function tryStack(cardNo,value,color){ // check
 	nmove=0;
 	j=0; // scan all the columns
 	while(j<ncol && !nmove) {
-		topCardNo=document.getElementById("c"+j).lastChild.id;
-		console.log("try stack j="+j+" topCardNo="+topCardNo);
-		topCardId = deck[topCardNo.substring(1)]; // runs 0 to ncards
-		value2=getVal(topCardId);
-		color2=getColor(topCardId);
-		console.log("tryStack j="+j+" topCardId="+topCardId+" value2="+value2+" color2="+color2);
-		if(value2==(value+1) && color!=color2) {
+		topCard=document.getElementById("c"+j).lastChild;
+		if(topCard==null && value==12) { // ahah, place a king
+			console.log("King placed in "+j);
 			appendCard(cardNo,j,1);
 			nmove++;
-		}else{j++;}
+		}else if (topCard!=null) { //ie, a top card exists
+			topCardNo=topCard.id;
+			console.log("try stack j="+j+" topCardNo="+topCardNo);
+			topCardId = deck[topCardNo.substring(1)]; // runs 0 to ncards
+			value2=getVal(topCardId);
+			color2=getColor(topCardId);
+			console.log("tryStack j="+j+" topCardId="+topCardId+" value2="+value2+" color2="+color2);
+			if(value2==(value+1) && color!=color2) {
+				appendCard(cardNo,j,1);
+				nmove++;
+			}else{j++;}
+		}
 	}
 	return nmove;	
 }
@@ -199,14 +240,16 @@ function removeFromCascade(j){ // removed last child
 	cascade=document.getElementById(id).get;
 }
 
-function appendCard(i,j,up) { // add a card position i in the deck to the end of cascade j
+function appendCard(cardNo,j,up) { // add a card position i in the deck to the end of cascade j
 	const cascade=document.getElementById("c"+j);
-	z=cascade.childElementCount+1;
+	cascades[j]++; // Keep track of size of each cascade
+	z=cascades[j];
     var card=document.createElement("div");
-    if(up) {card.innerHTML=cards[deck[i]];flips[i]=1;}else{card.innerHTML=back;flips[i]=0;}
-    card.id="v"+i;
+    if(up) {card.innerHTML=cards[deck[cardNo]];
+		flips[cardNo]=1;}
+	else{card.innerHTML=back;flips[cardNo]=0;}
+    card.id="v"+cardNo;
     card.classList.add("card");
-    card.style.zindex=z.toString();
     card.style.position='absolute';
     card.style.width='100%';
 	y=(screen.width < 600 ? (z-1)*4 :  (z-1)*3);
