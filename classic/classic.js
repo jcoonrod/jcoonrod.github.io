@@ -69,7 +69,7 @@ function shuffle(){
 	for(i=0; i<ncards; i++) { // do lots random interchanges
 		j=Math.floor(Math.random() * 52);
 	[deck[i],deck[j]]=[deck[j],deck[i]];
-	console.log("i,j="+i+','+j);
+//	console.log("i,j="+i+','+j);
     }
   }
 // for now, we won's us frame - deal 7,6,5,4,3,2,1
@@ -97,39 +97,46 @@ function clearBoard(){	document.getElementById('r0').innerHTML=back;
 }
 
 // when a "freecell" is clicked, see if it will map to a column
-function tryDrop(event){
+function tryDrop(event){ // this is called with argument "this";
+	eventId=event.id; // This should be like s0, s1, s2  
 	nmove=0; // nothing has moved yet
-	cardNo=parseInt(event.id.substring(1,2));
+	freecellId=eventId.substring(1); // like 0,1,2
+	console.log("tryDrop eventId="+eventId+" freecellId="+freecellId);	
+	cardNo=freecells[freecellId];
 	cardId=deck[cardNo];
 	var suit1=getSuit(cardId);
 	var color1=getColor(cardId); // optionally paint the red suits red
 	var value1=getVal(cardId); 
+	console.log("tryDrop eventId="+eventId+" cardNo="+cardNo+" cardId="+cardId+" value1="+value1+ "suit1="+suit1);
 	nmove=tryAce(value1,suit1);
 	if (!nmove) nmove=tryStack(event,value1,color1); // if not, try end of a cascade 
-	if(nmove) {event.innerHTML="";}
+	if(nmove) {event.innerHTML="";freecells[freecellId]=-1;}
 }
 function tryAce(value,suit){
 	nmove=0;
+	console.log('tryAce value='+value+" suit="+suit);
 	if(aces[suit]==(value-1)){ // if it stacks, move it there
 		document.getElementById("a"+suit).innerHTML=cards[cardId];
-		aces[suit1]++;
+		aces[suit]++;
 		nmove=1;
 	}
 	return nmove;
 }
 
-function tryStack(cardNo,value,color){
+function tryStack(cardNo,value,color){ // check
 	nmove=0;
 	j=event.parentNode;
 	i=1; // start with 1 to the right
 	while(i<ncol && !nmove) {
 		k=j+i; // scan cascades to the right of the current one, yet loop around
 		if(k>ncol) k=0;
-		whi
 		cascade=document.getElementById("c"+k);
-		topCardId = deck[cascade.lastChild.id];
-		value2=getVal(topCarId);
+		topCardNo=cascade.lastChild.id;
+		console.log("try stack k="+k+" topCardNo="+topCardNo);
+		topCardId = deck[topCardNo];
+		value2=getVal(topCardId);
 		color2=getColor(topCardId);
+		console.log("tryStack topCardId="+topCardId+" value2="+value2+" color2="+color2);
 		if(value2==(value-1) && color!=color2) {
 			appendCard(cardNo,k,1);
 			nmove++;
@@ -138,12 +145,12 @@ function tryStack(cardNo,value,color){
 }
 
 
-function tryMove(event) { // can the clicked card move to end of a cascade?
+function tryMove(event) { // let's try it with "this"
+	eventId=event.id;
 	nmove=0; // nothing has moved yet
-	eventId=event.getAttribute('id');
-	console.log("tryMove eventId"+eventId);
-	cardNo=parseInt(eventId.substring(1,2));
-	console.log("tryMove cardNo"+cardNo);
+	console.log("tryMove eventId "+eventId);
+	cardNo=parseInt(eventId.substring(1,3));
+	console.log("tryMove cardNo "+cardNo);
 	cardId=deck[cardNo];
 	var suit1=getSuit(cardId);
 	var color1=getColor(cardId); // optionally paint the red suits red
@@ -154,7 +161,6 @@ function tryMove(event) { // can the clicked card move to end of a cascade?
 		parent=event.parentNode;
 		parent.removeChild(event);
 	}
-
 }
 
 
@@ -169,17 +175,6 @@ function tryMove(event) { // can the clicked card move to end of a cascade?
     }
   }
 
-  // check if anything can jump to the aces piles automatically
-  // given parameters - no point in doing things twice
-  function tryAce(cardId) { // cardId is the source of the click
-    var nmove=1; // This gets incremented and returned
-	card
-	if(aces(suit)==(val-1)){
-		aces(suit)++;
-		showFoundations();
-		removeCard(cardNo);
-	}
-  } // end try ace
 
 // try to make this work for both the freeCell and cascade
 function removeFromCascade(j){ // removed last child
@@ -199,7 +194,7 @@ function appendCard(i,j,up) { // add a card position i in the deck to the end of
     card.style.width='100%';
 	y=(screen.width < 600 ? (z-1)*4 :  (z-1)*3);
     card.style.top=y.toString()+"vw";
-	if(up) card.setAttribute("onclick","tryMove('v"+i+"');");
+	if(up) card.setAttribute("onclick","tryMove(this);");
     cascade.appendChild(card);
 }
 function topCardId(j){
