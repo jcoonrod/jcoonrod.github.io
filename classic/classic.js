@@ -180,6 +180,7 @@ function tryMove(event) { // When cascade card is clicked.
 		gotme=0;
 		while(!gotme){
 			nextChild=cascade.lastChild;
+			console.log("Remove form j="+j+" nextChildId="+nextChild.id);
 			cascade.removeChild(nextChild);
 			cascades[j]--;
 			if(nextChild==event)gotme=1;
@@ -256,6 +257,7 @@ function appendCard(cardNo,j,up) { // add a card position i in the deck to the e
     card.style.top=y.toString()+"vw";
 	if(up) card.setAttribute("onclick","tryMove(this);");
     cascade.appendChild(card);
+	cascades(j)++;
 }
 function topCardId(j){
 	console.log("topCardId from j="+j);
