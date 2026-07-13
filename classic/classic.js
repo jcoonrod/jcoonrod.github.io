@@ -40,7 +40,7 @@ const getColor = cardId => (getSuit(cardId)==0 || getSuit(cardId)==3) ? 'b' : 'r
 function next3(){ // this now only gets called if there are cards to deal
 	for(i=0;i<3;i++) {
 		if (ireserve<reserve.length) {
-			document.getElementById("s"+i).innerHTML=cards[deck[reserve[ireserve]]];
+			document.getElementById("s"+i).innerHTML=cards[reserve[ireserve]];
 			freecells[i]=reserve[ireserve];
 			ireserve++;
 			if(ireserve==reserve.length) ireserve=0; // loop around
@@ -92,7 +92,6 @@ function deal(){
 		}
 		console.log("Append ndealt="+ndealt+" j="+j);
 	}
-	for (i=24;i<52;i++) reserve[i-24]=i; // we now have to do a double index to find the actual card
 }
 
 function clearBoard(){	document.getElementById('r0').innerHTML=back;
@@ -165,9 +164,9 @@ function tryAce(value,suit){
 // it must determine if is the last card in the stack or not
 
 function tryMove(event) { // When cascade card is clicked. Must delete it before it can be appended
+	eventId1=event.id; // which card was clicked?
 	console.log("tryMove event="+event);
 	nmove=0; // nothing has moved yet
-	eventId1=event.id; // which card was clicked?
 	console.log("tryMove eventId1 "+eventId1);
 	cardNo1=parseInt(eventId1.substring(1)); // learn all about the clicked card
 	console.log("tryMove cardNo1 "+cardNo1);
@@ -176,7 +175,7 @@ function tryMove(event) { // When cascade card is clicked. Must delete it before
 	var color1=getColor(cardId1); // optionally paint the red suits red
 	var value1=getVal(cardId1); 
 	cascade1=event.parentNode; // we can only consider an ace if it is not the last child
-	j1=cascade1.id;
+	j1=cascade1.id.substring(1);
 	topCard1=cascade1.lastChild; // get the last card in the column
 	if(topCard1==event) nmove=tryAce(value1,suit1); // only clicked last cards can move to an ace}
 	if(nmove) {
@@ -215,18 +214,25 @@ function moveStack(j1,cardNo1,j2){
 	const cascade1=document.getElementById("c"+j1);
 	console.log("cascade1 "+cascade1);
 	const kids=document.getElementById("c"+j1).children;
-	console.log("kide "+kides);
+	console.log("kids "+kids);
 	const cascade2=document.getElementById("c"+j2);
 	console.log("cascade2 "+cascade2);
 	// now find at while index is the one clicked
 	nkids=kids.length;
 	console.log("nkids "+nkids);
-	for(i=0;i<nkids;i++) if(kid==event1) ikid=i; // find index of clicked element
+	for(i=0;i<nkids;i++) if(kids[i].id.substring(1)==cardNo1) ikid=i; // find index of clicked element
 	console.log('ikid '+ikid);
 	for (i=ikid;i<nkids;i++) {
+		copyKid=kids[i];
+		cardNo2=copyKid.id.substring(1);
+		console.log("Kid "+i+" "+kids[i]);
 		cascade1.removeChild(kids[i]);
-		cascade2.appendChild(kids[i]);
+		console.log("append cardNo2 "+cardNo2+" j="+j);
+		appendCard(cardNo2,j,1);
+
 	}
+	last1=cascade1.lastChild;
+	if(last1)flipup(last1);
 }
 
 function flipup(child){ // id shold be v0 to v51
