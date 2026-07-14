@@ -66,7 +66,7 @@ function createCards(){
 function faceUp(cardNo){
 	card=document.getElementById("v"+cardNo);
 	card.innerHTML=cards[deck[cardNo]];
-	card.setAttribute("onclick","tryMove('v"+cardNo+"');");
+	card.setAttribute("onclick","tryMove(this);");
 }
 
 // a function to Fisher-Yate shuffle two decks together (104 cards);
@@ -110,8 +110,8 @@ function clearBoard(){	document.getElementById('r0').innerHTML=back;
 // maybe we could share the "test j" parts?
 // ok, we will set up reserve deck to count initially 0 to 28 containing cardNo from deck
 // othersie we cannot slice it out.
-function tryDrop(freecell){ // this is called with argument "this";
-	freecellId=freecell.id; // This should be like s0, s1, s2  
+function tryDrop(event){ // this is called with argument "this";
+	freecellId=event.id; // This should be like s0, s1, s2  
 	nmove=0; // nothing has moved yet
 	freecellNo=freecellId.substring(1); // like 0,1,2
 	console.log("tryDrop freecellId="+freecellId+" freecellNo="+freecellNo);	
@@ -125,21 +125,23 @@ function tryDrop(freecell){ // this is called with argument "this";
 	j=0;
 	while (!nmove && j<7) { // try moving it to a cascade
 		cascade=document.getElementById("c"+j); //
-		cascadeSize=cascade1.childElementCount;
+		cascadeSize=cascade.childElementCount;
 		console.log("Try from "+freecellId+" to cascade j="+j);
 		if(cascadeSize==0 && value1==12) { //is the cascade empty and our card a king?
 			console.log("Append a King from "+FreecellId+"to empty cascade "+j);
-			appendCard(j,cardNo,1);
+			appendCard(cardNo,j,1);
 			nmove++;
 		} else if (cascadeSize) {
 			topCard=cascade.lastChild;
-			topCardId=deck[topCard.id.substring(1)];
+			topCardNo=topCard.id.substring(1);
+			console.log(".. topCardNo="+topCardNo);
+			topCardId=deck[topCardNo];
 			const color2=getColor(topCardId);
 			const value2=getVal(topCardId);
 			console.log("Top card of "+j+" value2="+value2+"color2="+color2); 
 			if( (value2==(value1+1))&&(color2!=color1)){
-				console.log("Append a King to "+j);
-				appendCard(j,cardNo,1);
+				console.log("Append a card to "+j);
+				appendCard(cardNo,j,1);
 				nmove++;
 			}					
 		}
@@ -147,10 +149,10 @@ function tryDrop(freecell){ // this is called with argument "this";
 	}
 	if(nmove) {
 		console.log("tryDrop nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
-		document.getElementById(eventId).innerHTML="";
-		freecells[freecellId]=-1;
-		deck.splice(deck.indexOf[cardNo],1); // 
-		console.log("new length of deck="+deck.length);
+		document.getElementById(freecellId).innerHTML="";
+		freecells[freecellNo]=-1;
+		deck.splice(reserve.indexOf[cardNo],1); // 
+		console.log("new length of reserve="+reserve.length);
 	};
 }
 function tryAce(value,suit){
@@ -185,7 +187,7 @@ function tryMove(event) { // When cascade card is clicked. Must delete it before
 	if(topCard1==event) nmove=tryAce(value1,suit1); // only clicked last cards can move to an ace}
 	if(nmove) {
 		cascade1.removeChild(topCard1);
-		if(cascade1.lastChild) flipup(cascade1.lastChild);
+		if(cascade1.lastChild) flipup(cascade1.lastChild.id);
 	}
 	if (!nmove) nmove=tryStack(j1,cardNo1,value1,color1); // try stack moves from clicked to end
 }
@@ -232,19 +234,19 @@ function moveStack(j1,cardNo1,j2){
 		cardNo2=copyKid.id.substring(1);
 		console.log("Kid "+i+" "+kids[i]);
 		cascade1.removeChild(kids[i]);
-		console.log("append cardNo2 "+cardNo2+" j="+j);
-		appendCard(cardNo2,j,1);
+		console.log("append cardNo2 "+cardNo2+" j2="+j2);
+		appendCard(cardNo2,j2,1);
 
 	}
 	last1=cascade1.lastChild;
-	if(last1)flipup(last1);
+	if(last1)flipup(last1.id);
 }
 
-function flipup(child){ // id shold be v0 to v51
-	console.log("flipup id="+child.id);
-	cardNo=child.id.substring(1);
-	child.innerHTML=cards[deck[cardNo]];
-	child.setAttribute("onclick","tryMove(self)");
+function flipup(childId){ // id shold be v0 to v51
+	console.log("flipup childId="+childId);
+	cardNo=childId.substring(1);
+	document.getElementById(childId).innerHTML=cards[deck[cardNo]];
+	document.getElementById(childId).setAttribute("onclick","tryMove(this);");
 }
 
 function appendCard(cardNo,j,up) { // add a card position i in the deck to the end of cascade j
