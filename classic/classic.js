@@ -18,8 +18,8 @@ var cards = []; // array of card div svg objects
 var ndealt=0; // how many cards have been dealt?
 var nmove=0; // how many cards moved in this turn?
 var deck = []; // sort order for the cards
-var reserve = []; // get created after the deal
-var ireserve = 0; // the cursor into the reserve deck
+var reserve = []; // contains the undealt cardNos
+var ireserve = 0; // the cursor into the reserve deck from 1 to its length
 const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
 const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
 const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -39,11 +39,11 @@ const getColor = cardId => (getSuit(cardId)==0 || getSuit(cardId)==3) ? 'b' : 'r
 // When you click on the reserve, it flips up to 3 cards
 function next3(){ // this now only gets called if there are cards to deal
 	for(i=0;i<3;i++) {
-		if (ireserve<reserve.length) {
-			document.getElementById("s"+i).innerHTML=cards[reserve[ireserve]];
-			freecells[i]=reserve[ireserve];
+		if (ireserve<deck.length) { // this will now be shrinking
+			document.getElementById("s"+i).innerHTML=cards[deck[reserve[ireserve]]];
+			freecells[i]=reserve[ireserve]; //cardNo
 			ireserve++;
-			if(ireserve==reserve.length) ireserve=0; // loop around
+			if(ireserve==deck.length) ireserve=0; // loop around
 		}else{
 			document.getElementById("s"+i).innerHTML="";
 		}
@@ -92,6 +92,8 @@ function deal(){
 		}
 		console.log("Append ndealt="+ndealt+" j="+j);
 	}
+	ireserve=0; // Where to start on turning up cards
+	for(i=28;i<ncards;i++) reserve[i-28]=i; // i is the cardNo
 }
 
 function clearBoard(){	document.getElementById('r0').innerHTML=back;
@@ -106,6 +108,8 @@ function clearBoard(){	document.getElementById('r0').innerHTML=back;
 // when a "freecell" is clicked, see if it will map to a column
 // i though i could share the scan with tryMove but that didn't work
 // maybe we could share the "test j" parts?
+// ok, we will set up reserve deck to count initially 0 to 28 containing cardNo from deck
+// othersie we cannot slice it out.
 function tryDrop(freecell){ // this is called with argument "this";
 	freecellId=freecell.id; // This should be like s0, s1, s2  
 	nmove=0; // nothing has moved yet
@@ -116,7 +120,7 @@ function tryDrop(freecell){ // this is called with argument "this";
 	suit1=getSuit(cardId);
 	color1=getColor(cardId); // optionally paint the red suits red
 	value1=getVal(cardId); 
-	console.log("tryDrop freecellId="+freecellId+" cardNo="+cardNo+" cardId="+cardId+" value1="+value1+ "suit1="+suit1);
+	console.log("tryDrop freecellId="+freecellId+" cardId="+cardId+" value1="+value1+ "suit1="+suit1);
 	nmove=tryAce(value1,suit1);
 	j=0;
 	while (!nmove && j<7) { // try moving it to a cascade
@@ -131,7 +135,8 @@ function tryDrop(freecell){ // this is called with argument "this";
 			topCard=cascade.lastChild;
 			topCardId=deck[topCard.id.substring(1)];
 			const color2=getColor(topCardId);
-			const value2=getVal(topCardId); 
+			const value2=getVal(topCardId);
+			console.log("Top card of "+j+" value2="+value2+"color2="+color2); 
 			if( (value2==(value1+1))&&(color2!=color1)){
 				console.log("Append a King to "+j);
 				appendCard(j,cardNo,1);
@@ -144,8 +149,8 @@ function tryDrop(freecell){ // this is called with argument "this";
 		console.log("tryDrop nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
 		document.getElementById(eventId).innerHTML="";
 		freecells[freecellId]=-1;
-		reserve.splice(reserve.indexOf[cardNo],1); // 
-		console.log("new length of reserve="+reserve.length);
+		deck.splice(deck.indexOf[cardNo],1); // 
+		console.log("new length of deck="+deck.length);
 	};
 }
 function tryAce(value,suit){
