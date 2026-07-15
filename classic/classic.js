@@ -114,7 +114,7 @@ function tryDrop(event){ // this is called with argument "this";
 	freecellId=event.id; // This should be like s0, s1, s2  
 	nmove=0; // nothing has moved yet
 	freecellNo=freecellId.substring(1); // like 0,1,2
-	console.log("tryDrop freecellId="+freecellId+" freecellNo="+freecellNo);	
+	console.log("tryDrop freecellId="+freecellId+" freecellNo="+freecellNo+" reserve length="+reserve.length);	
 	cardNo=freecells[freecellNo];
 	cardId=deck[cardNo];
 	suit1=getSuit(cardId);
@@ -148,10 +148,10 @@ function tryDrop(event){ // this is called with argument "this";
 		j++;
 	}
 	if(nmove) {
-		console.log("tryDrop nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
+		console.log("... nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
 		document.getElementById(freecellId).innerHTML="";
 		freecells[freecellNo]=-1;
-		deck.splice(reserve.indexOf[cardNo],1); // 
+		reserve.splice(reserve.indexOf[cardNo],1); // 
 		console.log("new length of reserve="+reserve.length);
 	};
 }
@@ -196,15 +196,21 @@ function tryStack(j1,cardNo1,value1,color1){ // try moving stack to stack
 	nmove=0;
 	j=0; // scan all the columns
 	while(j<ncol && !nmove) {
-		topCard=document.getElementById("c"+j).lastChild;
-		if(topCard==null && value1==12) { // ahah, place a king and any children
-			console.log("King stack moved to "+j);
-			moveStack(j1,cardNo1,j);
-			nmove++;
-		}else if (topCard!=null) { //ie, a top card exists
-			topCardNo=topCard.id;
-			console.log("try stack j="+j+" topCardNo="+topCardNo);
-			topCardId = deck[topCardNo.substring(1)]; // runs 0 to ncards
+		cascade=document.getElementById("c"+j);
+		n=cascade.childElementCount;
+		console.log("tryStack j1="+j1+" value1="+value1+" n="+n+" j="+j);
+		if(n==0){ // the only thing you can stack on an empty cascade is a king
+			if(value1=12){
+				console.log("King stack moved to "+j);
+				moveStack(j1,cardNo1,j);
+				nmove++;
+			}
+		}else { //children exist
+			topCard=cascade.lastChild;
+			topCardNo=topCard.id.substring(1);
+			console.log("...n="+n+" topCardNo="+topCardNo);
+			topCardId = deck[topCardNo]; // runs 0 to ncards
+			console.log("...n="+n+" topCardNo="+topCardNo+" topCardId="+topCardId);
 			value2=getVal(topCardId);
 			color2=getColor(topCardId);
 			console.log("tryStack j="+j+" topCardId="+topCardId+" value2="+value2+" color2="+color2);
