@@ -93,7 +93,7 @@ function deal(){
 		console.log("Append ndealt="+ndealt+" j="+j);
 	}
 	ireserve=0; // Where to start on turning up cards
-	for(i=28;i<ncards;i++) reserve[i-28]=i; // i is the cardNo
+	for(i=28;i<ncards;i++) reserve[i-28]=i; // i is the cardNo (index) within deck
 }
 
 function clearBoard(){	document.getElementById('r0').innerHTML=back;
@@ -128,7 +128,7 @@ function tryDrop(event){ // this is called with argument "this";
 		cascadeSize=cascade.childElementCount;
 		console.log("Try from "+freecellId+" to cascade j="+j);
 		if(cascadeSize==0 && value1==12) { //is the cascade empty and our card a king?
-			console.log("Append a King from "+FreecellId+"to empty cascade "+j);
+			console.log("Append a King to empty cascade "+j);
 			appendCard(cardNo,j,1);
 			nmove++;
 		} else if (cascadeSize) {
@@ -193,72 +193,41 @@ function tryMove(event) { // When cascade card is clicked. Must delete it before
 // So we create a stackList of cardNo's that should be moved in order.
 
 function tryStack(j1,cardNo1,value1,color1){ // try moving stack to stack 
-	//before scanning the destinations, compute how many cards must be mmoved
 	console.log("tryStack j1="+j1+" value1="+value1+" color1="+color1);
-	moveList=[]; // start with an empty list
-	cascade1=document.getElementById("c"+j1);  // Source cascade
-	kids=cascade1.children; //list all the cards
-	nkids=kids.length;
-	for(i=0;i<nkids;i++) if(kids[i].id.substring(1)==cardNo1) myKid=i;
-	imove=nkids-myKid;
-	console.log("Prepare to move "+imove+" cards. nkids="+nkids+" myKid="+myKid);
-	nmove=0;
-	stack=[]; // Create an empty Array
-	for(i=0;i<imove;i++) stack[i]=kids[i].id.substring(1); // Get the list of cardNos
-	console.log("Cards in stack "+stack);
+	// First, find a suitable destination if any
 	j=0; // next, scan all the columns for a target
+	nmove=0;
 	while(j<ncol && !nmove) {
 		proceed=false; // don't move ahead unless one condition or the other is met
 		cascade1=document.getElementById("c"+j);
 		n=cascade1.childElementCount; // check if it is empty
-		if(!n && value1==12) proceed=true; // move a king stack
-		else {
+		if(!n && value1==12) nmove=moveStack(j1,cardNo1,j); // move a king stack to empty cascade
+		else if(n) { // don't consider an empty cascade
 			target=cascade1.lastChild.id.substring(1); // cardNo on bottom of target
 			cardId=deck[target];
 			value2=getVal(cardId);
 			color2=getColor(cardId);
 			console.log("... j="+j+" value2="+value2+" color2="+color2);
-			if((color1!=color2)&&(value1==value2-1)) proceed=true;
+			if((color1!=color2)&&(value1==value2-1)) nmove=moveStack(j1,cardNo1,j);
 		}
-		if(proceed){
-			console.log("Proceed from j1="+j1+" to "+j);
-			for(i=myKid;i<nkids;i++) {
-				console.log("move kid"+kids[i].id);
-				cardNo=kids[i].id.substring(1);
-				cascade=kids[i].parentNode;
-				cascade.removeChild(kids[i]);
-				flipup(cascade.lastChild.id);
-				appendCard(cardNo1,j,1);
-			}
-		}
-		j++
+		j++;
 	}
-	return nmove;	
 }
-
-function moveStack(j1,cardNo1,j2){
-	const cascade1=document.getElementById("c"+j1);
-	console.log("cascade1 "+cascade1);
-	const kids=document.getElementById("c"+j1).children;
-	console.log("kids "+kids);
-	const cascade2=document.getElementById("c"+j2);
-	console.log("cascade2 "+cascade2);
-	// now find at while index is the one clicked
+function moveStack(j1,cardNo1,j2){ // move the stack
+	// since we remove kids, the active index stays myKid
+	console.log("Move from j1="+j1+" to "+j2);
+	kids=document.getElementById("c"+j1).children;
 	nkids=kids.length;
-	console.log("nkids "+nkids);
-	for(i=0;i<nkids;i++) if(kids[i].id.substring(1)==cardNo1) ikid=i; // find index of clicked element
-	console.log('ikid '+ikid);
-	for (i=ikid;i<nkids;i++) {
-		copyKid=kids[i];
-		cardNo2=copyKid.id.substring(1);
-		console.log("Kid "+i+" "+kids[i]);
-		cascade1.removeChild(kids[i]);
-		console.log("append cardNo2 "+cardNo2+" j2="+j2);
-		appendCard(cardNo2,j2,1);
-
+	for(i=0;i<kids.length;i++) if(cardNo1==kids[i].id.substring(1)) myKid=i; // top of stack to move
+	nmove=nkids-myKid;
+	console.log("nkids="+nkids+" myKid="+myKid+" nmove="+nmove);
+	for(i=myKid;i<nkids;i++) {
+		console.log("move kid"+kids[myKid].id);
+		cardNo=kids[myKid].id.substring(1);
+		kids[myKid].parentNode.removeChild(kids[myKid]);
+		appendCard(cardNo,j2,1);
 	}
-	last1=cascade1.lastChild;
-	if(last1)flipup(last1.id);
+	flipup(document.getElementById("c"+j1).lastChild.id);
 }
 
 function flipup(childId){ // id shold be v0 to v51
