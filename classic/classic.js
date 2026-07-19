@@ -151,7 +151,7 @@ function tryDrop(event){ // this is called with argument "this";
 		console.log("... nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
 		document.getElementById(freecellId).innerHTML="";
 		freecells[freecellNo]=-1;
-		reserve.splice(reserve.indexOf[cardNo],1); // 
+		reserve.splice(cardNo-28,1); // 
 		console.log("new length of reserve="+reserve.length);
 	};
 }
