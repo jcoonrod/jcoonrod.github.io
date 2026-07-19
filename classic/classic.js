@@ -103,6 +103,7 @@ function clearBoard(){	document.getElementById('r0').innerHTML=back;
   }
   for(j=0;j<nfree;j++) document.getElementById("s"+j).innerHTML="";
   for(j=0;j<4;j++) document.getElementById("a"+j).innerHTML="";
+  aces=[-1,-1,-1,-1];
 }
 
 // when a "freecell" is clicked, see if it will map to a column
@@ -151,8 +152,9 @@ function tryDrop(event){ // this is called with argument "this";
 		console.log("... nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
 		document.getElementById(freecellId).innerHTML="";
 		freecells[freecellNo]=-1;
-		reserve.splice(cardNo-28,1); // 
-		console.log("new length of reserve="+reserve.length);
+		reserveNo=reserve.indexOf(cardNo);
+		reserve.splice(reserveNo,1); // 
+		console.log("cardNo="+cardNo+" reserveNo="+reserveNo+" new length of reserve="+reserve.length);
 	};
 }
 function tryAce(value,suit){
