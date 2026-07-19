@@ -1,25 +1,18 @@
-// Serious refactor so that when clicking either a freecell or cascade cell the functions work
-// the same - eg, we deal with the element id card element id just the cardNo.
-// In cascade, we only add the onclick on faceup cards.
-// Once we deal the original cards, we move the rest to a reserve deck.
-// When a reserve card goes to the tableau, it is sliced out of the reserve
-// Discovery - I don't need z!
-// scoping problem - name everything by source or dest
-// seems difficult to put nodes as parameters - have to use ids instead.
-
+// Complete rewrite based on the 7/26 Classic scripts
+// Note the simple changes below in parameters
 const ncards=52; // This game just uses one deck
-const ncol=7; //maximum width
-const nfree=3; // how many dropable cards are turned over?
+const ncol=8; //maximum width
+const nfree=4; // how many dropable cards are turned over?
 const nfoundations=4; // as distinct from freecell where there are 8
 var nmove=0; // make this global
-var freecells=[-1,-1,-1]; // Initial the cardno of the three we turn over
+var freecells=[-1,-1,-1,-1]; // Initial the cardno of put there
 var aces=[-1,-1,-1,-1]; // order for each suit 
 var cards = []; // array of card div svg objects
 var ndealt=0; // how many cards have been dealt?
 var nmove=0; // how many cards moved in this turn?
 var deck = []; // sort order for the cards
-var reserve = []; // contains the undealt cardNos
-var ireserve = 0; // the cursor into the reserve deck from 1 to its length
+// var reserve = []; // contains the undealt cardNos
+// var ireserve = 0; // the cursor into the reserve deck from 1 to its length
 const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
 const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
 const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -29,7 +22,7 @@ var flips=[];
 // Start the game without waiting
 createCards();
 shuffle();
-deal();
+deal(); // change from classic
 
 // convert cardId
 const getSuit = cardId => Math.floor(cardId/13);
@@ -37,19 +30,19 @@ const getVal = cardId => cardId % 13;
 const getColor = cardId => (getSuit(cardId)==0 || getSuit(cardId)==3) ? 'b' : 'r';
 
 // When you click on the reserve, it flips up to 3 cards
-function next3(){ // this now only gets called if there are cards to deal
-	for(i=0;i<3;i++) {
-		if (ireserve<reserve.length) { // this will now be shrinking
-			document.getElementById("s"+i).innerHTML=cards[deck[reserve[ireserve]]];
-			freecells[i]=reserve[ireserve]; //cardNo
-			ireserve++;
-			if(ireserve>=(reserve.length-1)) ireserve=0; // loop around
-		}else{
-			document.getElementById("s"+i).innerHTML="";
-		}
-	}
-	console.log("next 3 ireserve="+ireserve+" freecells="+freecells);
-}
+//function next3(){ // this now only gets called if there are cards to deal
+//	for(i=0;i<3;i++) {
+//		if (ireserve<reserve.length) { // this will now be shrinking
+//			document.getElementById("s"+i).innerHTML=cards[deck[reserve[ireserve]]];
+//			freecells[i]=reserve[ireserve]; //cardNo
+//			ireserve++;
+//			if(ireserve>=(reserve.length-1)) ireserve=0; // loop around
+//		}else{
+//			document.getElementById("s"+i).innerHTML="";
+//		}
+//	}
+//	console.log("next 3 ireserve="+ireserve+" freecells="+freecells);
+//}
 
 function createCards(){
 	for (n=0;n<ncards;n++) { // create 52 dif cards as strings in this array - innerHTML for divs
@@ -63,11 +56,11 @@ function createCards(){
 	}
 }
 // flip over card in cascade and put onclick in it
-function faceUp(cardNo){
-	card=document.getElementById("v"+cardNo);
-	card.innerHTML=cards[deck[cardNo]];
-	card.setAttribute("onclick","tryMove(this);");
-}
+//function faceUp(cardNo){
+//	card=document.getElementById("v"+cardNo);
+//	card.innerHTML=cards[deck[cardNo]];
+//	card.setAttribute("onclick","tryMove(this);");
+//}
 
 // a function to Fisher-Yate shuffle two decks together (104 cards);
 function shuffle(){
@@ -78,25 +71,34 @@ function shuffle(){
 		//	console.log("i,j="+i+','+j);
     }
 }
-// for now, we won's us frame - deal 7,6,5,4,3,2,1
-function deal(){
-	clearBoard(); // resets everything
-	ndealt=0;
-	for (j=0;j<7;j++){ // j here indicated which cascade
-		appendCard(ndealt,j,1); // first card face up
-		flips[ndealt]=1;
-		ndealt++;
-		for (i=j+1;i<7;i++){ // the rest of the row takes default face down
-			appendCard(ndealt,i,0);
-			ndealt++;
-		}
-		console.log("Append ndealt="+ndealt+" j="+j);
-	}
-	ireserve=0; // Where to start on turning up cards
-	for(i=28;i<ncards;i++) reserve[i-28]=i; // i is the cardNo (index) within deck
-}
 
-function clearBoard(){	document.getElementById('r0').innerHTML=back;
+function deal(){
+	for(i=0;i<ncards;i++){
+		j=i%ncol;
+		appendCard(i,j,1);
+	}
+	ndealt=ncards;
+}
+// for now, we won's us frame - deal 7,6,5,4,3,2,1
+//function deal(){
+//	clearBoard(); // resets everything
+//	ndealt=0;
+//	for (j=0;j<ncol;j++){ // j here indicated which cascade
+//		appendCard(ndealt,j,1); // first card face up
+//		flips[ndealt]=1;
+//		ndealt++;
+//		for (i=j+1;i<7;i++){ // the rest of the row takes default face down
+//			appendCard(ndealt,i,0);
+//			ndealt++;
+//		}
+//		console.log("Append ndealt="+ndealt+" j="+j);
+//	}
+//	ireserve=0; // Where to start on turning up cards
+//	for(i=28;i<ncards;i++) reserve[i-28]=i; // i is the cardNo (index) within deck
+//}
+
+function clearBoard(){	
+//	document.getElementById('r0').innerHTML=back;
   for(j=0;j<ncol;j++) { // clear cascades
     const cascade=document.getElementById("c"+j);
     while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
@@ -156,6 +158,7 @@ function tryDrop(event){ // this is called with argument "this";
 		reserve.splice(reserveNo,1); // 
 		console.log("cardNo="+cardNo+" reserveNo="+reserveNo+" new length of reserve="+reserve.length);
 	};
+	return nmove;
 }
 function tryAce(value,suit){
 	nmove=0;
@@ -173,6 +176,7 @@ function tryAce(value,suit){
 // it must determine if is the last card in the stack or not
 
 function tryMove(event) { // When cascade card is clicked. Must delete it before it can be appended
+	// the big difference in freecell is it can hop up to an empty freecell if nowhere elsee
 	eventId1=event.id; // which card was clicked?
 	parent1=event.parentNode;
 	j1=parent1.id.substring(1);
@@ -186,10 +190,26 @@ function tryMove(event) { // When cascade card is clicked. Must delete it before
 	var color1=getColor(cardId1); // optionally paint the red suits red
 	var value1=getVal(cardId1); 
 	nmove=tryAce(value1,suit1);
-	if(nmove) {parent1.removeChild(parent1.lastChild);
-		flipup(parent1.lastChild.id);
-	}
+	if(nmove) {parent1.removeChild(parent1.lastChild);} // no flips in freecells
 	if(!nmove) nmove=tryStack(j1,cardNo1,value1,color1); // try stack moves from clicked to end
+	if(!nmove) {
+		nmove=tryFree(cardNo1); 
+		if(nmove) {parent1.removeChild(parent1.lastChild);} // no flips in freecells
+	}
+	return nmove;
+}
+function tryFree(cardNo){
+	nmove=0;
+	j=0;
+	while(!nmove && j<nfree){
+		if(freecells[j]=="-1") {
+			nmove++;
+			freecells[j]=cardNo;
+			document.getElementById("s"+j).innerHTML=cards[deck[cardNo]];
+		}
+		j++;
+	}
+	return nmove;
 }
 // We need to preserve the list of cards that must be moved
 // So we create a stackList of cardNo's that should be moved in order.
@@ -230,31 +250,29 @@ function moveStack(j1,cardNo1,j2){ // move the stack
 		kids[myKid].parentNode.removeChild(kids[myKid]);
 		appendCard(cardNo,j2,1);
 	}
-	cascade=document.getElementById("c"+j1);
-	if(cascade.childElementCount) flipup(cascade.lastChild.id);
+	return nmove;
+//	cascade=document.getElementById("c"+j1);
+//	if(cascade.childElementCount) flipup(cascade.lastChild.id);
 }
 
-function flipup(childId){ // id shold be v0 to v51
-	console.log("flipup childId="+childId);
-	cardNo=childId.substring(1);
-	document.getElementById(childId).innerHTML=cards[deck[cardNo]];
-	document.getElementById(childId).setAttribute("onclick","tryMove(this);");
-}
+//function flipup(childId){ // id shold be v0 to v51
+//	console.log("flipup childId="+childId);
+//	cardNo=childId.substring(1);
+//	document.getElementById(childId).innerHTML=cards[deck[cardNo]];
+//	document.getElementById(childId).setAttribute("onclick","tryMove(this);");
+//}
 
-function appendCard(cardNo,j,up) { // add a card position i in the deck to the end of cascade j
-	cascade=document.getElementById("c"+j);
-	z=cascade.childElementCount;
-    card=document.createElement("div");
-    if(up) {card.innerHTML=cards[deck[cardNo]];
-		flips[cardNo]=1;}
-	else{card.innerHTML=back;flips[cardNo]=0;}
-    card.id="v"+cardNo;
+function appendCard(cardNo,j) { // add a card to the end of cascade j
+	const cascade=document.getElementById("c"+j);
+	z=cascade.childElementCount+1;
+    var card=document.createElement("div");
     card.classList.add("card");
+    card.innerHTML=cards[deck[cardNo]];
+    card.id="v"+cardNo;
     card.style.position='absolute';
-    card.style.width='100%';
-	y=(screen.width < 600 ? (z-1)*4 :  (z-1)*3);
+    y=(z-1)*3;
     card.style.top=y.toString()+"vw";
-	if(up) card.setAttribute("onclick","tryMove(this);");
+	card.setAttribute("onclick","tryMove(this);");
     cascade.appendChild(card);
 }
 function topCardId(j){

@@ -9,43 +9,43 @@ var ndealt=0;
 const ncol=8;
 const nfree=4;
 cards = []; // array of card div objects
-	moves = []; // stack of moves that can then be undone
-  tomove = []; // array of cards to move
-  deck = []; // sort order for the cards
-  flips = [];
-  freecells = [-1,-1,-1,-1]; // holds the cardNo if filled
-  nopen = 0; // computed # open freecells
-  nempty = 0; // computed # empty cascades
-  aces = [-1,-1,-1,-1]; // holds the card value if filled
-  suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
-  faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
-  vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-  var nodes = []; // this gets defined by stackable
-  var first=0; // index within the nodes for the first that could be moved
-  var last=0; // " the top card
-  createCards();
+moves = []; // stack of moves that can then be undone
+tomove = []; // array of cards to move
+deck = []; // sort order for the cards
+flips = [];
+freecells = [-1,-1,-1,-1]; // holds the cardNo if filled
+nopen = 0; // computed # open freecells
+nempty = 0; // computed # empty cascades
+aces = [-1,-1,-1,-1]; // holds the card value if filled
+suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
+faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
+vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+var nodes = []; // this gets defined by stackable
+var first=0; // index within the nodes for the first that could be moved
+var last=0; // " the top card
+createCards();
 
-    function createCards(){
-    for (n=0;n<ncards;n++) { // create 52 svg cards as strings in this array - innerHTML for divs
-			var suit=Math.floor(n/13);
-			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
-			var val = n % 13;
-			var ctr = (val<10) ? suits[suit] : faces[val-10];
-			cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
-			deck[n]=n;
-			flips[n]=0;
-		}
+function createCards(){
+  for (n=0;n<ncards;n++) { // create 52 svg cards as strings in this array - innerHTML for divs
+		var suit=Math.floor(n/13);
+		var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
+		var val = n % 13;
+		var ctr = (val<10) ? suits[suit] : faces[val-10];
+		cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
+		deck[n]=n;
+		flips[n]=0;
 	}
+}
 	
-	// a function to shuffle the deck;
-  function shuffle(){
-    ndealt=0;
-    for(i=0; i<100; i++) { // do 100 random interchanges
-      j=Math.floor(52*Math.random());
-      k=Math.floor(52*Math.random());
-      m=deck[j]; deck[j]=deck[k]; deck[k]=m;
-    }
+// a function to shuffle the deck;
+function shuffle(){
+  ndealt=0;
+  for(i=0; i<100; i++) { // do 100 random interchanges
+    j=Math.floor(52*Math.random());
+    k=Math.floor(52*Math.random());
+    m=deck[j]; deck[j]=deck[k]; deck[k]=m;
   }
+}
 // convert cardId
 const getSuit = cardId => Math.floor(cardId/13);
 const getVal = cardId => cardId % 13;
@@ -67,64 +67,38 @@ function deal(){
   }
 }
 
-  // MODIFIED FUNCTIONS FOR CLASSIC
-function next3(){
-	for(i=0;i<3;i++) {
-		if (ndealt<ncards) {
-			document.getElementById("s"+i).innerHTML=cards[deck[ndealt]];
-			ndealt++;
-		}else if(nfoundation<ncards){ // repeat remaining undeal cards
-			ndealt=24-nfoundation;
-		}
-	}
 
+function clearBoard(){
+	moves.length=0; // clear these working arrays
+	nodes.length=0;
+  for(j=0;j<ncol;j++) { // clear cascades
+    const cascade=document.getElementById("c"+j);
+    console.log("cascade c"+j);
+    while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
+  }
+  for(j=0;j<4;j++) { // clear freecells and aces piles
+		aces[j]=-1;
+    console.log("ace a"+j);
+		document.getElementById("a"+j).innerHTML='';
+	}
+  for(j=0;j<nfree;j++){
+    console.log("freecell s"+j);
+    document.getElementById("s"+j).innerHTML='';
+  }
 }
-// for now, we won's us frame - deal 7,6,5,4,3,2,1
-  function dealClassic(){ 
-	console.log("dealClassic "+ndealt);
-	ndealt=0;
-	for (j=0;j<7;j++){ // j here indicated which cascade
-		appendCard(ndealt,j,1); // first card face up
-		flips[ndealt]=1;
-		ndealt++;
-		for (i=j+1;i<7;i++){ // the rest of the row takes default face down
-			appendCard(ndealt,i,0);
-			ndealt++;
-		}
-	}
-  }
-
-  function clearBoard(){
-		moves.length=0; // clear these working arrays
-		nodes.length=0;
-    for(j=0;j<ncol;j++) { // clear cascades
-      const cascade=document.getElementById("c"+j);
-      console.log("cascade c"+j);
-      while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
-    }
-	  for(j=0;j<4;j++) { // clear freecells and aces piles
-			aces[j]=-1;
-      console.log("ace a"+j);
-			document.getElementById("a"+j).innerHTML='';
-		}
-    for(j=0;j<nfree;j++){
-      console.log("freecell s"+j);
-      document.getElementById("s"+j).innerHTML='';
-    }
-  }
 	
-  function popStack(j) { // a cascade has been clicked
-		xtp=document.getElementById("xt");
-		if(j) xtp.textContent="j="+j;
-    stackable(j);
-    if (!tryMove(j)) {
-      if(!tryEmpty(j)) tryFreeCells(j);} // try either moving a cascade or a car to a freecell
-    tryAce();
-  }
+function popStack(j) { // a cascade has been clicked
+	xtp=document.getElementById("xt");
+	if(j) xtp.textContent="j="+j;
+  stackable(j);
+  if (!tryMove(j)) {
+    if(!tryEmpty(j)) tryFreeCells(j);} // try either moving a cascade or a car to a freecell
+  tryAce();
+}
 
-  function cascadeEmpty(j) {
-	  return (document.getElementById("c"+j).childElementCount==0)
-	}
+function cascadeEmpty(j) {
+  return (document.getElementById("c"+j).childElementCount==0)
+}
   
   function tryEmpty(j) { // attempt to move cascade to an open column
     nmove=0; i=1;

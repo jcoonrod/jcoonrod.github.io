@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!-- FreeCell using div for the cards - all in one HTML page -->
+<!-- PWA disabled for development here and script-->
+<html lang=en>
+<head>
+  <link rel="icon" type="image/png" href="back.png"/>
+<!--	<link rel="manifest" href="/manifest.json"> -->
+	<link rel="apple-touch-icon" href="jc192.png">
+	<meta name="mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-status-bar-style" content="green">
+  <meta name="mobile-web-app-title" content="FreeCell">
+	<link rel="canonical" href="https://jcoonrod.github.io" />
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta name="google" content="notranslate">
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+  <link rel='shortcut icon' href='/jc192.png'>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="theme-color" content="green"/>
+  <meta name="description" content="One-Click FreeCell Game by John Coonrod"/>
+  <link rel="stylesheet" href="freecell.css">
+  <script src="freecell.js" defer></script>
+	<title>1-Click Freecell</title>
+</head>
+  
+<body tabindex="-1">
+  <p>FreeCell 
+  <button onclick="shuffle(); deal()">New Game</button>
+  <button onclick="deal()">Replay</button>
+  <button onclick="undo()">Undo</button>
+    <a href='classic'>Classic</a>
+    <a href="spider">Spider</a>
+	<span id=xt>  </span> -- <b>Under Construction</b>
+  </p>
+  <div class=row>
+  <div id=s0 class="card redborder" onclick="dropFree(0)"></div>
+  <div id=s1 class="card redborder" onclick="dropFree(1)"></div>
+  <div id=s2 class="card redborder" onclick="dropFree(2)"></div>
+  <div id=s3 class="card redborder" onclick="dropFree(3)"></div>
+  <div id=a0 class="card blueborder"></div>
+  <div id=a1 class="card blueborder"></div>
+  <div id=a2 class="card blueborder"></div>
+  <div id=a3 class="card blueborder"></div>
+</div>
+<div class=row>&nbsp;</div>
+<div class=row>
+  <div id=c0 class=c onclick="popStack(0)"></div>
+  <div id=c1 class=c onclick="popStack(1)"></div>
+  <div id=c2 class=c onclick="popStack(2)"></div>
+  <div id=c3 class=c onclick="popStack(3)"></div>
+  <div id=c4 class=c onclick="popStack(4)"></div>
+  <div id=c5 class=c onclick="popStack(5)"></div>
+  <div id=c6 class=c onclick="popStack(6)"></div>
+  <div id=c7 class=c onclick="popStack(7)"></div>
+</div>
+</body>
+</html>
