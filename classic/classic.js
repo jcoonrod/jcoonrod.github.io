@@ -43,7 +43,7 @@ function next3(){ // this now only gets called if there are cards to deal
 			document.getElementById("s"+i).innerHTML=cards[deck[reserve[ireserve]]];
 			freecells[i]=reserve[ireserve]; //cardNo
 			ireserve++;
-			if(ireserve==reserve.length) ireserve=0; // loop around
+			if(ireserve>=(reserve.length-1)) ireserve=0; // loop around
 		}else{
 			document.getElementById("s"+i).innerHTML="";
 		}
@@ -229,7 +229,8 @@ function moveStack(j1,cardNo1,j2){ // move the stack
 		kids[myKid].parentNode.removeChild(kids[myKid]);
 		appendCard(cardNo,j2,1);
 	}
-	flipup(document.getElementById("c"+j1).lastChild.id);
+	cascade=document.getElementById("c"+j1);
+	if(cascade.childElementCount) flipup(cascade.lastChild.id);
 }
 
 function flipup(childId){ // id shold be v0 to v51
