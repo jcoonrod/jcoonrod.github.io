@@ -108,16 +108,12 @@ function clearBoard(){
   aces=[-1,-1,-1,-1];
 }
 
-// when a "freecell" is clicked, see if it will map to a column
-// i though i could share the scan with tryMove but that didn't work
-// maybe we could share the "test j" parts?
-// ok, we will set up reserve deck to count initially 0 to 28 containing cardNo from deck
-// othersie we cannot slice it out.
+// A freecell can be dropped to any empty tableau or matching 
 function tryDrop(event){ // this is called with argument "this";
 	freecellId=event.id; // This should be like s0, s1, s2  
 	nmove=0; // nothing has moved yet
 	freecellNo=freecellId.substring(1); // like 0,1,2
-	console.log("tryDrop freecellId="+freecellId+" freecellNo="+freecellNo+" reserve length="+reserve.length);	
+	console.log("tryDrop freecellId="+freecellId+" freecellNo="+freecellNo);	
 	cardNo=freecells[freecellNo];
 	cardId=deck[cardNo];
 	suit1=getSuit(cardId);
@@ -130,8 +126,8 @@ function tryDrop(event){ // this is called with argument "this";
 		cascade=document.getElementById("c"+j); //
 		cascadeSize=cascade.childElementCount;
 		console.log("Try from "+freecellId+" to cascade j="+j);
-		if(cascadeSize==0 && value1==12) { //is the cascade empty and our card a king?
-			console.log("Append a King to empty cascade "+j);
+		if(cascadeSize==0) { //is the cascade empty? (not restricted to kings)
+			console.log("Append a Freecell card to empty cascade "+j);
 			appendCard(cardNo,j,1);
 			nmove++;
 		} else if (cascadeSize) {
@@ -154,9 +150,9 @@ function tryDrop(event){ // this is called with argument "this";
 		console.log("... nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
 		document.getElementById(freecellId).innerHTML="";
 		freecells[freecellNo]=-1;
-		reserveNo=reserve.indexOf(cardNo);
-		reserve.splice(reserveNo,1); // 
-		console.log("cardNo="+cardNo+" reserveNo="+reserveNo+" new length of reserve="+reserve.length);
+//		reserveNo=reserve.indexOf(cardNo);
+//		reserve.splice(reserveNo,1); // 
+//		console.log("cardNo="+cardNo+" reserveNo="+reserveNo+" new length of reserve="+reserve.length);
 	};
 	return nmove;
 }
