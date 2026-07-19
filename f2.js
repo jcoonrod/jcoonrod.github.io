@@ -7,7 +7,7 @@ const nfoundations=4; // as distinct from freecell where there are 8
 var nmove=0; // make this global
 var freecells=[-1,-1,-1,-1]; // Initial the cardno of put there
 var aces=[-1,-1,-1,-1]; // order for each suit 
-var cards = []; // array of card div svg objects
+var cards = []; // array of card div objects
 var ndealt=0; // how many cards have been dealt?
 var nmove=0; // how many cards moved in this turn?
 var deck = []; // sort order for the cards
@@ -28,21 +28,6 @@ deal(); // change from classic
 const getSuit = cardId => Math.floor(cardId/13);
 const getVal = cardId => cardId % 13;
 const getColor = cardId => (getSuit(cardId)==0 || getSuit(cardId)==3) ? 'b' : 'r';
-
-// When you click on the reserve, it flips up to 3 cards
-//function next3(){ // this now only gets called if there are cards to deal
-//	for(i=0;i<3;i++) {
-//		if (ireserve<reserve.length) { // this will now be shrinking
-//			document.getElementById("s"+i).innerHTML=cards[deck[reserve[ireserve]]];
-//			freecells[i]=reserve[ireserve]; //cardNo
-//			ireserve++;
-//			if(ireserve>=(reserve.length-1)) ireserve=0; // loop around
-//		}else{
-//			document.getElementById("s"+i).innerHTML="";
-//		}
-//	}
-//	console.log("next 3 ireserve="+ireserve+" freecells="+freecells);
-//}
 
 function createCards(){
 	for (n=0;n<ncards;n++) { // create 52 dif cards as strings in this array - innerHTML for divs
