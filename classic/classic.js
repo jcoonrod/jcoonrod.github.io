@@ -252,7 +252,7 @@ function appendCard(cardNo,j,up) { // add a card position i in the deck to the e
     card.classList.add("card");
     card.style.position='absolute';
     card.style.width='100%';
-	y=(screen.width < 600 ? (z-1)*4 :  (z-1)*3);
+	y=(z-1)*4;
     card.style.top=y.toString()+"vw";
 	if(up) card.setAttribute("onclick","tryMove(this);");
     cascade.appendChild(card);
