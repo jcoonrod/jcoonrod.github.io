@@ -157,7 +157,9 @@ function tryAce(value,suit){
 // it must determine if is the last card in the stack or not
 
 function tryMove(event) { // When cascade card is clicked. Must delete it before it can be appended
-	// the big difference in freecell is it can hop up to an empty freecell if nowhere elsee
+	// the big difference in freecell is it can hop up to an empty freecell if nowhere else
+	// Also, the size of the stack is limited to 2^m*(n+1) where m=empty cascades
+	// Only a full stack can move to the foundation (ace)
 	eventId1=event.id; // which card was clicked?
 	parent1=event.parentNode;
 	j1=parent1.id.substring(1);
@@ -169,8 +171,10 @@ function tryMove(event) { // When cascade card is clicked. Must delete it before
 	cardId1=deck[cardNo1];
 	var suit1=getSuit(cardId1);
 	var color1=getColor(cardId1); // optionally paint the red suits red
-	var value1=getVal(cardId1); 
-	nmove=tryAce(value1,suit1);
+	var value1=getVal(cardId1);
+	lastCardNo1=parent1.lastChild.id.substring(1);
+	var value3=getVal(deck[lastCardNo1]) 
+	if(value1==12 && value3==0) nmove=tryFull(j1,cardNo1,suit1); // in freecell, gets replace with tryFull
 	if(nmove) {parent1.removeChild(parent1.lastChild);} // no flips in freecells
 	if(!nmove) nmove=tryStack(j1,cardNo1,value1,color1); // try stack moves from clicked to end
 	if(!nmove) {

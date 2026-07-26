@@ -16,11 +16,16 @@
 </head>
   
 <body tabindex="-1">
-	<p>Freecell
-		<button onclick="shuffle(); deal();">New</button>
-		<button onclick="deal();">Replay</button>
-    <a href="/classic">Classic</a><a href="/spider"> Spider</a>
-  </p>
+<div class="dropdown">
+  <button class="dropbtn">Freecell ^</button>
+  <div class="dropdown-content">
+    <a href="/classic">Classic</a>
+    <a href="/">Freecell</a>
+    <a href="/spider">Spider</a>
+  </div>
+  <button class="dropbtn" onclick="shuffle(); deal();">New</button>
+	<button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
+</div>
 <!--First row is the reserve (r0) dealt from reserve (s0-2) and foundation piles (a0-3)-->
 <div class=row>
   <div id=s0 class="card blueborder" onclick="tryDrop(this);"></div>
@@ -33,8 +38,7 @@
   <div id=a3 class="card redborder"></div>
 </div>
 <!-- make sure the blank row has some space-->
-<div class=row><h1>&nbsp;</h1></div>
-
+<div class="row">&nbsp;</div>
 <div class=row>
   <div id=c0 class=c></div>
   <div id=c1 class=c></div>
