@@ -11,16 +11,23 @@
   	<meta name="theme-color" content="green"/>
   	<meta name="description" content="Classic Solitaire Game by John Coonrod"/>
 	<title>Classic Solitaire</title>
-	<link rel="stylesheet" href="classic.css">
+	<link rel="stylesheet" href="/f2.css">
   <script src="classic.js" defer></script>
 </head>
   
 <body tabindex="-1">
-	<p>Classic Solitaire
-		<button onclick="shuffle(); deal();">New</button>
-		<button onclick="deal();">Replay</button>
-    <a href="/">Freecell</a><a href="/spider"> Spider</a>
-  </p>
+<div class="dropdown">
+  <button class="dropbtn">Classic v</button>
+  <div class="dropdown-content">
+    <a href="/classic">Classic</a>
+    <a href="/">Freecell</a>
+    <a href="/spider">Spider</a>
+  </div>
+</div>
+<div class="buttons">
+  <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
+	<button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
+</div>
 <!--First row is the reserve (r0) dealt from reserve (s0-2) and foundation piles (a0-3)-->
 <div class=row>
   <div id=r0 class=card onclick="if(ndealt<ncards)next3();"><img src=/back.jpg draggable="false" width=100% height=100%></div> 

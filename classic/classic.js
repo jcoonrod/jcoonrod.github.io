@@ -187,7 +187,7 @@ function tryMove(event) { // When cascade card is clicked. Must delete it before
 	var value1=getVal(cardId1); 
 	nmove=tryAce(value1,suit1);
 	if(nmove) {parent1.removeChild(parent1.lastChild);
-		flipup(parent1.lastChild.id);
+		if(parent1.childElementCount) flipup(parent1.lastChild.id);
 	}
 	if(!nmove) nmove=tryStack(j1,cardNo1,value1,color1); // try stack moves from clicked to end
 }

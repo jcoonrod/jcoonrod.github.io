@@ -18,13 +18,15 @@
   
 <body tabindex="-1">
 <div class="dropdown">
-  <button class="dropbtn">Freecell ^</button>
+  <button class="dropbtn">Freecell v</button>
   <div class="dropdown-content">
     <a href="/classic">Classic</a>
     <a href="/">Freecell</a>
     <a href="/spider">Spider</a>
   </div>
-  <button class="dropbtn" onclick="shuffle(); deal();">New</button>
+</div>
+<div class="buttons">
+  <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
 	<button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
 </div>
 <!--First row is the reserve (r0) dealt from reserve (s0-2) and foundation piles (a0-3)-->

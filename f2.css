@@ -8,6 +8,7 @@ p, p>a {color:white;}
 img {width:100%;}
 div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;}
 div.c {height:80vw;width:12.5%;position:relative;margin:0;border:0;}
+div.c10 {height:80vw;width:10%;position:relative;margin:0;border:0;}
 .r {color:red;}
 .b {color:black;}
 h2{font-size:4vw;padding:0;margin:0;font-weight:bold;position:relative; top:-0.5vw;}
@@ -15,17 +16,23 @@ h1{font-size:8vw;padding:0;margin:0;font-weight:normal;text-align: center;positi
 .card {
   background: white;
   padding: 0 0.2vw;margin:0;
+  box-sizing: border-box;
   border-style: solid;
   border-radius: 1vw;
   border-color:black; border-width:0.5vw;
-  width:11vw; 
-  height:16vw;
+  width:100%; 
+  aspect-ratio: 7 / 10;
 }
 .redborder {border-color:red !important;}
 .blueborder {border-color:blue !important;}
 
 /* Container needed to position the dropdown content */
 .dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.buttons {
   position: relative;
   display: inline-block;
 }
