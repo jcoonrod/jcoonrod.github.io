@@ -24,38 +24,6 @@ createCards();
 shuffle();
 deal(); // change from classic
 
-// convert cardId
-const getSuit = cardId => Math.floor(cardId/13);
-const getVal = cardId => cardId % 13;
-const getColor = cardId => (getSuit(cardId)==0 || getSuit(cardId)==3) ? 'b' : 'r';
-
-function createCards(){
-	for (n=0;n<ncards;n++) { // create 52 dif cards as strings in this array - innerHTML for divs
-			var suit=Math.floor(n/13);
-			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
-			var val = n % 13;
-			var ctr = (val<10) ? suits[suit] : faces[val-10];
-			cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
-			deck[n]=n;
-			flips[n]=0;
-	}
-}
-// flip over card in cascade and put onclick in it
-//function faceUp(cardNo){
-//	card=document.getElementById("v"+cardNo);
-//	card.innerHTML=cards[deck[cardNo]];
-//	card.setAttribute("onclick","tryMove(this);");
-//}
-
-// a function to Fisher-Yate shuffle two decks together (104 cards);
-function shuffle(){
-	console.log("Shuffle "+ncards);
-	for(i=0; i<ncards; i++) { // do lots random interchanges
-		j=Math.floor(Math.random() * 52);
-		[deck[i],deck[j]]=[deck[j],deck[i]];
-		//	console.log("i,j="+i+','+j);
-    }
-}
 
 function deal(){
 	for(i=0;i<ncards;i++){
@@ -64,23 +32,6 @@ function deal(){
 	}
 	ndealt=ncards;
 }
-// for now, we won's us frame - deal 7,6,5,4,3,2,1
-//function deal(){
-//	clearBoard(); // resets everything
-//	ndealt=0;
-//	for (j=0;j<ncol;j++){ // j here indicated which cascade
-//		appendCard(ndealt,j,1); // first card face up
-//		flips[ndealt]=1;
-//		ndealt++;
-//		for (i=j+1;i<7;i++){ // the rest of the row takes default face down
-//			appendCard(ndealt,i,0);
-//			ndealt++;
-//		}
-//		console.log("Append ndealt="+ndealt+" j="+j);
-//	}
-//	ireserve=0; // Where to start on turning up cards
-//	for(i=28;i<ncards;i++) reserve[i-28]=i; // i is the cardNo (index) within deck
-//}
 
 function clearBoard(){	
 //	document.getElementById('r0').innerHTML=back;
@@ -107,7 +58,7 @@ function tryDrop(event){ // this is called with argument "this";
 	console.log("tryDrop freecellId="+freecellId+" cardId="+cardId+" value1="+value1+ "suit1="+suit1);
 	nmove=tryAce(value1,suit1);
 	j=0;
-	while (!nmove && j<7) { // try moving it to a cascade
+	while (!nmove && j<ncol) { // try moving it to a cascade
 		cascade=document.getElementById("c"+j); //
 		cascadeSize=cascade.childElementCount;
 		console.log("Try from "+freecellId+" to cascade j="+j);
@@ -157,9 +108,6 @@ function tryAce(value,suit){
 // it must determine if is the last card in the stack or not
 
 function tryMove(event) { // When cascade card is clicked. Must delete it before it can be appended
-	// the big difference in freecell is it can hop up to an empty freecell if nowhere else
-	// Also, the size of the stack is limited to 2^m*(n+1) where m=empty cascades
-	// Only a full stack can move to the foundation (ace)
 	eventId1=event.id; // which card was clicked?
 	parent1=event.parentNode;
 	j1=parent1.id.substring(1);
@@ -171,81 +119,18 @@ function tryMove(event) { // When cascade card is clicked. Must delete it before
 	cardId1=deck[cardNo1];
 	var suit1=getSuit(cardId1);
 	var color1=getColor(cardId1); // optionally paint the red suits red
-	var value1=getVal(cardId1);
-	lastCardNo1=parent1.lastChild.id.substring(1);
-	var value3=getVal(deck[lastCardNo1]) 
-	if(value1==12 && value3==0) nmove=tryFull(j1,cardNo1,suit1); // in freecell, gets replace with tryFull
-	if(nmove) {parent1.removeChild(parent1.lastChild);} // no flips in freecells
+	var value1=getVal(cardId1); 
+	if(!nmove) {
+		nmove=tryAce(value1,suit1);
+		if(nmove) parent1.removeChild(parent1.lastChild);
+	}
 	if(!nmove) nmove=tryStack(j1,cardNo1,value1,color1); // try stack moves from clicked to end
 	if(!nmove) {
-		nmove=tryFree(cardNo1); 
-		if(nmove) {parent1.removeChild(parent1.lastChild);} // no flips in freecells
+		nmove=tryFree(cardNo1);
+		if(nmove) parent1.removeChild(parent1.lastChild);
 	}
-	return nmove;
-}
-function tryFree(cardNo){
-	nmove=0;
-	j=0;
-	while(!nmove && j<nfree){
-		if(freecells[j]=="-1") {
-			nmove++;
-			freecells[j]=cardNo;
-			document.getElementById("s"+j).innerHTML=cards[deck[cardNo]];
-		}
-		j++;
-	}
-	return nmove;
-}
-// We need to preserve the list of cards that must be moved
-// So we create a stackList of cardNo's that should be moved in order.
-
-function tryStack(j1,cardNo1,value1,color1){ // try moving stack to stack 
-	console.log("tryStack j1="+j1+" value1="+value1+" color1="+color1);
-	// First, find a suitable destination if any
-	j=0; // next, scan all the columns for a target
-	nmove=0;
-	while(j<ncol && !nmove) {
-		proceed=false; // don't move ahead unless one condition or the other is met
-		cascade1=document.getElementById("c"+j);
-		n=cascade1.childElementCount; // check if it is empty
-		if(!n && value1==12) nmove=moveStack(j1,cardNo1,j); // move a king stack to empty cascade
-		else if(n) { // don't consider an empty cascade
-			target=cascade1.lastChild.id.substring(1); // cardNo on bottom of target
-			cardId=deck[target];
-			value2=getVal(cardId);
-			color2=getColor(cardId);
-			console.log("... j="+j+" value2="+value2+" color2="+color2);
-			if((color1!=color2)&&(value1==value2-1)) nmove=moveStack(j1,cardNo1,j);
-		}
-		j++;
-	}
-	return nmove;
-}
-function moveStack(j1,cardNo1,j2){ // move the stack
-	// since we remove kids, the active index stays myKid
-	console.log("Move from j1="+j1+" to "+j2);
-	kids=document.getElementById("c"+j1).children;
-	nkids=kids.length;
-	for(i=0;i<kids.length;i++) if(cardNo1==kids[i].id.substring(1)) myKid=i; // top of stack to move
-	nmove=nkids-myKid;
-	console.log("nkids="+nkids+" myKid="+myKid+" nmove="+nmove);
-	for(i=myKid;i<nkids;i++) {
-		console.log("move kid"+kids[myKid].id);
-		cardNo=kids[myKid].id.substring(1);
-		kids[myKid].parentNode.removeChild(kids[myKid]);
-		appendCard(cardNo,j2,1);
-	}
-	return nmove;
-//	cascade=document.getElementById("c"+j1);
-//	if(cascade.childElementCount) flipup(cascade.lastChild.id);
 }
 
-//function flipup(childId){ // id shold be v0 to v51
-//	console.log("flipup childId="+childId);
-//	cardNo=childId.substring(1);
-//	document.getElementById(childId).innerHTML=cards[deck[cardNo]];
-//	document.getElementById(childId).setAttribute("onclick","tryMove(this);");
-//}
 
 function appendCard(cardNo,j) { // add a card to the end of cascade j
 	const cascade=document.getElementById("c"+j);
@@ -259,11 +144,4 @@ function appendCard(cardNo,j) { // add a card to the end of cascade j
     card.style.top=y.toString()+"vw";
 	card.setAttribute("onclick","tryMove(this);");
     cascade.appendChild(card);
-}
-function topCardId(j){
-	console.log("topCardId from j="+j);
-    cascade=document.getElementById("c"+j);
-    id = cascade.lastChild.id;
-	console.log("topCardId="+id);
-    return (id); // what card is it? v0...	
 }
