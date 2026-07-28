@@ -262,7 +262,7 @@ function deal(){ // does different things if the game has not already started
     card.style.position='absolute';
     card.setAttribute("onclick","tryMove("+i+");");
     card.style.width='100%';
-    y=(z-1)*4;
+    y=(z-1)*5;
     card.style.top=y.toString()+"vw";
     cascade.appendChild(card);
 	}

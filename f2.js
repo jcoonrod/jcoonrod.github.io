@@ -140,7 +140,7 @@ function appendCard(cardNo,j) { // add a card to the end of cascade j
     card.innerHTML=cards[deck[cardNo]];
     card.id="v"+cardNo;
     card.style.position='absolute';
-    y=(z-1)*4;
+    y=(z-1)*5;
     card.style.top=y.toString()+"vw";
 	card.setAttribute("onclick","tryMove(this);");
     cascade.appendChild(card);
