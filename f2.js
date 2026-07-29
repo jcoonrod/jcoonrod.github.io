@@ -1,5 +1,6 @@
 // Complete rewrite based on the 7/26 Classic scripts
 // Note the simple changes below in parameters
+TODO: mystery card appearances!
 const ncards=52; // This game just uses one deck
 const ncol=8; //maximum width
 const nfree=4; // how many dropable cards are turned over?
@@ -87,9 +88,6 @@ function tryDrop(event){ // this is called with argument "this";
 		console.log("... nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
 		document.getElementById(freecellId).innerHTML="";
 		freecells[freecellNo]=-1;
-//		reserveNo=reserve.indexOf(cardNo);
-//		reserve.splice(reserveNo,1); // 
-//		console.log("cardNo="+cardNo+" reserveNo="+reserveNo+" new length of reserve="+reserve.length);
 	};
 	return nmove;
 }
