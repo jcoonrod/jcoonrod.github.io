@@ -2,6 +2,7 @@
 const demo=document.getElementById("demo");
 const expiry="Fri, 01 Jan 2038 00:00:01 GMT";
 const sofar=document.getElementById("sofar");
+const ncards=104;
 if(localStorage.times==null) localStorage.times=0;
 if(localStorage.wins==null) localStorage.wins=0;
 if(localStorage.nsuit==null) localStorage.nsuit=2; //default number of suits
@@ -13,11 +14,12 @@ var deck = []; // sort order for the cards
 nfoundation=0; // how many foundation piles have gone up?
 nempty = 0; // computed # empty cascades
 const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
-faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
-vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];	back= '<img src=/back.jpg width=100% height=auto>';
+const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
+const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];	back= '<img src=/back.jpg width=100% height=auto>';
 var first=0; // index within the nodes for the first that could be moved
 var last=0; // " the top card
-var flips=[];	document.getElementById("s0").innerHTML=back;
+var flips=[];
+document.getElementById("s0").innerHTML=back;
 createCards();
 showSuits();
 showScores();
@@ -42,27 +44,7 @@ function showSuits() {
 	document.getElementById("suitlist").innerHTML=suitlist;
 }		
 // MODIFIED TO USE DIFS INSTEAD OF SVG
-function createCards(){ // creates 13, 26 or 52 dependuing on nsuit for spider
-	var size=( screen.width<600 ? 70 : 45);
-for (n=0;n<(13*localStorage.nsuit);n++) { // create 52 svg cards as strings in this array - innerHTML for divs
-		var suit=Math.floor(n/13);
-		var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
-		var val = n % 13;
-		var ctr = (val<10) ? suits[suit] : faces[val-10];
-		cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
-	}
-	for (i=0;i<104;i++) { // initialize the deck
-	  deck[i] = i % (localStorage.nsuit*13) ; // this would run up to 13, 26 or 52
-  flips[i]=0; // initially show only the backs
-	}
-}
 
-// a function to Fisher-Yate shuffle two decks together (104 cards);
-function shuffle(){		localStorage.times++; showScores();
-  for(i=103; i>0; i--) { // do 100 random interchanges
-    let j=Math.floor(Math.random()*(i+1));			[deck[i],deck[j]]=[deck[j],deck[i]];
-  }
-}
 function deal(){ // does different things if the game has not already started
  	clearBoard();
 	var i=0;
@@ -264,13 +246,3 @@ function deal(){ // does different things if the game has not already started
 	}
 
 
-  // Run through to see if any top cards can jump to the ace pile
-  function topCardId(j){
-    cascade=document.getElementById("c"+j);
-    topCard = cascade.lastChild;
-    return (topCard) ? topCard.id : ''; // what card is it? v0...
-  }
-  // simple functions to convert id to values
-  const getSuit = s => Math.floor(parseInt(s.substring(1),10)/13);
-  const getVal = s => parseInt(s.substring(1),10) % 13;
-  const getColor = s => (getSuit(s)==0 || getSuit(s)==3) ? 'b' : 'r';
