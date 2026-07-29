@@ -30,10 +30,12 @@ function tryFree(cardNo){
 	nmove=0;
 	j=0;
 	while(!nmove && j<nfree){
+		console.log("tryFree cardNo="+cardNo+" nfree="+nfree);
 		if(freecells[j]=="-1") {
 			nmove++;
 			freecells[j]=cardNo;
 			document.getElementById("s"+j).innerHTML=cards[deck[cardNo]];
+			console.log("... moved to j="+j);
 		}
 		j++;
 	}

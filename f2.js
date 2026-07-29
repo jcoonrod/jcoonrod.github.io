@@ -42,6 +42,7 @@ function clearBoard(){
   for(j=0;j<nfree;j++) document.getElementById("s"+j).innerHTML="";
   for(j=0;j<4;j++) document.getElementById("a"+j).innerHTML="";
   aces=[-1,-1,-1,-1];
+  freecells=[-1,-1,-1,-1];
 }
 
 // A freecell can be dropped to any empty tableau or matching 
@@ -101,6 +102,8 @@ function tryAce(value,suit){
 		aces[suit]++;
 		nmove=1;
 	}
+	if(aces[0]==12 && aces[1]==12 && aces[2]==12 && aces[3]==12) confetti(
+		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
 	return nmove;
 }
 
