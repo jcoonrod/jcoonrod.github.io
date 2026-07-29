@@ -81,9 +81,8 @@ function moveStack(j1,cardNo1,j2){ // move the stack
 		appendCard(cardNo,j2,1);
 	}
 	return nmove;
-//	cascade=document.getElementById("c"+j1);
-//	if(cascade.childElementCount) flipup(cascade.lastChild.id);
 }
+
 function topCardId(j){
 	console.log("topCardId from j="+j);
     cascade=document.getElementById("c"+j);
