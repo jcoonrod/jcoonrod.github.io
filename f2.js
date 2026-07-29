@@ -1,6 +1,6 @@
 // Complete rewrite based on the 7/26 Classic scripts
 // Note the simple changes below in parameters
-TODO: mystery card appearances!
+//TODO: mystery card appearances!
 const ncards=52; // This game just uses one deck
 const ncol=8; //maximum width
 const nfree=4; // how many dropable cards are turned over?

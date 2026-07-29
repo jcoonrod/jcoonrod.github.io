@@ -1,8 +1,4 @@
 // Functions and actions in Spider
-// Set up a 1-d array of the unicode values for the cards 0-103 (two decks)
-// Note - Unicode sets up 16 cards per suit, including two queens
-// Unlike the old game, I want to only use the DOM
-// Each move of n cards from x1, iy1 to x2, iy2 (an array of 5 items)
 const demo=document.getElementById("demo");
 const expiry="Fri, 01 Jan 2038 00:00:01 GMT";
 const sofar=document.getElementById("sofar");
@@ -267,8 +263,6 @@ function deal(){ // does different things if the game has not already started
     cascade.appendChild(card);
 	}
 
-	function dropFree(k){ // Drop the card from freecell k to a cascade
-	}
 
   // Run through to see if any top cards can jump to the ace pile
   function topCardId(j){
