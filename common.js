@@ -1,18 +1,30 @@
 // routines used in multiple games
+var cards = []; // array of card div objects
+var ndealt=0; // how many cards have been dealt?
+var nmove=0; // how many cards moved in this turn?
+var deck = []; // sort order for the cards
+const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
+const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
+const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const back= '<img src=/back.jpg width=100% height=auto>';
+var flips=[];
+
 
 const getSuit = cardId => Math.floor(cardId/13);
 const getVal = cardId => cardId % 13;
 const getColor = cardId => (getSuit(cardId)==0 || getSuit(cardId)==3) ? 'b' : 'r';
 
 function createCards(){
-	for (n=0;n<ncards;n++) { // create 52 dif cards as strings in this array - innerHTML for divs
+	for (n=0;n<52;n++) { // create 52 dif cards as strings in this array - innerHTML for divs
 			var suit=Math.floor(n/13);
 			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
 			var val = n % 13;
 			var ctr = (val<10) ? suits[suit] : faces[val-10];
 			cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
-			deck[n]=n;
-			flips[n]=0;
+	}
+	for(n=0;n<ncards;n++) { // handle 52 and 104 items in deck
+		deck[n]=n%52;
+		flips[n]=0;
 	}
 }
 

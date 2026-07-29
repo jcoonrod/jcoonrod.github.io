@@ -8,17 +8,6 @@ const nfoundations=4; // as distinct from freecell where there are 8
 var nmove=0; // make this global
 var freecells=[-1,-1,-1,-1]; // Initial the cardno of put there
 var aces=[-1,-1,-1,-1]; // order for each suit 
-var cards = []; // array of card div objects
-var ndealt=0; // how many cards have been dealt?
-var nmove=0; // how many cards moved in this turn?
-var deck = []; // sort order for the cards
-// var reserve = []; // contains the undealt cardNos
-// var ireserve = 0; // the cursor into the reserve deck from 1 to its length
-const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
-const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
-const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-const back= '<img src=/back.jpg width=100% height=auto>';
-var flips=[];
 
 // Start the game without waiting
 createCards();

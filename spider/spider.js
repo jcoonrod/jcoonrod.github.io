@@ -6,19 +6,12 @@ const ncards=104;
 if(localStorage.times==null) localStorage.times=0;
 if(localStorage.wins==null) localStorage.wins=0;
 if(localStorage.nsuit==null) localStorage.nsuit=2; //default number of suits
-var cards = []; // array of card div objects
-var ndealt=0; // how many cards have been dealt?
 var moves = [];
 var toMove = []; // array of cards to move
-var deck = []; // sort order for the cards
-nfoundation=0; // how many foundation piles have gone up?
-nempty = 0; // computed # empty cascades
-const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
-const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
-const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];	back= '<img src=/back.jpg width=100% height=auto>';
+var nfoundation=0; // how many foundation piles have gone up?
+var nempty = 0; // computed # empty cascades
 var first=0; // index within the nodes for the first that could be moved
 var last=0; // " the top card
-var flips=[];
 document.getElementById("s0").innerHTML=back;
 createCards();
 showSuits();
