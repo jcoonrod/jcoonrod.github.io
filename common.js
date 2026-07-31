@@ -9,7 +9,6 @@ const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const back= '<img src=/back.jpg width=100% height=auto>';
 var flips=[];
 
-
 const getSuit = cardId => Math.floor(cardId/13);
 const getVal = cardId => cardId % 13;
 const getColor = cardId => (getSuit(cardId)==0 || getSuit(cardId)==3) ? 'b' : 'r';
@@ -95,10 +94,20 @@ function moveStack(j1,cardNo1,j2){ // move the stack
 	return nmove;
 }
 
+function flipup(childId){ // id shold be v0 to v51
+	console.log("flipup childId="+childId);
+	cardNo=childId.substring(1);
+	document.getElementById(childId).innerHTML=cards[deck[cardNo]];
+	document.getElementById(childId).setAttribute("onclick","tryMove(this);");
+}
+
 function topCardId(j){
 	console.log("topCardId from j="+j);
     cascade=document.getElementById("c"+j);
-    id = cascade.lastChild.id;
-	console.log("topCardId="+id);
-    return (id); // what card is it? v0...	
+	if(cascade.childElementCount) {
+		id = cascade.lastChild.id;
+		console.log("topCardId="+id);
+	}
+	else {id=-1;}
+    return (id); // what card is it? or -1 if empty cascade
 }

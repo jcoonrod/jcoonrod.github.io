@@ -15,18 +15,19 @@ var freecells=[-1,-1,-1]; // Initial the cardno of the three we turn over
 var aces=[-1,-1,-1,-1]; // order for each suit 
 var reserve = []; // contains the undealt cardNos
 var ireserve = 0; // the cursor into the reserve deck from 1 to its length
+createCards(); // Do this differently depending on number of suits.
 
 // When you click on the reserve, it flips up to 3 cards
 function next3(){ // this now only gets called if there are cards to deal
-	for(i=0;i<3;i++) {
-		if (ireserve<reserve.length) { // this will now be shrinking
-			document.getElementById("s"+i).innerHTML=cards[deck[reserve[ireserve]]];
-			freecells[i]=reserve[ireserve]; //cardNo
-			ireserve++;
-			if(ireserve>=(reserve.length-1)) ireserve=0; // loop around
-		}else{
-			document.getElementById("s"+i).innerHTML="";
-		}
+	n=Math.min(3,reserve.length);
+	if(ireserve>=(reserve.length-1)) ireserve=0;
+	// first, clear out what is there
+	for(i=0;i<3;i++) document.getElementById("s"+i).innerHTML="";
+	for(i=0;i<n;i++) {
+		document.getElementById("s"+i).innerHTML=cards[deck[reserve[ireserve]]];
+		freecells[i]=reserve[ireserve]; //cardNo
+		ireserve++;
+		if(ireserve>=(reserve.length-1)) ireserve=0; // loop around
 	}
 	console.log("next 3 ireserve="+ireserve+" freecells="+freecells);
 }
@@ -126,6 +127,8 @@ function tryAce(value,suit){
 		aces[suit]++;
 		nmove=1;
 	}
+	if(aces[0]==12 && aces[1]==12 && aces[2]==12 && aces[3]==12) confetti(
+		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
 	return nmove;
 }
 
@@ -155,12 +158,6 @@ function tryMove(event) { // When cascade card is clicked. Must delete it before
 	}
 }
 
-function flipup(childId){ // id shold be v0 to v51
-	console.log("flipup childId="+childId);
-	cardNo=childId.substring(1);
-	document.getElementById(childId).innerHTML=cards[deck[cardNo]];
-	document.getElementById(childId).setAttribute("onclick","tryMove(this);");
-}
 
 function appendCard(cardNo,j,up) { // add a card position i in the deck to the end of cascade j
 	cascade=document.getElementById("c"+j);
