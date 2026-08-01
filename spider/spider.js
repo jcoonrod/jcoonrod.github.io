@@ -3,6 +3,7 @@ const demo=document.getElementById("demo");
 const expiry="Fri, 01 Jan 2038 00:00:01 GMT";
 const sofar=document.getElementById("sofar");
 const ncards=104;
+const ncol=10;
 if(localStorage.times==null) localStorage.times=0;
 if(localStorage.wins==null) localStorage.wins=0;
 if(localStorage.nsuit==null) localStorage.nsuit=2; //default number of suits
@@ -16,7 +17,6 @@ document.getElementById("s0").innerHTML=back;
 createCardsSpider(localStorage.nsuit);
 showSuits();
 showScores();
-
 
 function createCardsSpider(nsuit){
 	m=nsuit*13; // creates 13, 26 or 52 cards
@@ -32,7 +32,6 @@ function createCardsSpider(nsuit){
 		flips[i]=0;
 	}
 }
-
 
 // FUNCTIONS from top down	// make numbers bigger for phones
 function showScores(){
@@ -53,7 +52,6 @@ function showSuits() {
 	if(localStorage.nsuit==4) suitlist+=suits[2]+suits[3];
 	document.getElementById("suitlist").innerHTML=suitlist;
 }		
-// MODIFIED TO USE DIFS INSTEAD OF SVG
 
 function deal(){ // does different things if the game has not already started
  	clearBoard();
@@ -61,7 +59,8 @@ function deal(){ // does different things if the game has not already started
 	var m = setInterval(frame,30);
 	function frame() { // use interval to deal the cards slowly
 	if(i==44) {
-		clearInterval(m);					ndealt=44;
+		clearInterval(m);
+		ndealt=44;
 	    next10();
     }else{
       	j=i%10;
@@ -164,16 +163,16 @@ function topCardValue(m) { // return -1 on empty, or 0-12 value of top card
   return v2;
 }
 function trySame(toMove,c1,j) { // Try moving stack to the same suit
-  nmove=0;
-  k=1;  // first run through possible stack-to-stack moves
-while(k<10 && !nmove) {
+	nmove=0;
+	k=1;  // first run through possible stack-to-stack moves
+	while(k<ncol && !nmove) {
 		m=(j+k)%10; // next cascade to the right
-  k++;
+  		k++;
 		c2=deck[topCardId(m).substr(1)];
 		console.log("Same k="+k+" c1="+c1+" c2="+c2);
 		if(c2==(c1+1)) nmove=moveStack(toMove,j,m);
-}
-return nmove;
+	}
+	return nmove;
 }
 // 11/24 - include moves to empty in the same scan
 function tryStack(toMove,v1,j) {
