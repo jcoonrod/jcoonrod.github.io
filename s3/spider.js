@@ -20,20 +20,6 @@ showSuits();
 showScores();
 
 
-function createCardsSpider(nsuit){
-	m=nsuit*13; // creates 13, 26 or 52 cards
-	for (i=0;i<m;i++) { // create 52 dif cards as strings in this array - innerHTML for divs
-			var suit=Math.floor(i/13);
-			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
-			var val = i % 13;
-			var ctr = (val<10) ? suits[suit] : faces[val-10];
-			cards[i]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
-	}
-	for(i=0;i<ncards;i++) { // handle 52 and 104 items in deck
-		deck[i]=i%m;
-		flips[i]=0;
-	}
-}
 
 // FUNCTIONS from top down	// make numbers bigger for phones
 function showScores(){
@@ -55,6 +41,21 @@ function showSuits() {
 	document.getElementById("suitlist").innerHTML=suitlist;
 }		
 // specialized functions for Spider
+function createCardsSpider(nsuit){
+	m=nsuit*13; // creates 13, 26 or 52 cards
+	for (i=0;i<m;i++) { // create 52 dif cards as strings in this array - innerHTML for divs
+			var suit=Math.floor(i/13);
+			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
+			var val = i % 13;
+			var ctr = (val<10) ? suits[suit] : faces[val-10];
+			cards[i]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
+	}
+	for(i=0;i<ncards;i++) { // handle 52 and 104 items in deck
+		deck[i]=i%m;
+		flips[i]=0;
+	}
+}
+
 function deal(){ // does different things if the game has not already started
  	clearBoard();
 	var i=0;
