@@ -101,13 +101,13 @@ function flipup(childId){ // id shold be v0 to v51
 	document.getElementById(childId).setAttribute("onclick","tryMove(this);");
 }
 
-function topCardId(j){
-	console.log("topCardId from j="+j);
+function lastChildId(j){
+	console.log("LastChildId from j="+j);
     cascade=document.getElementById("c"+j);
 	if(cascade.childElementCount) {
 		id = cascade.lastChild.id;
-		console.log("topCardId="+id);
+		console.log("lastChildId="+id);
 	}
-	else {id=-1;}
-    return (id); // what card is it? or -1 if empty cascade
+	else {id=NULL;}
+    return (id); // what card is it? or NULL if empty cascade
 }

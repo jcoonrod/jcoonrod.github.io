@@ -1,4 +1,5 @@
 // Functions and actions in Spider
+// OK - everything is messed up - 8/26 - let's do one move at a time.
 const demo=document.getElementById("demo");
 const expiry="Fri, 01 Jan 2038 00:00:01 GMT";
 const sofar=document.getElementById("sofar");
@@ -17,6 +18,7 @@ document.getElementById("s0").innerHTML=back;
 createCardsSpider(localStorage.nsuit);
 showSuits();
 showScores();
+
 
 function createCardsSpider(nsuit){
 	m=nsuit*13; // creates 13, 26 or 52 cards
@@ -52,7 +54,7 @@ function showSuits() {
 	if(localStorage.nsuit==4) suitlist+=suits[2]+suits[3];
 	document.getElementById("suitlist").innerHTML=suitlist;
 }		
-
+// specialized functions for Spider
 function deal(){ // does different things if the game has not already started
  	clearBoard();
 	var i=0;
@@ -118,61 +120,69 @@ function undo(){ // at the moment, this just works for cascade to cascade
 }
 
 function tryFoundation(j,value) { // move a whole stack of 13 cards to a foundation
+	console.log("tryFoundation j="+j+" value="+value);
 	cascade=document.getElementById('c'+j);
 	value2=getVal(cascade.lastChild.id);
 	if(value==12 && value2==0) {
   		document.getElementById('f'+nfoundation).innerHTML=cards[deck[cardNo]];
   		nfoundation++;
   		for(i=0;i<13;i++) cascade.removeChild(cascade.lastChild);
+		if(cascade.childElementCount) flipup(cascade.lastChild.id);
 	}
-  	if(cascade.childElementCount) flipup(cascade.lastChild.id);
 }	
 
 function tryMove(event) { // When cascade card is clicked. Must delete it before it can be appended
 	eventId1=event.id; // which card was clicked?
 	parent1=event.parentNode;
 	j1=parent1.id.substring(1);
-	console.log("tryMove event.id="+eventId1+" j1="+j1);
 	nmove=0; // nothing has moved yet
-	cardNo1=parseInt(eventId1.substring(1)); // learn all about the clicked card
+// temporary - just move the top card now, not the clicked stack
+//	cardNo1=parseInt(eventId1.substring(1)); // learn all about the clicked card
+	cardNo1=lastChildId(j1).substring(1);
 	cardId1=deck[cardNo1];
 	const suit1=getSuit(cardId1);
-	var color1=getColor(cardId1); // optionally paint the red suits red
-	var value1=getVal(cardId1); 
+	const color1=getColor(cardId1); // optionally paint the red suits red
+	const value1=getVal(cardId1); 
 	console.log("trymove cardId1="+cardId1+" value1="+value1);
 	nmove=tryFoundation(j1,value1);
-	if(!nmove) {
-		nmove=tryStack(j1,cardNo1,value1,color1); // try stack moves from clicked to end
-		if(nmove && parent1.childElementCount) flipup(parent1.lastChild.id);
-	}
+	if(!nmove) nmove=trySame(eventId1,j1,suit1,value1);
+	if(!nmove) nmove=tryNotSame(eventId1,j1,suit1,value1);
 }
-function trywin(){
-	var win=0;
-	if(nfoundation==8) {
-		localStorage.wins++;
-		showScores();
-		let clickEvent = new Event('click');
-		demo.dispatchEvent(clickEvent);
+function trySame(eventId,j1,suit1,value1) { // Try moving stack to the same suit
+	console.log("trySame eventId="+eventId+" j1="+j1+" suit1="+suit1+" value1="+value1);
+	nmove=0;
+	k=1;
+	while(k<ncol && !nmove) {
+		m=(j1+k)%10; // next cascade to the right
+  		k++;
+		CardNo2=lastChildId(m).substr(1);
+		c2=deck[CardNo2];
+		value2=getVal(c2);
+		suit2=getSuit(c2)
+		console.log("...m="+m+" CardNo2="+CardNo2+" c2="+c2+" suit2="+suit2+"value2="+value2 );
+		if(value2==(value1+1) && suit1==suit2) nmove=moveOne(j,m);
 	}
+	return nmove;
 }
+// move the topcard from column j to column m
+function moveOne(j,m) {
+	child=lastChildId(j);
+	cardNo1=deck[child.substring(1)];
+	parent=document.getElementById("c"+j);
+	console.log("moveOne j="+j+" m="+m+" cardNo1="+cardNo1)
+	parent.removeChild(parent.lastChild);
+	appendCard(cardNo1,j,1);
+	nmove=1;
+}
+
+
+
 function topCardValue(m) { // return -1 on empty, or 0-12 value of top card
   cascade2=document.getElementById('c'+m);
   v2=-1;
   if(cascade2) card=cascade2.lastElementChild;
   if(card) v2=deck[ parseInt(card.id.substr(1))]%13;
   return v2;
-}
-function trySame(toMove,c1,j) { // Try moving stack to the same suit
-	nmove=0;
-	k=1;  // first run through possible stack-to-stack moves
-	while(k<ncol && !nmove) {
-		m=(j+k)%10; // next cascade to the right
-  		k++;
-		c2=deck[topCardId(m).substr(1)];
-		console.log("Same k="+k+" c1="+c1+" c2="+c2);
-		if(c2==(c1+1)) nmove=moveStack(toMove,j,m);
-	}
-	return nmove;
 }
 // 11/24 - include moves to empty in the same scan
 function tryStack(toMove,v1,j) {
@@ -190,13 +200,33 @@ function tryStack(toMove,v1,j) {
 	}
 	return nmove;
 }
-function tryEmpty(toMove,j) {
-k=1; // second, run through possible empty stack moves
-while(k<10 && !nmove) { // first run through possible stack-to-stack moves
-    m=(j+k)%10; // next cascade to the right
-    k++;
-    if(topCardValue(m)==-1) nmove=moveStack(toMove,j,m);
+// 7/26 tryNotSame (can only move the top card in the clicked cascade)
+function tryNotSame(j1){
+	nmove=0;
+	childId=lastChildId(j1);
+	cardId1=deck[lastChildId.substring(1)];
+	value1=getVal(cardId1);
+	suit1=getSuit(cardId1);
+	k=1;
+	while(!nmove && k<ncol){
+		m=(j1+k)%10; // next cascade to the right
+  		k++;
+		CardNo2=lastChildId(m).substr(1);
+		c2=deck[CardNo2];
+		value2=getVal(c2);
+		suit2=getSuit(c2)
+		console.log("NotSame k="+k+" c1="+c1+" c2="+c2+" suit2="+suit2);
+		if(value2==(value1+1) && suit1!=suit2) nmove=moveStack(eventId,j,m);
+	}
 }
+
+function tryEmpty(toMove,j) {
+	k=1; // second, run through possible empty stack moves
+	while(k<10 && !nmove) { // first run through possible stack-to-stack moves
+    	m=(j+k)%10; // next cascade to the right
+    	k++;
+    	if(topCardValue(m)==-1) nmove=moveStack(toMove,j,m);
+	}
 }
 function moveStack(toMove,j,m){
 	console.log("moveStack j="+j+" m="+m);
@@ -225,3 +255,12 @@ function moveStack(toMove,j,m){
 	}
 
 
+function trywin(){
+	var win=0;
+	if(nfoundation==8) {
+		localStorage.wins++;
+		showScores();
+		let clickEvent = new Event('click');
+		demo.dispatchEvent(clickEvent);
+	}
+}
