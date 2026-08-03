@@ -1,4 +1,8 @@
 const ncards=52
+const ncol=8; //maximum width
+const nfree=4; // how many dropable cards are turned over?
+const nfoundations=4; // as distinct from spider where there are 8
+
 var moves = []; // stack of moves that can then be undone
 var tomove = []; // array of cards to move
 var freecells = [-1,-1,-1,-1]; // holds the cardNo if filled
@@ -11,19 +15,18 @@ var last=0; // " the top card
 createCards();
 
 function deal(){
-  clearBoard();
-  var i=0;		var m = setInterval(frame,50);
-  function frame() { // use interval to deal the cards slowly
-    if(i==52) {
-      clearInterval(m);
-      tryAce();
-    }else{
-      j=i%8;
-      appendCard(deck[i],j);
-      i++;
-    }
-  }
+	for(i=0;i<ncards;i++){
+		j=i%ncol;
+		appendCard(i,j,1);
+	}
+	ndealt=ncards;
 }
+
+  function topCardId(j){
+    cascade=document.getElementById("c"+j);
+    topCard = cascade.lastChild;
+    return (topCard) ? topCard.id : ''; // what card is it? v0...
+  }
 
 function clearBoard(){		moves.length=0; // clear these working arrays		nodes.length=0;
   for(j=0;j<8;j++) { // clear cascades
@@ -78,11 +81,15 @@ function tryMove(j) { // attempt to move a cascade to another
   while(!nmove && m<=last) { // loop from the first of the stackables to whatever will move
     srcId=nodes[m].id; val=getVal(srcId); color=getColor(srcId);
     i=1; // cascades beyond k
-    while(i<8 && !nmove) {
-      k=(j+i) % 8;
-      destId=topCardId(k); val2=getVal(destId); color2=getColor(destId);
+    while(i<ncol && !nmove) {
+      k=(j+i) % ncol;
+      destId=document.getElementById("c"+k).lastChild.id; 
+      cardNo=deck[destId.substring(1)];
+      val2=getVal(destId); 
+      color2=getColor(destId);
       if((color!==color2 && val+1==val2)) {
-        nmove++;					moves.push(['c',j,'c',k,last-m+1]); // this defines a move from one cascade to another
+        nmove++;					
+        moves.push(['c',j,'c',k,last-m+1]); // this defines a move from one cascade to another
         removeStack(j,m);
         appendStack(k,m);
       }
@@ -154,20 +161,19 @@ function stackable(j) { // return the global values of first and last
 function cascadeEmpty(j) {
   return (document.getElementById("c"+j).childElementCount==0)
 }
-	
-function appendCard(cardNo,j) { // add a card to the end of cascade j
+	function appendCard(cardNo,j) { // add a card to the end of cascade j
 	const cascade=document.getElementById("c"+j);
 	z=cascade.childElementCount+1;
     var card=document.createElement("div");
-    card.innerHTML=cards[cardNo];
+    card.classList.add("card");
+    card.innerHTML=cards[deck[cardNo]];
     card.id="v"+cardNo;
-    card.style.zindex=z.toString();
     card.style.position='absolute';
-    card.style.width='100%';
-    y=(screen.width < 600 ? (z-1)*4 :  (z-1)*3);
+    y=(z-1)*5;
     card.style.top=y.toString()+"vw";
     cascade.appendChild(card);
 }
+
 function dropFree(k){ // Drop the card from freecell k to a cascade
 	var cardNo=freecells[k];
 	if(cardNo>-1) {
@@ -251,7 +257,7 @@ function dropFree(k){ // Drop the card from freecell k to a cascade
     }
   }
 
-  function tryFreeCells(j){
+    function tryFreeCells(j){
     free=-1;
     for(k=0;k<4;k++) if(freecells[k]==-1) free=k;
     if(free>-1) {
@@ -264,6 +270,7 @@ function dropFree(k){ // Drop the card from freecell k to a cascade
       return 0;
     }
   }
+
 
   // Move a card from one place to another
   function popCard(j,srcId,destId){
