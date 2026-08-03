@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<!-- FreeCell using svg for the cards - all in one HTML page -->
+<!-- FreeCell using SVG for the cards - and different treatment of cards and deck -->
 <html lang=en>
 <head>
 	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 	<meta name="google" content="notranslate">
+  <link rel='shortcut icon' href='/back.png'>
 	<meta http-equiv="Pragma" content="no-cache" />
 	<meta http-equiv="Expires" content="0" />
   <meta charset="utf-8">
@@ -15,10 +16,19 @@
 </head>
   
 <body tabindex="-1">
-  <p>Div FreeCell 
-  <button onclick="shuffle(); deal()">New Game</button>
-  <button onclick="deal()">Replay</button>
-  <button onclick="undo()">Undo</button>
+<div class="dropdown">
+  <button class="dropbtn">Classic v</button>
+  <div class="dropdown-content">
+    <a href="/">Freecell</a>
+    <a href="/classic">Classic</a>
+    <a href="/spider">Spider</a>
+  </div>
+</div>
+<div class="buttons">
+  <button class="dropbtn" onclick="shuffle(); deal()">New Game</button>
+  <button class="dropbtn" onclick="deal()">Replay</button>
+  <button class="dropbtn" onclick="undo()">Undo</button>
+</div>
   <a href="/">SVG</a> <a href="spider">Spider</a> <a href="classic">Classic</a>
   </p>
   <div class=row>
@@ -67,7 +77,6 @@
 
 	// FUNCTIONS from top down	// make numbers bigger for phones
 	function createCards(){
-		var size=( screen.width<600 ? 70 : 45);	
     for (n=0;n<52;n++) { // create 52 svg cards as strings in this array - innerHTML for divs
       deck[n]=n; // initialize the deck pre-shuffle
 			var suit=Math.floor(n/13); 
@@ -242,10 +251,9 @@
     var card=document.createElement("div");
     card.innerHTML=cards[cardNo];
     card.id="v"+cardNo;
-    card.style.zindex=z.toString();
     card.style.position='absolute';
     card.style.width='100%';
-    y=(screen.width < 600 ? (z-1)*4 :  (z-1)*3);
+    y=(z-1)*5;
     card.style.top=y.toString()+"vw";
     cascade.appendChild(card);
 	}
