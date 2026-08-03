@@ -24,7 +24,7 @@ function deal(){
 
   function topCardId(j){
     cascade=document.getElementById("c"+j);
-    topCard = cascade.lastChild;
+    topCard = deck[cascade.lastChild.id.substring(1)];
     return (topCard) ? topCard.id : ''; // what card is it? v0...
   }
 
@@ -176,13 +176,16 @@ function cascadeEmpty(j) {
 
 function dropFree(k){ // Drop the card from freecell k to a cascade
 	var cardNo=freecells[k];
+  console.log("dropFree "+k+" cardNo="+cardNo);
 	if(cardNo>-1) {
 		suit=Math.floor(cardNo/13); val=cardNo % 13; color=(suit==0 || suit==3) ? 'b' : 'r';
 		// run through the top cards to see if it can drop down to them
 		j=0;nmove=0;
 		while(j<8 && nmove==0){
-			destId=topCardId(j); destVal=getVal(destId); destSuit=getSuit(destId);
+			destId=topCardId(j);
+      destVal=getVal(destId); destSuit=getSuit(destId);
 			destColor=(destSuit==0 || destSuit==3) ? 'b' : 'r';
+      console.log("...j="+j+" destId="+destId+" destVal="+destVal+" destSuit="+destSuit);
 			if((val==destVal-1) && (color !== destColor)) {
 				moves.push(['f',k,'c',j,1]); // this defines a move from freecell to cascade
 				appendCard(cardNo,j);
@@ -208,46 +211,39 @@ function dropFree(k){ // Drop the card from freecell k to a cascade
 }
   
   // check if anything can jump to the aces piles automatically
+  //(try removing pausing)
   function tryAce() { // this will repeat as long as it moves something
-    var nmove=1; // This gets incremented and returned
-    var m=setInterval(frame2,100);
-    function frame2() {
-      if (nmove==0) {
-        clearInterval(m);
-        showFoundations();
-      } else {
-  			nmove=0;
-	      for(j=0;j<8;j++) { // try pop from the cascades
-	        topID=topCardId(j);
-  	      if(topID) { // is there a top card in this cascade?
-    	      suit=getSuit(topID);
-      	    val=getVal(topID);
-          	if(aces[suit]==(val-1)) {
-            	nmove++;
-							moves.push(['c',j,'a',suit,1]); // this defines a move from freecell to cascade
-            	aces[suit]++;
-              cascade=document.getElementById("c"+j);
-  	          cascade.removeChild(cascade.lastChild);
-          	}
-  				}
-        }
-      
-        for(j=0;j<4;j++) { // try pop from freecells
-          cardNo=freecells[j];
-          if(cardNo>-1) {
-            val=cardNo % 13; suit=Math.floor(cardNo/13);
-            if(aces[suit]==(val-1)) {
-              nmove++;
-							moves.push(['f',j,'a',suit,1]); // this defines a move from freecell to cascade
-              aces[suit]=val;
-              freecells[j]=-1;
-              document.getElementById("s"+j).innerHTML="";
-            }
-          }
+ 	nmove=0;
+	  for(j=0;j<8;j++) { // try pop from the cascades
+	    topID=topCardId(j);
+      if(topID) { // is there a top card in this cascade?
+        suit=getSuit(topID);
+  	    val=getVal(topID);
+        console.log("topID="+topID+" suit="+suit+" val="+val);
+      	if(aces[suit]==(val-1)) {
+        	nmove++;
+					moves.push(['c',j,'a',suit,1]); // this defines a move from freecell to cascade
+        	aces[suit]++;
+          cascade=document.getElementById("c"+j);
+          cascade.removeChild(cascade.lastChild);
+      	}
+  		}
+    }
+  
+    for(j=0;j<4;j++) { // try pop from freecells
+      cardNo=freecells[j];
+      if(cardNo>-1) {
+        val=cardNo % 13; suit=Math.floor(cardNo/13);
+        if(aces[suit]==(val-1)) {
+          nmove++;
+					moves.push(['f',j,'a',suit,1]); // this defines a move from freecell to cascade
+          aces[suit]=val;
+          freecells[j]=-1;
+          document.getElementById("s"+j).innerHTML="";
         }
       }
-    }  // end frame
-  } // end try aces
+    }
+  }
   function showFoundations(){
     for(i=0;i<4;i++) {
       if(aces[i]>-1) {
@@ -263,7 +259,7 @@ function dropFree(k){ // Drop the card from freecell k to a cascade
     if(free>-1) {
       t=topCardId(j);
 			moves.push(['c',j,'f',free,1]); // this defines a move from cascade to freecell
-      freecells[free]=parseInt(t.substring(1)); // place the cardno in there for easy move later
+      freecells[free]=t; // place the cardno in there for easy move later
       popCard(j,t,"s"+free);
       return 1;
     }else{

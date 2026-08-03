@@ -24,10 +24,11 @@
 </head>
   
 <body tabindex="-1">
-  <p>One-Click FreeCell 1.6 &#x1F482;
+  <p>SVG FreeCell 
   <button onclick="shuffle(); deal()">New Game</button>
   <button onclick="deal()">Replay</button>
   <button onclick="undo()">Undo</button>
+  <a href="spider">Spider</a> <a href="classic">Classic</a>
   </p>
   <div class=row>
   <div id=s0 class=s onclick="dropFree(0)"></div>
@@ -320,6 +321,7 @@
   	      if(topID) { // is there a top card in this cascade?
     	      suit=getSuit(topID);
       	    val=getVal(topID);
+            console.log("topID="+topID+" suit="+suit+" val="+val);
           	if(aces[suit]==(val-1)) {
             	nmove++;
 							moves.push(['c',j,'a',suit,1]); // this defines a move from freecell to cascade
