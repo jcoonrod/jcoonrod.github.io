@@ -256,13 +256,15 @@ function dropFree(k){ // Drop the card from freecell k to a cascade
             console.log("topID="+topID+" suit="+suit+" val="+val);
           	if(aces[suit]==(val-1)) {
             	nmove++;
-							moves.push(['c',j,'a',suit,1]); // this defines a move from freecell to cascade
+				moves.push(['c',j,'a',suit,1]); // this defines a move from freecell to cascade
             	aces[suit]++;
               cascade=document.getElementById("c"+j);
   	          cascade.removeChild(cascade.lastChild);
           	}
-  				}
-        }
+  		}
+    if(aces[0]==12 && aces[1]==12 && aces[2]==12 && aces[3]==12) confetti(
+		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
+    }
       
         for(j=0;j<4;j++) { // try pop from freecells
           cardNo=freecells[j];
