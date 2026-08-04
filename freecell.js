@@ -1,135 +1,314 @@
-//TODO: mystery card appearances!
-const ncards=52; // This game just uses one deck
-const ncol=8; //maximum width
-const nfree=4; // how many dropable cards are turned over?
-const nfoundations=4; // as distinct from freecell where there are 8
-var nmove=0; // make this global
-var freecells=[-1,-1,-1,-1]; // Initial the cardno of put there
-var aces=[-1,-1,-1,-1]; // order for each suit 
-
-// Start the game without waiting
+// Freecell is different in many ways so we cannot use much of the common code at this point
+const ncards=52;
+var cards = []; // array of card div objects
+var moves = []; // stack of moves that can then be undone
+var tomove = []; // array of cards to move
+var deck = []; // sort order for the cards
+var freecells = [-1,-1,-1,-1]; // holds the cardNo if filled
+var nopen = 0; // computed # open freecells
+var nempty = 0; // computed # empty cascades
+var aces = [-1,-1,-1,-1]; // holds the card value if filled
+const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
+const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards to work with Servo
+const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+var nodes = []; // this gets defined by stackable
+var first=0; // index within the nodes for the first that could be moved
+var last=0; // " the top card
 createCards();
-shuffle();
-deal(); // change from classic
 
+// simple functions to convert id to values -- standard for all games
+const getSuit = s => Math.floor(parseInt(s.substring(1),10)/13);
+const getVal = s => parseInt(s.substring(1),10) % 13;
+const getColor = s => (getSuit(s)==0 || getSuit(s)==3) ? 'b' : 'r';
 
-function deal(){
-	for(i=0;i<ncards;i++){
-		j=i%ncol;
-		appendCard(i,j,1);
+// FUNCTIONS from top down	// make numbers bigger for phones
+// Different than other games are as the cards not just deck is sorted.
+function createCards(){
+for (n=0;n<ncards;n++) { // create 52 div cards as strings in this array - innerHTML for divs
+  deck[n]=n; // initialize the deck pre-shuffle
+		var suit=Math.floor(n/13); 
+		var f=''; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
+		var val = n % 13;
+		var ctr = (val<10) ? suits[suit] : faces[val-10];
+		cards[n]='<div class=card><h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
 	}
-	ndealt=ncards;
 }
 
-function clearBoard(){	
-//	document.getElementById('r0').innerHTML=back;
-  for(j=0;j<ncol;j++) { // clear cascades
-    const cascade=document.getElementById("c"+j);
-    while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
+// a function to shuffle the deck;
+function shuffle(){
+  for(i=0; i<100; i++) { // do 100 random interchanges
+    j=Math.floor(52*Math.random());
+    k=Math.floor(52*Math.random());
+    m=deck[j]; deck[j]=deck[k]; deck[k]=m;
   }
-  for(j=0;j<nfree;j++) document.getElementById("s"+j).innerHTML="";
-  for(j=0;j<4;j++) document.getElementById("a"+j).innerHTML="";
-  aces=[-1,-1,-1,-1];
-  freecells=[-1,-1,-1,-1];
+}
+function deal(){ // this moves slowly on purpose
+  clearBoard();
+  var i=0;		var m = setInterval(frame,50);
+  function frame() { // use interval to deal the cards slowly
+    if(i==52) {
+      clearInterval(m);
+      tryAce();
+    }else{
+      j=i%8;
+      appendCard(deck[i],j);
+      i++;
+    }
+  }
+}
+function clearBoard(){		moves.length=0; // clear these working arrays		nodes.length=0;
+    for(j=0;j<8;j++) { // clear cascades
+        const cascade=document.getElementById("c"+j);
+        while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
+    }
+    for(j=0;j<4;j++) { // clear freecells and aces piles
+		aces[j]=-1;
+        document.getElementById("a"+j).innerHTML='';
+        freecells[j]=-1;
+        document.getElementById("s"+j).innerHTML='';
+    }
+}	
+function popStack(j) { // a cascade has been clicked
+  stackable(j);
+  if (!tryMove(j)) {
+    if(!tryEmpty(j)) tryFreeCells(j);} // try either moving a cascade or a car to a freecell
+  tryAce();
 }
 
-// A freecell can be dropped to any empty tableau or matching 
-function tryDrop(event){ // this is called with argument "this";
-	freecellId=event.id; // This should be like s0, s1, s2  
-	nmove=0; // nothing has moved yet
-	freecellNo=freecellId.substring(1); // like 0,1,2
-	console.log("tryDrop freecellId="+freecellId+" freecellNo="+freecellNo);	
-	cardNo=freecells[freecellNo];
-	cardId=deck[cardNo];
-	suit1=getSuit(cardId);
-	color1=getColor(cardId); // optionally paint the red suits red
-	value1=getVal(cardId); 
-	console.log("tryDrop freecellId="+freecellId+" cardId="+cardId+" value1="+value1+ "suit1="+suit1);
-	nmove=tryAce(value1,suit1);
-	j=0;
-	while (!nmove && j<ncol) { // try moving it to a cascade
-		cascade=document.getElementById("c"+j); //
-		cascadeSize=cascade.childElementCount;
-		console.log("Try from "+freecellId+" to cascade j="+j);
-		if(cascadeSize==0) { //is the cascade empty? (not restricted to kings)
-			console.log("Append a Freecell card to empty cascade "+j);
-			appendCard(cardNo,j,1);
-			nmove++;
-		} else if (cascadeSize) {
-			topCard=cascade.lastChild;
-			topCardNo=topCard.id.substring(1);
-			console.log(".. topCardNo="+topCardNo);
-			topCardId=deck[topCardNo];
-			const color2=getColor(topCardId);
-			const value2=getVal(topCardId);
-			console.log("Top card of "+j+" value2="+value2+"color2="+color2); 
-			if( (value2==(value1+1))&&(color2!=color1)){
-				console.log("Append a card to "+j);
-				appendCard(cardNo,j,1);
-				nmove++;
-			}					
+function tryEmpty(j) { // attempt to move cascade to an open column
+  nmove=0; i=1;
+  while(!nmove && i<8) {
+    k=(j+i) % 8;
+    if(cascadeEmpty(k)) {
+      nmove++;
+      removeStack(j,first); // unlink these cards into the tomove array
+      appendStack(k,first);
+    }
+    i++;
+  }
+  return nmove;
+}
+
+function removeStack(j,m) {
+  tomove.length=0; // clear it off
+  cascade=document.getElementById("c"+j);
+  for(n=m;n<=last;n++) {
+    l=nodes[n].id;
+    tomove.push(l.substring(1)); // cardNo
+  }
+  for(n=m;n<=last;n++) cascade.removeChild(cascade.lastElementChild);
+}
+function appendStack(k,m) {
+  for(n=m;n<=last;n++) appendCard(tomove[n-m],k);
+}
+
+function tryMove(j) { // attempt to move a cascade to another
+  tomove = []; // array to hold cards that will move
+  computeFree();
+  if(nmax<(last-first+1)) first=last-nmax+1; // limit range
+  nmove=0; m=first; // we'll march down the cascade until something moves
+  cascade=document.getElementById("c"+j);
+  while(!nmove && m<=last) { // loop from the first of the stackables to whatever will move
+    srcId=nodes[m].id; val=getVal(srcId); color=getColor(srcId);
+    i=1; // cascades beyond k
+    while(i<8 && !nmove) {
+      k=(j+i) % 8;
+      destId=topCardId(k); val2=getVal(destId); color2=getColor(destId);
+      if((color!==color2 && val+1==val2)) {
+        nmove++;					moves.push(['c',j,'c',k,last-m+1]); // this defines a move from one cascade to another
+        removeStack(j,m);
+        appendStack(k,m);
+      }
+      i++;
+    }
+    m++;
+  }
+  return nmove;
+}
+
+function undo(){ // at the moment, this just works for cascade to cascade
+	if(moves.length) {
+		cardid=-1;
+		move=moves.pop();
+		cj=move[0]; j=move[1]; ck=move[2]; k=move[3]; n=move[4];
+		if(cj=='c' && ck=='c') {
+			tomove.length=0; // clear this array - a bit like remove stack
+			nodes=document.getElementById('c'+k).childNodes;
+			last=nodes.length-1; m=last-n+1;
+			removeStack(k,m);
+			appendStack(j,m);
+		} else if(ck=='f') {
+			cardid=freecells[k];
+			document.getElementById("s"+k).innerHTML="";
+			freecells[k]=-1;
+		} else if(ck=='a') {
+			cardid=aces[k]+13*k;
+			aces[k]--;
+			if(aces[k]==-1) {card="";} else {card=cards[cardid-1];}
+			document.getElementById("a"+k).innerHTML=card;				
 		}
-		j++;
-	}
-	if(nmove) {
-		console.log("... nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
-		document.getElementById(freecellId).innerHTML="";
-		freecells[freecellNo]=-1;
-	};
-	return nmove;
-}
-function tryAce(value,suit){
-	nmove=0;
-	console.log('tryAce aces='+aces+' value='+value+" suit="+suit);
-	if(aces[suit]==(value-1)){ // if it stacks, move it there
-		cardId=suit*13+value;
-		document.getElementById("a"+suit).innerHTML=cards[cardId];
-		aces[suit]++;
-		nmove=1;
-	}
-	if(aces[0]==12 && aces[1]==12 && aces[2]==12 && aces[3]==12) confetti(
-		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
-	return nmove;
-}
-
-// this is where a tableau card goes when clicked
-// it must determine if is the last card in the stack or not
-
-function tryMove(event) { // When cascade card is clicked. Must delete it before it can be appended
-	eventId1=event.id; // which card was clicked?
-	parent1=event.parentNode;
-	j1=parent1.id.substring(1);
-	console.log("tryMove event.id="+eventId1+" j1="+j1);
-	nmove=0; // nothing has moved yet
-	console.log("tryMove eventId1 "+eventId1);
-	cardNo1=parseInt(eventId1.substring(1)); // learn all about the clicked card
-	console.log("tryMove cardNo1 "+cardNo1);
-	cardId1=deck[cardNo1];
-	var suit1=getSuit(cardId1);
-	var color1=getColor(cardId1); // optionally paint the red suits red
-	var value1=getVal(cardId1); 
-	if(!nmove) {
-		nmove=tryAce(value1,suit1);
-		if(nmove) parent1.removeChild(parent1.lastChild);
-	}
-	if(!nmove) nmove=tryStack(j1,cardNo1,value1,color1); // try stack moves from clicked to end
-	if(!nmove) {
-		nmove=tryFree(cardNo1);
-		if(nmove) parent1.removeChild(parent1.lastChild);
+		if(cardid>-1 && cj=='c') {
+			appendCard(cardid,j);
+		}
 	}
 }
+function computeFree() { // What is the biggest move we can make
+  nopen=0;
+  for(k=0;k<4;k++) if(freecells[k]==-1) nopen++;
+  nempty=0;
+  for(j=0;j<8;j++) if(cascadeEmpty(j)) nempty++;
+  nmax=1+(nopen+nempty);
+}
+function stackable(j) { // return the global values of first and last
+    nodes=document.getElementById("c"+j).childNodes;
+    last=nodes.length-1; // index of top node in node list
+    if(last<1) {
+        first=last;
+    }else{
+        first=last-1; // index on how many can be stacked
+        match=1; // test to see whether it can be stacked
+        while(first>-1 && match) {
+            id1=nodes[first].id; id2=nodes[first+1].id;
+            val1=getVal(id1); val2=getVal(id2);
+            color1=getColor(id1); color2=getColor(id2); // returns 'r' or 'b'
+            match=(val1==(val2+1) && color1!==color2); // true or false
+            first--;
+ //         console.log("F "+first+" L "+last+" M "+match)
+        }
+        first=(first==-1 && match) ? 0 : first+2;
+    }
+}
 
-
+function cascadeEmpty(j) {
+  return (document.getElementById("c"+j).childElementCount==0)
+}
+	
 function appendCard(cardNo,j) { // add a card to the end of cascade j
 	const cascade=document.getElementById("c"+j);
 	z=cascade.childElementCount+1;
     var card=document.createElement("div");
-    card.classList.add("card");
-    card.innerHTML=cards[deck[cardNo]];
+    card.innerHTML=cards[cardNo];
     card.id="v"+cardNo;
     card.style.position='absolute';
+    card.style.width='100%';
     y=(z-1)*5;
     card.style.top=y.toString()+"vw";
-	card.setAttribute("onclick","tryMove(this);");
     cascade.appendChild(card);
+}
+
+function dropFree(k){ // Drop the card from freecell k to a cascade
+	var cardNo=freecells[k];
+	if(cardNo>-1) {
+		suit=Math.floor(cardNo/13); val=cardNo % 13; color=(suit==0 || suit==3) ? 'b' : 'r';
+		// run through the top cards to see if it can drop down to them
+		j=0;nmove=0;
+		while(j<8 && nmove==0){
+			destId=topCardId(j); destVal=getVal(destId); destSuit=getSuit(destId);
+			destColor=(destSuit==0 || destSuit==3) ? 'b' : 'r';
+			if((val==destVal-1) && (color !== destColor)) {
+				moves.push(['f',k,'c',j,1]); // this defines a move from freecell to cascade
+				appendCard(cardNo,j);
+				freecells[k]=-1;
+				document.getElementById("s"+k).innerHTML="";
+				nmove=1;
+			}
+			j++;
+		}
+		j=0; // if nothing moved to a full cascade, try empty cascades!
+		while(j<8 && nmove==0) {
+		  if(cascadeEmpty(j)) {
+				moves.push(['f',k,'c',j,1]); // this defines a move from freecell to cascade
+ 				appendCard(cardNo,j);
+				freecells[k]=-1;
+				document.getElementById("s"+k).innerHTML="";
+				nmove=1;
+		  }
+		  j++;
+		}
+	}
+	tryAce(); // after making a move, see if any cards can jump up to foundation
+    if(aces[0]==12 && aces[1]==12 && aces[2]==12 && aces[3]==12) confetti(
+		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
+}
+
+  // Run through to see if any top cards can jump to the ace pile
+  function topCardId(j){
+    cascade=document.getElementById("c"+j);
+    topCard = cascade.lastChild;
+    return (topCard) ? topCard.id : ''; // what card is it? v0...
+  }
+    
+  // check if anything can jump to the aces piles automatically
+  function tryAce() { // this will repeat as long as it moves something
+    var nmove=1; // This gets incremented and returned
+    var m=setInterval(frame2,100);
+    function frame2() {
+      if (nmove==0) {
+        clearInterval(m);
+        showFoundations();
+      } else {
+  			nmove=0;
+	      for(j=0;j<8;j++) { // try pop from the cascades
+	        topID=topCardId(j);
+  	      if(topID) { // is there a top card in this cascade?
+    	      suit=getSuit(topID);
+      	    val=getVal(topID);
+            console.log("topID="+topID+" suit="+suit+" val="+val);
+          	if(aces[suit]==(val-1)) {
+            	nmove++;
+							moves.push(['c',j,'a',suit,1]); // this defines a move from freecell to cascade
+            	aces[suit]++;
+              cascade=document.getElementById("c"+j);
+  	          cascade.removeChild(cascade.lastChild);
+          	}
+  				}
+        }
+      
+        for(j=0;j<4;j++) { // try pop from freecells
+          cardNo=freecells[j];
+          if(cardNo>-1) {
+            val=cardNo % 13; suit=Math.floor(cardNo/13);
+            if(aces[suit]==(val-1)) {
+              nmove++;
+							moves.push(['f',j,'a',suit,1]); // this defines a move from freecell to cascade
+              aces[suit]=val;
+              freecells[j]=-1;
+              document.getElementById("s"+j).innerHTML="";
+            }
+          }
+        }
+      }
+    }  // end frame
+  } // end try aces
+function showFoundations(){
+  for(i=0;i<4;i++) {
+    if(aces[i]>-1) {
+      var card=cards[i*13+aces[i]];
+      document.getElementById("a"+i).innerHTML=card;
+    }
+  }
+}
+
+function tryFreeCells(j){
+    free=-1;
+    for(k=0;k<4;k++) if(freecells[k]==-1) free=k;
+    if(free>-1) {
+        t=topCardId(j);
+	    moves.push(['c',j,'f',free,1]); // this defines a move from cascade to freecell
+        freecells[free]=parseInt(t.substring(1)); // place the cardno in there for easy move later
+        popCard(j,t,"s"+free);
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+// Move a card from one place to another
+function popCard(j,srcId,destId){
+  cascade=document.getElementById("c"+j);
+  src=document.getElementById(srcId);
+  dest=document.getElementById(destId);
+  if(dest) dest.innerHTML=src.innerHTML;
+  cascade.removeChild(cascade.lastChild);
+  return 1;
 }
