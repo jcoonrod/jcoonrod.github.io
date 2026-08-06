@@ -1,5 +1,6 @@
 const ncards=52;
 createCards();
+shuffle();
 deal();
 
 function deal(){
@@ -12,10 +13,11 @@ function deal(){
         }
     }
 }
+
 function pop(i){
     console.log("pop i="+i);
     blank=document.createElement("div");
-    blank.id="b"+i;
+    blank.id="v"+i;
     blank.classList.add("blank");
     blank.style.width="12vw";
     blank.style.display='inline-block';
@@ -24,8 +26,11 @@ function pop(i){
 }
 
 function clearBoard(){
-//    for(i=0;i<27;i++) document.getElementById("v"+i).removeChild(document.getElementById("cd"+i));
-}
+    for(i=0;i<27;i++) {
+        cell=document.getElementById("v"+i);
+        while(cell && (child=cell.lastChild)) cell.removeChild(child);
+    }
+}   
 
 function appendCard(i) { // add a card to cell vi
     console.log("AppendCard "+i);
