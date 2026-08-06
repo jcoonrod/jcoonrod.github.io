@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!-- Pyramid HTML - do as much html as possible -->
+<!-- Create an array of visibles 0-27 to see which ones are-->
+<html lang=en>
+<head>
+<meta name="google" content="notranslate">
+<link rel='shortcut icon' href='/back.png'>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<meta name="description" content="Pyramid Solitaire Game by John Coonrod"/>
+<title>Pyramid Solitaire</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+    .layer {position:absolute;width:100%;border:0;margin:0;padding:0;text-align:center;}
+    .cell {width:12vw;height:16.8vw;display:inline-block;border: 1px solid red;}
+</style>
+<script src="/confetti.browser.min.js"></script>
+<script src="/common.js"></script>
+<script src="pyramid2.js" defer></script>
+</head>
+  
+<body tabindex="-1">
+<div class="dropdown">
+  <button class="dropbtn">Pyramid</button>
+  <div class="dropdown-content">
+    <a href="/pyramid">Pyramid</a>
+    <a href="/classic">Classic</a>
+    <a href="/">Freecell</a>
+    <a href="/spider">Spider</a>
+  </div>
+</div>
+<div class="buttons">
+  <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
+	<button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
+</div>
+<div id="c0" class="layer" style="top:10vw;">
+    <div id="v0" class="cell"></div>
+</div>
+<div id="c1" class="layer" style="top:15vw;">
+    <div id="v1" class="cell"></div>
+    <div id="v2" class="cell"></div>
+</div>
+<div id="c2" class="layer" style="top:20vw;">
+    <div id="v3" class="cell"></div>
+    <div id="v4" class="cell"></div>
+    <div id="v5" class="cell"></div>
+</div>
+<div id="c3" class="layer" style="top:25vw;">
+    <div id="v6" class="cell"></div>
+    <div id="v7" class="cell"></div>
+    <div id="v8" class="cell"></div>
+    <div id="v9" class="cell"></div>
+</div>
+<div id="c4" class="layer" style="top:30vw;">
+    <div id="v10" class="cell"></div>
+    <div id="v11" class="cell"></div>
+    <div id="v12" class="cell"></div>
+    <div id="v13" class="cell"></div>
+    <div id="v14" class="cell"></div>
+</div>
+<div id="c5" class="layer" style="top:35vw;">
+    <div id="v15" class="cell"></div>
+    <div id="v16" class="cell"></div>
+    <div id="v17" class="cell"></div>
+    <div id="v18" class="cell"></div>
+    <div id="v19" class="cell"></div>
+    <div id="v20" class="cell"></div>
+</div>
+<div id="c6" class="layer" style="top:40vw;">
+    <div id="v21" class="cell"></div>
+    <div id="v22" class="cell"></div>
+    <div id="v23" class="cell"></div>
+    <div id="v24" class="cell"></div>
+    <div id="v25" class="cell"></div>
+    <div id="v26" class="cell"></div>
+    <div id="v27" class="cell"></div>
+</div>
+</body>
+</html>
