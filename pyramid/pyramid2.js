@@ -1,42 +1,41 @@
 const ncards=52;
 createCards();
-shuffle();
 deal();
+
 function deal(){
     ndealt=0;
     for(i=0;i<7;i++){
+    console.log("Dealing layer i="+i);
         for (j=0;j<i+1;j++){
-            s='<div class="card" onclick="pop(this)">'+cards[deck[ndealt]]+"</div>";
-            document.getElementById("v"+ndealt).innerHTML=s; // add cards to the row
+            appendCard(ndealt);
             ndealt++;
         }
     }
 }
-function pop(event){
-    
+function pop(i){
+    console.log("pop i="+i);
+    blank=document.createElement("div");
+    blank.id="b"+i;
+    blank.classList.add("blank");
+    blank.style.width="12vw";
+    blank.style.display='inline-block';
+    blank.style.top='0';
+    document.getElementById("v"+i).replaceWith(blank);
 }
-function createRow(i){ // create overlapping rows in the tableau
-    const tableau=document.getElementById("tableau");
-    console.log("createRow "+i);
-    row=document.createElement("div");
-    row.id="c"+i;
-    row.style.position='absolute';
-    row.style.width='100%';
-	y=(i+1)*5;
-    row.style.top=y.toString()+"vw";
-    row.style.textAlign="center";
-    tableau.appendChild(row);
+
+function clearBoard(){
+//    for(i=0;i<27;i++) document.getElementById("v"+i).removeChild(document.getElementById("cd"+i));
 }
-function appendCard(cardNo,i,up) { // add a card to row i 
-	row=document.getElementById("c"+i);
+
+function appendCard(i) { // add a card to cell vi
+    console.log("AppendCard "+i);
+	cell=document.getElementById("v"+i);
     card=document.createElement("div");
-    if(up) {card.innerHTML=cards[deck[cardNo]];
-		flips[cardNo]=1;}
-	else{card.innerHTML=back;flips[cardNo]=0;}
-    card.id="v"+cardNo;
+    card.id="cd"+i;
     card.classList.add("card");
     card.style.width="12vw";
     card.style.display='inline-block';
-	if(up) card.setAttribute("onclick","tryMove(this);");
-    row.appendChild(card);
+    card.style.top='0';
+    card.innerHTML=cards[deck[i]];
+    cell.appendChild(card);
 }

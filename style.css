@@ -4,6 +4,9 @@
 	font-weight: normal;font-style: normal;font-display: swap;
 }
 body {font-family: sans-serif,'Noto Sans Symbols 2'; background:green;padding:0;margin:0;}
+html, body {
+  overflow: hidden;
+}
 p, p>a {color:white;}
 img {width:100%;}
 div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;}
@@ -17,10 +20,10 @@ h1{font-size:8vw;line-height:1.2; padding:0;margin:0;font-weight:normal;text-ali
   background: white;
   padding: 0 0.2vw;margin:0;
   box-sizing: border-box;
+  width:12vw;
   border-style: solid;
   border-radius: 1vw;
   border-color:black; border-width:0.5vw;
-  width:100%; 
   aspect-ratio: 7 / 10;
 }
 .redborder {border-color:red !important;}

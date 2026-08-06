@@ -1,17 +1,22 @@
 <!DOCTYPE html>
-<!-- Pyramid Solitaire - not a pwa for now -->
+<!-- Pyramid HTML - do as much html as possible -->
+<!-- Create an array of visibles 0-27 to see which ones are-->
 <html lang=en>
 <head>
-  <meta name="google" content="notranslate">
-  <link rel='shortcut icon' href='/back.png'>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <meta name="description" content="Pyramid Solitaire Game by John Coonrod"/>
-	<title>Pyramid Solitaire</title>
-	<link rel="stylesheet" href="/style.css">
-  <script src="/confetti.browser.min.js"></script>
-  <script src="/common.js"></script>
-  <script src="pyramid.js" defer></script>
+<meta name="google" content="notranslate">
+<link rel='shortcut icon' href='/back.png'>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<meta name="description" content="Pyramid Solitaire Game by John Coonrod"/>
+<title>Pyramid Solitaire</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+    .layer {position:absolute;width:100%;height:18vw;border:0;margin:0;padding:0;text-align:center;}
+    .cell {width:12vw;height:16.8vw;box-sizing:border-box;display:inline-block;border: 1px solid red;}
+</style>
+<script src="/confetti.browser.min.js"></script>
+<script src="/common.js"></script>
+<script src="pyramid2.js" defer></script>
 </head>
   
 <body tabindex="-1">
@@ -25,10 +30,52 @@
   </div>
 </div>
 <div class="buttons">
-  <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
-	<button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
+    <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
+    <button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
 </div>
-<div id="tableau">
+<div id="tabeau">
+<div id="c0" class="layer" style="top:10vw;">
+    <div id="v0" class="cell" onclick="pop(this);"></div>
+</div>
+<div id="c1" class="layer" style="top:15vw;">
+    <div id="v1" class="cell" onclick="pop(1);"></div>
+    <div id="v2" class="cell" onclick="pop(2);"></div>
+</div>
+<div id="c2" class="layer" style="top:20vw;">
+    <div id="v3" class="cell" onclick="pop(3);"></div>
+    <div id="v4" class="cell" onclick="pop(4);"></div>
+    <div id="v5" class="cell" onclick="pop(5);"></div>
+</div>
+<div id="c3" class="layer" style="top:25vw;">
+    <div id="v6" class="cell" onclick="pop(6);"></div>
+    <div id="v7" class="cell" onclick="pop(7);"></div>
+    <div id="v8" class="cell" onclick="pop(8);"></div>
+    <div id="v9" class="cell" onclick="pop(9);"></div>
+</div>
+<div id="c4" class="layer" style="top:30vw;">
+    <div id="v10" class="cell" onclick="pop(10);"></div>
+    <div id="v11" class="cell" onclick="pop(11);"></div>
+    <div id="v12" class="cell" onclick="pop(12);"></div>
+    <div id="v13" class="cell" onclick="pop(13);"></div>
+    <div id="v14" class="cell" onclick="pop(14);"></div>
+</div>
+<div id="c5" class="layer" style="top:35vw;">
+    <div id="v15" class="cell" onclick="pop(15);"></div>
+    <div id="v16" class="cell" onclick="pop(16);"></div>
+    <div id="v17" class="cell" onclick="pop(17);"></div>
+    <div id="v18" class="cell" onclick="pop(18);"></div>
+    <div id="v19" class="cell" onclick="pop(19);"></div>
+    <div id="v20" class="cell" onclick="pop(20);"></div>
+</div>
+<div id="c6" class="layer" style="top:40vw;">
+    <div id="v21" class="cell" onclick="pop(21);"></div>
+    <div id="v22" class="cell" onclick="pop(22);"></div>
+    <div id="v23" class="cell" onclick="pop(23);"></div>
+    <div id="v24" class="cell" onclick="pop(24);"></div>
+    <div id="v25" class="cell" onclick="pop(25);"></div>
+    <div id="v26" class="cell" onclick="pop(26);"></div>
+    <div id="v27" class="cell" onclick="pop(27);"></div>
+</div>
 </div>
 </body>
 </html>
