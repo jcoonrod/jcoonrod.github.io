@@ -78,8 +78,8 @@ function next10() { // put the next 10 face up
         i++;
       }
       }
-    }
-  }
+	}
+}
 
 function clearBoard(){
     nfoundation=0; // how many foundation piles have gone up?
@@ -186,37 +186,33 @@ function tryMove(event) { // version .2 moves a stack by reading the z values
 		}
 		trywin();
 	}
-	function trywin(){
-		var win=0;
-		if(nfoundation==8) {
-			let clickEvent = new Event('click');
-			demo.dispatchEvent(clickEvent);
-		}
-
-	}
-	function topCardValue(m) { // return -1 on empty, or 0-12 value of top card
-	  cascade2=document.getElementById('c'+m);
-	  v2=-1;
-	  if(cascade2) card=cascade2.lastElementChild;
-	  if(card) v2=deck[ parseInt(card.id.substr(1))]%13;
-	  return v2;
-	}
-	function trySame(toMove,c1,j) { // Try moving stack to the same suit
-	  nmove=0;
-	  k=1;  // first run through possible stack-to-stack moves
-    while(k<10 && !nmove) {
-			m=(j+k)%10; // next cascade to the right
-      k++;
-			c2=deck[topCardId(m).substr(1)];
-			console.log("Same k="+k+" c1="+c1+" c2="+c2);
-			if(c2==(c1+1)) nmove=moveStack(toMove,j,m);
+function trywin(){
+	if(nfoundation==8)confetti(
+		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
+}
+function topCardValue(m) { // return -1 on empty, or 0-12 value of top card
+  cascade2=document.getElementById('c'+m);
+  v2=-1;
+  if(cascade2) card=cascade2.lastElementChild;
+  if(card) v2=deck[ parseInt(card.id.substr(1))]%13;
+  return v2;
+}
+function trySame(toMove,c1,j) { // Try moving stack to the same suit
+  nmove=0;
+  k=1;  // first run through possible stack-to-stack moves
+	while(k<10 && !nmove) {
+		m=(j+k)%10; // next cascade to the right
+  		k++;
+		c2=deck[topCardId(m).substr(1)];
+		console.log("Same k="+k+" c1="+c1+" c2="+c2);
+		if(c2==(c1+1)) nmove=moveStack(toMove,j,m);
     }
     return nmove;
-	}
+}
 	// 11/24 - include moves to empty in the same scan
-	function tryStack(toMove,v1,j) {
-	  nmove=0;
-	  k=1;  // first run through possible stack-to-stack moves
+function tryStack(toMove,v1,j) {
+	nmove=0;
+	k=1;  // first run through possible stack-to-stack moves
     while(k<10 && !nmove) {
       m=(j+k)%10; // next cascade to the right
       k++;
@@ -228,25 +224,25 @@ function tryMove(event) { // version .2 moves a stack by reading the z values
 			}
     }
     return nmove;
-	}
-	function tryEmpty(toMove,j) {
+}
+function tryEmpty(toMove,j) {
     k=1; // second, run through possible empty stack moves
     while(k<10 && !nmove) { // first run through possible stack-to-stack moves
         m=(j+k)%10; // next cascade to the right
         k++;
         if(topCardValue(m)==-1) nmove=moveStack(toMove,j,m);
     }
-	}
+}
 
-	function moveStack(toMove,j,m){
-		console.log("moveStack j="+j+" m="+m);
-	  cascade1=document.getElementById('c'+j);
-	  for(i=0;i<toMove.length;i++) cascade1.removeChild(cascade1.lastChild);
-	  for(i=0;i<toMove.length;i++) appendCard(toMove[i],m,1);
+function moveStack(toMove,j,m){
+	console.log("moveStack j="+j+" m="+m);
+	cascade1=document.getElementById('c'+j);
+	for(i=0;i<toMove.length;i++) cascade1.removeChild(cascade1.lastChild);
+	for(i=0;i<toMove.length;i++) appendCard(toMove[i],m,1);
     faceUp( parseInt(cascade1.id.substr(1)) ); // flip the top card in cascade j if not already flipped
     return 1;
   }
-	function appendCard(i,j,up) { // add a card position i in the deck to the end of cascade j
+function appendCard(i,j,up) { // add a card position i in the deck to the end of cascade j
 	  //when i>43, deal face up
 	    const cascade=document.getElementById("c"+j);
 		z=cascade.childElementCount+1;

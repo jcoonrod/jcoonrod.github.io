@@ -10,7 +10,7 @@ html, body {
 p, p>a {color:white;}
 img {width:100%;}
 div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;}
-div.c {height:80vw;width:12.5%;position:relative;margin:0;border:0;}
+div.c {height:200vw;width:12.5%;position:relative;margin:0;border:0;}
 div.c10 {height:80vw;width:10%;position:relative;margin:0;border:0;}
 .r {color:red;}
 .b {color:black;}

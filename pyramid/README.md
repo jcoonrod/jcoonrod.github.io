@@ -1,0 +1,2 @@
+# Pyramid Solitaire
+* How to tell if a square is covered or not. The last 7 always are. A pure dom way would be check any clicked square to see if those below it are covering it or not. We could make arrays of covers (eg: a cell number points to one to the lower left of it, the right is one more, and then we mark them -1 those as they disappear)

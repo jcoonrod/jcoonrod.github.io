@@ -1,6 +1,10 @@
 const ncards=52;
 var nlast=52; //this will decrease as we delete cards from the stack
 var ndealt=0;
+var lefts=[]; // squares which might coveer other squares
+var rights=[];
+const offsets=[1,2,2,3,3,3,4,4,4,4,5,5,5,5,5,6,6,6,6,6,6];
+var tapped=0; // value+1 of first tapped? When it reaches 13 theygo.
 createCards();
 shuffle();
 deal();
@@ -13,6 +17,15 @@ function deal(){
             appendCard(ndealt);
             ndealt++;
         }
+    }
+// Initialize who covers whom
+    for(i=0;i<21;i++) {
+        lefts[i]=i+offsets[i];
+        rights[i]=lefts[i]+1;
+    }
+    for(i=21;i<28;i++){ // mark the bottom row as visible
+        lefts[i]=-1;
+        right[i]=-1;
     }
 }
 
@@ -55,6 +68,9 @@ function clearBoard(){
         cell=document.getElementById("v"+i);
         while(cell && (child=cell.lastChild)) cell.removeChild(child);
     }
+    lefts=[];
+    rights=[];
+    tagged=0;
 }   
 
 function appendCard(i) { // add a card to cell vi

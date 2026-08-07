@@ -22,14 +22,17 @@ function next3(){ // this now only gets called if there are cards to deal
 	n=Math.min(3,reserve.length);
 	if(ireserve>=(reserve.length-1)) ireserve=0;
 	// first, clear out what is there
-	for(i=0;i<3;i++) document.getElementById("s"+i).innerHTML="";
+	for(i=0;i<3;i++) {
+		document.getElementById("s"+i).innerHTML="";
+		freecells[i]=-1;
+	}
 	for(i=0;i<n;i++) {
 		document.getElementById("s"+i).innerHTML=cards[deck[reserve[ireserve]]];
 		freecells[i]=reserve[ireserve]; //cardNo
 		ireserve++;
 		if(ireserve>=(reserve.length-1)) ireserve=0; // loop around
 	}
-	console.log("next 3 ireserve="+ireserve+" freecells="+freecells);
+	console.log("next "+n+" ireserve="+ireserve+" freecells="+freecells);
 }
 
 // flip over card in cascade and put onclick in it
