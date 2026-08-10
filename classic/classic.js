@@ -75,6 +75,7 @@ function clearBoard(){	document.getElementById('r0').innerHTML=back;
 // maybe we could share the "test j" parts?
 // ok, we will set up reserve deck to count initially 0 to 28 containing cardNo from deck
 // othersie we cannot slice it out.
+// changed to not drop to aces
 function tryDrop(event){ // this is called with argument "this";
 	freecellId=event.id; // This should be like s0, s1, s2  
 	nmove=0; // nothing has moved yet
@@ -85,8 +86,6 @@ function tryDrop(event){ // this is called with argument "this";
 	suit1=getSuit(cardId);
 	color1=getColor(cardId); // optionally paint the red suits red
 	value1=getVal(cardId); 
-	console.log("tryDrop freecellId="+freecellId+" cardId="+cardId+" value1="+value1+ "suit1="+suit1);
-	nmove=tryAce(value1,suit1);
 	j=0;
 	while (!nmove && j<7) { // try moving it to a cascade
 		cascade=document.getElementById("c"+j); //
@@ -112,6 +111,10 @@ function tryDrop(event){ // this is called with argument "this";
 		}
 		j++;
 	}
+		if(!nmove) {
+			console.log("tryDrop freecellId="+freecellId+" cardId="+cardId+" value1="+value1+ "suit1="+suit1);
+			nmove=tryAce(value1,suit1);
+		} 
 	if(nmove) {
 		console.log("... nmove="+nmove+" cardNo="+cardNo+" freecells="+freecells);
 		document.getElementById(freecellId).innerHTML="";
