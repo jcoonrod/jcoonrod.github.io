@@ -11,6 +11,7 @@ const ncards=52; // This game just uses one deck
 const ncol=7; //maximum width
 const nfree=3; // how many dropable cards are turned over?
 const nfoundations=4; // as distinct from freecell where there are 8
+const res=document.getElementById("res");
 var freecells=[-1,-1,-1]; // Initial the cardno of the three we turn over
 var aces=[-1,-1,-1,-1]; // order for each suit 
 var reserve = []; // contains the undealt cardNos
@@ -58,6 +59,7 @@ function deal(){
 	}
 	ireserve=0; // Where to start on turning up cards
 	for(i=28;i<ncards;i++) reserve[i-28]=i; // i is the cardNo (index) within deck
+	res.innerHTML=reserve.length;
 }
 
 function clearBoard(){	document.getElementById('r0').innerHTML=back;
@@ -71,11 +73,6 @@ function clearBoard(){	document.getElementById('r0').innerHTML=back;
 }
 
 // when a "freecell" is clicked, see if it will map to a column
-// i though i could share the scan with tryMove but that didn't work
-// maybe we could share the "test j" parts?
-// ok, we will set up reserve deck to count initially 0 to 28 containing cardNo from deck
-// othersie we cannot slice it out.
-// changed to not drop to aces
 function tryDrop(event){ // this is called with argument "this";
 	freecellId=event.id; // This should be like s0, s1, s2  
 	nmove=0; // nothing has moved yet
@@ -122,6 +119,9 @@ function tryDrop(event){ // this is called with argument "this";
 		reserveNo=reserve.indexOf(cardNo);
 		reserve.splice(reserveNo,1); // 
 		console.log("cardNo="+cardNo+" reserveNo="+reserveNo+" new length of reserve="+reserve.length);
+		n=reserve.length;
+		res.innerHTML=n;
+		if(n==0) document.getElementById("r0").innerHTML="";
 	};
 }
 function tryAce(value,suit){
@@ -163,7 +163,6 @@ function tryMove(event) { // When cascade card is clicked. Must delete it before
 		if(nmove && parent1.childElementCount) flipup(parent1.lastChild.id);
 	}
 }
-
 
 function appendCard(cardNo,j,up) { // add a card position i in the deck to the end of cascade j
 	cascade=document.getElementById("c"+j);
