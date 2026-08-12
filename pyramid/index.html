@@ -16,7 +16,7 @@
 </style>
 <script src="/confetti.browser.min.js"></script>
 <script src="/common.js"></script>
-<script src="pyramid2.js" defer></script>
+<script src="pyramid.js" defer></script>
 </head>
   
 <body tabindex="-1">
@@ -32,8 +32,8 @@
 <div class="buttons">
     <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
     <button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
+    Selected: <span id="status">0</span>
 </div>
-<div id="tabeau">
 <div id="c0" class="layer" style="top:10vw;">
     <div id="v0" class="cell" onclick="pop(0);"></div>
 </div>
@@ -76,9 +76,8 @@
     <div id="v26" class="cell" onclick="pop(26);"></div>
     <div id="v27" class="cell" onclick="pop(27);"></div>
 </div>
-</div>
 <div class="layer" style="top:60vw;text-align:left !important;">
     <div id="stack" class="cell" onclick="next();"><img src="/back.jpg"></div>
-    <div id="flip" class="cell"></div>
+    <div id="v28" class="cell" onclick="pop(28);"></div>
 </body>
 </html>
