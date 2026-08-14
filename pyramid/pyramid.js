@@ -1,6 +1,5 @@
 // NEXT STEPS
-// Paint one or two cards yellow when clicked.
-// Check value of the cards simply by looking into innerHTML?
+// address visibility
 const ncards=52;
 var nlast=52; //this will decrease as we delete cards from the stack
 var ndealt=0;
@@ -10,7 +9,7 @@ var click2; // which card was clicked second?
 var lefts=[]; // squares which might coveer other squares
 var rights=[];
 const offsets=[1,2,2,3,3,3,4,4,4,4,5,5,5,5,5,6,6,6,6,6,6];
-const yellowrgb=[255,255,0];
+const status=document.getElementById("status");
 var tapped=0; // value+1 of first tapped? When it reaches 13 theygo.
 createCards();
 shuffle();
@@ -19,10 +18,42 @@ function pop(i){ // do various things when a card is clicked
     console.log("pop i="+i+" nclicked="+nclicked);
     // toggle background color between white and yellow adjust nclicked
     card=document.getElementById("cd"+i);
+    s=card.innerHTML.substring(14,18); // This should show the value and suit symbols
+    nclicked++;
+    v=vals.indexOf(s.substring(0,2).trim());
+    if(nclicked==1) {
+        v1=v;
+        click1=i
+        console.log("Card says "+s+" v1="+v1);
+        status.innerHTML="1 v1="+v1;
+        if(v1==12) {
+            nclicked=0;
+            nuke(i); // get rid of the card, replace it with a blank cell
+        }
+    }
     const backgroundColor = card.style.backgroundColor;
-    console.log("backgroundColor="+backgroundColor+" ending in "+backgroundColor.slice(-2));
-    if(backgroundColor=="yellow") card.style.backgroundColor="white";
-        else card.style.backgroundColor="yellow";
+    if(backgroundColor=="yellow") {
+        card.style.backgroundColor="white";
+        nclicked--;
+    } 
+    else card.style.backgroundColor="yellow";
+    if((nclicked)==2) {
+        v2=v;
+        click2==i;
+        console.log("Card says "+s+" v2="+v2);
+        if((v1+v2)==12) {// erase both cards
+            nuke(click1);
+            nuke(click2);
+            nclicked=0;
+            status.innerHTML="success";
+        } else {
+            sum=v1+v2;
+            status.innerHTML="2 v1+v2="+sum;
+        }
+
+
+    }
+
 }
 function deal(){
     ndealt=0;
@@ -53,13 +84,9 @@ function next(){
     ndealt++;
     if(ndealt==nlast) ndealt=28;
 }
-
-function nuke(cardno){
-    cards.splice(cardno-1,1); // one card removed
-    i=deck.indexOf(cardno); // which deck item to remove
-    deck.splice(i-1,1);
-    nlast=deck.length; // this should be 1 less 
-    console.log("Nuke "+cardno+" i="+i+" nlast="+nlast);
+// splice was a bad idea as removing <27 messes up the reserve
+function nuke(cardno){ // try it the simplest way.
+    document.getElementById("v"+cardno).innerHTML="";
 }
 
 function clearBoard(){
