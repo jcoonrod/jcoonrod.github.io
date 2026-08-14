@@ -1,5 +1,3 @@
-// NEXT STEPS
-// address visibility
 const ncards=52;
 var nlast=52; //this will decrease as we delete cards from the stack
 var ndealt=0;
@@ -16,11 +14,23 @@ shuffle();
 deal();
 function pop(i){ // do various things when a card is clicked
     console.log("pop i="+i+" nclicked="+nclicked);
-    // toggle background color between white and yellow adjust nclicked
+    // first determine if card is visible
+    if(i>20) visibility=true;
+    else {
+        left=i+offsets[i]; right=left+1;
+        leftcard=document.getElementById("v"+left);
+        rightcard=document.getElementById("v"+right);
+        visibility=(leftcard.innerHTML=="")&&(rightcard.innerHTML=="");
+    }
+    if(!visibility){
+        status.innerHTML="Not clickable";
+        return;
+    }
     card=document.getElementById("cd"+i);
     s=card.innerHTML.substring(14,18); // This should show the value and suit symbols
     nclicked++;
     v=1+vals.indexOf(s.substring(0,2).trim());
+    // toggle background color between white and yellow adjust nclicked
     if(nclicked==1) {
         v1=v;
         click1=i
@@ -37,7 +47,7 @@ function pop(i){ // do various things when a card is clicked
         card.style.backgroundColor="white";
         nclicked--;
     } 
-    else card.style.backgroundColor="yellow";
+    else if(nclicked!==0) card.style.backgroundColor="yellow";
     if((nclicked)==2) {
         v2=v;
         click2=i;
@@ -88,7 +98,9 @@ function next(){
 // splice was a bad idea as removing <27 messes up the reserve
 function nuke(cardno){ // try it the simplest way.
     console.log("nuke cardno="+cardno);
-    document.getElementById("v"+cardno).innerHTML="";
+    card=document.getElementById("v"+cardno);
+    card.innerHTML="";
+    card.removeAttribute("onclick");
 }
 
 function clearBoard(){
@@ -98,7 +110,7 @@ function clearBoard(){
     }
     lefts=[];
     rights=[];
-    tagged=0;
+    nclicked=0;
 }   
 
 function appendCard(i) { // add a card to cell vi
