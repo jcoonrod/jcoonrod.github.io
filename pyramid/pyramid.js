@@ -20,15 +20,16 @@ function pop(i){ // do various things when a card is clicked
     card=document.getElementById("cd"+i);
     s=card.innerHTML.substring(14,18); // This should show the value and suit symbols
     nclicked++;
-    v=vals.indexOf(s.substring(0,2).trim());
+    v=1+vals.indexOf(s.substring(0,2).trim());
     if(nclicked==1) {
         v1=v;
         click1=i
         console.log("Card says "+s+" v1="+v1);
         status.innerHTML="1 v1="+v1;
-        if(v1==12) {
+        if(v1==13) {
             nclicked=0;
             nuke(i); // get rid of the card, replace it with a blank cell
+            status.innerHTML="success";
         }
     }
     const backgroundColor = card.style.backgroundColor;
@@ -39,9 +40,9 @@ function pop(i){ // do various things when a card is clicked
     else card.style.backgroundColor="yellow";
     if((nclicked)==2) {
         v2=v;
-        click2==i;
+        click2=i;
         console.log("Card says "+s+" v2="+v2);
-        if((v1+v2)==12) {// erase both cards
+        if((v1+v2)==13) {// erase both cards
             nuke(click1);
             nuke(click2);
             nclicked=0;
@@ -86,6 +87,7 @@ function next(){
 }
 // splice was a bad idea as removing <27 messes up the reserve
 function nuke(cardno){ // try it the simplest way.
+    console.log("nuke cardno="+cardno);
     document.getElementById("v"+cardno).innerHTML="";
 }
 
