@@ -2,6 +2,7 @@ const ncards=52;
 var nlast=52; //this will decrease as we delete cards from the stack
 var ndealt=0;
 var nclicked=0;
+var score=0;
 var click1; // which card was clicked first?
 var click2; // which card was clicked second?
 var lefts=[]; // squares which might coveer other squares
@@ -12,6 +13,12 @@ var tapped=0; // value+1 of first tapped? When it reaches 13 theygo.
 createCards();
 shuffle();
 deal();
+
+function showStatus(s){  // pass in anything beyond score and nclicked
+    s2=score+" Clicked:"+nclicked+" "+s;
+    status.innerHTML=s2;
+}
+
 function pop(i){ // do various things when a card is clicked
     console.log("pop i="+i+" nclicked="+nclicked);
     // first determine if card is visible
@@ -23,7 +30,7 @@ function pop(i){ // do various things when a card is clicked
         visibility=(leftcard.innerHTML=="")&&(rightcard.innerHTML=="");
     }
     if(!visibility){
-        status.innerHTML="Not clickable";
+        showStatus("Not clickable");
         return;
     }
     card=document.getElementById("cd"+i);
@@ -35,19 +42,13 @@ function pop(i){ // do various things when a card is clicked
         v1=v;
         click1=i
         console.log("Card says "+s+" v1="+v1);
-        status.innerHTML="1 v1="+v1;
+        showStatus("v1="+v1);
         if(v1==13) {
             nclicked=0;
             nuke(i); // get rid of the card, replace it with a blank cell
-            status.innerHTML="success";
+            showStatus("success");
         }
     }
-    const backgroundColor = card.style.backgroundColor;
-    if(backgroundColor=="yellow") {
-        card.style.backgroundColor="white";
-        nclicked--;
-    } 
-    else if(nclicked!==0) card.style.backgroundColor="yellow";
     if((nclicked)==2) {
         v2=v;
         click2=i;
@@ -56,14 +57,18 @@ function pop(i){ // do various things when a card is clicked
             nuke(click1);
             nuke(click2);
             nclicked=0;
-            status.innerHTML="success";
+            showStatus("success");
         } else {
             sum=v1+v2;
-            status.innerHTML="2 v1+v2="+sum;
+            showStatus("v1+v2="+sum);
         }
-
-
     }
+    const backgroundColor = card.style.backgroundColor;
+    if(backgroundColor=="yellow") {
+        card.style.backgroundColor="white";
+        nclicked--;
+    } else if(nclicked!==0) card.style.backgroundColor="yellow";
+    showStatus("");
 
 }
 function deal(){
@@ -85,9 +90,16 @@ function deal(){
         rights[i]=-1;
     }
 }
+function whiten(cardno) {
+    document.getElementById("cd"+cardno).style.backgroundColor="white";
+}
 
 function next(){
+    if(nclicked && click1<28) whiten(click1);
+    if(nclicked && click2<28) whiten(click2);
+    nclicked=0; click1=-1; click2=-1
     console.log("Next "+ndealt);
+    showStatus("Next..");
     const cardno=deck[ndealt];
     s='<div id="cd28" class="card" style="backgroundColor: white;">'
     +cards[cardno]+'</dev>';
@@ -95,12 +107,15 @@ function next(){
     ndealt++;
     if(ndealt==nlast) ndealt=28;
 }
-// splice was a bad idea as removing <27 messes up the reserve
+
 function nuke(cardno){ // try it the simplest way.
     console.log("nuke cardno="+cardno);
     card=document.getElementById("v"+cardno);
     card.innerHTML="";
-    card.removeAttribute("onclick");
+    nclicked=0;
+    score++;
+    showStatus("Success");
+    if(cardno<28) card.removeAttribute("onclick");
 }
 
 function clearBoard(){

@@ -5,7 +5,7 @@
 }
 body {font-family: sans-serif,'Noto Sans Symbols 2'; background:green;padding:0;margin:0;}
 p, p>a {color:white;}
-img {width:100%;}
+img {width:100%;-webkit-user-drag: none;}
 div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;}
 div.c {height:200vw;width:12.5%;position:relative;margin:0;border:0;}
 div.c10 {height:80vw;width:10%;position:relative;margin:0;border:0;}
