@@ -8,7 +8,6 @@ var click2; // which card was clicked second?
 var lefts=[]; // squares which might coveer other squares
 var rights=[];
 const offsets=[1,2,2,3,3,3,4,4,4,4,5,5,5,5,5,6,6,6,6,6,6];
-const xi=[44,38,32,26,20,14,8]; // left of first card;
 const status=document.getElementById("status");
 var tapped=0; // value+1 of first tapped? When it reaches 13 theygo.
 createCards();
@@ -74,14 +73,21 @@ function pop(i){ // do various things when a card is clicked
 }
 function deal(){
     ndealt=0;
-    for(i=0;i<7;i++){ // i is row
-        y=10+i*5;
-        x0=xi[i];
+    for(i=0;i<7;i++){
 //    console.log("Dealing layer i="+i);
         for (j=0;j<i+1;j++){
-            makeCard(ndealt,x0+j*12,y);
+            appendCard(ndealt);
             ndealt++;
         }
+    }
+// Initialize who covers whom
+    for(i=0;i<21;i++) {
+        lefts[i]=i+offsets[i];
+        rights[i]=lefts[i]+1;
+    }
+    for(i=21;i<28;i++){ // mark the bottom row as visible
+        lefts[i]=-1;
+        rights[i]=-1;
     }
 }
 function whiten(cardno) {
@@ -94,41 +100,44 @@ function next(){
     nclicked=0; click1=-1; click2=-1
     console.log("Next "+ndealt);
     showStatus("Next..");
-    document.getElementById("cd28").innerHTML=cards[deck[ndealt]];
+    const cardno=deck[ndealt];
+    s='<div id="cd28" class="card" style="backgroundColor: white;">'
+    +cards[cardno]+'</dev>';
+    document.getElementById("v28").innerHTML=s;
     ndealt++;
     if(ndealt==nlast) ndealt=28;
 }
 
 function nuke(cardno){ // try it the simplest way.
     console.log("nuke cardno="+cardno);
-    card=document.getElementById("cd"+cardno);
-    document.body.removeChild(card);
+    card=document.getElementById("v"+cardno);
+    card.innerHTML="";
     nclicked=0;
     score++;
     showStatus("Success");
+    if(cardno<28) card.removeAttribute("onclick");
 }
 
 function clearBoard(){
     for(i=0;i<28;i++) {
-        child=document.getElementById("cd"+i);
-        while(chld) document.body.removeChild(child);
+        cell=document.getElementById("v"+i);
+        while(cell && (child=cell.lastChild)) cell.removeChild(child);
     }
+    lefts=[];
+    rights=[];
     nclicked=0;
-    click1=0;
-    click2=0;
-    score=0;
 }   
 
-function makeCard(cardno, x,y) { // add a card document at large
-    console.log("MakeCard i="+i+" j="+j);
+function appendCard(i) { // add a card to cell vi
+//    console.log("AppendCard "+i);
+	cell=document.getElementById("v"+i);
     card=document.createElement("div");
-    card.id="cd"+cardno;
+    card.id="cd"+i;
     card.classList.add("card");
-    card.style.position="absolute";
-    card.style.left=x+"vw";
-    card.style.top=y+"vw";
-    card.setAttribute("onclick","pop("+cardno+");");
+    card.style.width="12vw";
     card.style.backgroundColor="white";
-    card.innerHTML=cards[deck[cardno]];
-    document.body.appendChild(card);
+    card.style.display='inline-block';
+    card.style.top='0';
+    card.innerHTML=cards[deck[i]];
+    cell.appendChild(card);
 }
