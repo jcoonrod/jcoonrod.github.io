@@ -2,11 +2,10 @@ const ncards=52;
 var nlast=52; //this will decrease as we delete cards from the stack
 var ndealt=0;
 var nclicked=0;
+var cardno=-1; // make this global for ease of debugging
 var score=0;
 var click1; // which card was clicked first?
 var click2; // which card was clicked second?
-var lefts=[]; // squares which might coveer other squares
-var rights=[];
 const offsets=[1,2,2,3,3,3,4,4,4,4,5,5,5,5,5,6,6,6,6,6,6];
 const xi=[44,38,32,26,20,14,8]; // left of first card;
 const status=document.getElementById("status");
@@ -26,9 +25,9 @@ function pop(i){ // do various things when a card is clicked
     if(i>20) visibility=true;
     else {
         left=i+offsets[i]; right=left+1;
-        leftcard=document.getElementById("v"+left);
-        rightcard=document.getElementById("v"+right);
-        visibility=(leftcard.innerHTML=="")&&(rightcard.innerHTML=="");
+        leftcard=document.getElementById("cd"+left);
+        rightcard=document.getElementById("cd"+right);
+        visibility=!leftcard && !rightcard;
     }
     if(!visibility){
         showStatus("Not clickable");
@@ -86,22 +85,34 @@ function deal(){
 }
 function whiten(cardno) {
     document.getElementById("cd"+cardno).style.backgroundColor="white";
+    nclicked--;
+    if(cardno==click1) click1=-1;
+    if(cardno==click2) click2=-1;
 }
 
 function next(){
     if(nclicked && click1<28) whiten(click1);
     if(nclicked && click2<28) whiten(click2);
-    nclicked=0; click1=-1; click2=-1
+    nclicked=0; click1=-1; click2=-1;
+    if(ndealt>28) removeCard(ndealt-1); // disappear the previous card
     console.log("Next "+ndealt);
     showStatus("Next..");
-    document.getElementById("cd28").innerHTML=cards[deck[ndealt]];
+    // check if the next card was already deleted, if so skip them
+    while(deck[ndealt]==-1 && ndealt<52) ndealt++;
+    if(ndealt>=52) {ndealt=28;while(deck[ndealt]==-1 && ndealt<52) ndealt++;}
+    makeCard(ndealt,12,5);
     ndealt++;
-    if(ndealt==nlast) ndealt=28;
+}
+
+function removeCard(cardno){
+    card=document.getElementById("cd"+cardno);
+    if(card) document.body.removeChild;
 }
 
 function nuke(cardno){ // try it the simplest way.
     console.log("nuke cardno="+cardno);
     card=document.getElementById("cd"+cardno);
+    deck[cardno]=-1; // tag as already nuked
     document.body.removeChild(card);
     nclicked=0;
     score++;
@@ -109,10 +120,7 @@ function nuke(cardno){ // try it the simplest way.
 }
 
 function clearBoard(){
-    for(i=0;i<28;i++) {
-        child=document.getElementById("cd"+i);
-        while(chld) document.body.removeChild(child);
-    }
+    for(i=0;i<28;i++) removeCard(i);
     nclicked=0;
     click1=0;
     click2=0;
