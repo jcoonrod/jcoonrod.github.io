@@ -3,7 +3,7 @@ var cards = []; // array of card div objects
 var ndealt=0; // how many cards have been dealt?
 var nmove=0; // how many cards moved in this turn?
 var deck = []; // sort order for the cards
-const suits = ["&spadesuit;","&heartsuit;","&diamondsuit;","&clubsuit;"];
+const suits = ["♠","♥","♦","♣"];
 const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
 const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const back= '<img src=/back.jpg width=100% height=auto>';

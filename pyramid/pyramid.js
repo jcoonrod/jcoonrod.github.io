@@ -33,11 +33,11 @@ function pop(cardno){ // do various things when a card is clicked
         showStatus("Not clickable");
         return;
     }
-    card=document.getElementById("cd"+cardno);
-    s=card.innerHTML.substring(14,18); // This should show the value and suit symbols
+    const card=document.getElementById("cd"+cardno);
+    const s=card.innerHTML.substring(14,18); // This should show the value and suit symbols
     console.log("Visibility of cardno="+cardno+" s="+s);
     nclicked++;
-    v=1+vals.indexOf(s.substring(0,2).trim());
+    const v=1+vals.indexOf(s.substring(0,2).trim());
     console.log("Pop cardno="+cardno+" v="+v);
     // toggle background color between white and yellow adjust nclicked
     if(nclicked==1) {
@@ -61,7 +61,7 @@ function pop(cardno){ // do various things when a card is clicked
             nclicked=0;
             showStatus("success");
         } else {
-            sum=v1+v2;
+            const sum=v1+v2;
             showStatus("v1+v2="+sum);
         }
     }
@@ -75,11 +75,11 @@ function pop(cardno){ // do various things when a card is clicked
 }
 function deal(){
     ndealt=0;
-    for(i=0;i<7;i++){ // i is row
-        y=10+i*5;
-        x0=xi[i];
+    for(let i=0;i<7;i++){ // i is row
+        const y=10+i*5;
+        const x0=xi[i];
 //    console.log("Dealing layer i="+i);
-        for (j=0;j<i+1;j++){
+        for (let j=0;j<i+1;j++){
             makeCard(ndealt,x0+j*12,y);
             ndealt++;
         }
@@ -102,20 +102,31 @@ function next(){ // put the next flipped card into the flip cell
     // check if the next card was already deleted, if so skip them
     while(deck[ndealt]==-1 && ndealt<52) ndealt++;
     if(ndealt>=52) {ndealt=28;while(deck[ndealt]==-1 && ndealt<52) ndealt++;}
-    makeCard(ndealt,12,5);
+    makeCard(ndealt,12,10);
     ndealt++;
     if(ndealt==53)ndealt=28;
 }
 
 function removeCard(cardno){
     card=document.getElementById("cd"+cardno);
-    if(card) document.body.removeChild;
+    if(card) document.body.removeChild(card);
 }
 
 function nuke(cardno){ // try it the simplest way.
+    // if cardno==28 we much convert its contents to tag the "real" card number
     console.log("nuke cardno="+cardno);
-    card=document.getElementById("cd"+cardno);
-    deck[cardno]=-1; // tag as already nuked
+    const card=document.getElementById("cd"+cardno);
+    let realcardno=28;
+    if(cardno==28){ // surely there is a better way to do this!
+        const s=card.innerHTML.substring(14,18);
+        const v=vals.indexOf(s.substring(0,2).trim());
+        const b=s.indexOf(' ');
+        const suit=suits.indexOf(s.substring(b+1,b+2));
+        const realcard=13*suit+v;
+        realcardno=deck.indexOf(realcard);
+        console.log("Card s="+s+" b="+b+" suit="+suit+" converts to "+realcardno );
+    }
+    deck[realcardno]=-1; // tag as already nuked
     document.body.removeChild(card);
     nclicked=0;
     score++;
