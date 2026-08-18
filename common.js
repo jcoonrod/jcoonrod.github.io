@@ -14,11 +14,11 @@ const getVal = cardId => cardId % 13;
 const getColor = cardId => (getSuit(cardId)==0 || getSuit(cardId)==3) ? 'b' : 'r';
 
 function createCards(){
-	for (n=0;n<52;n++) { // create 52 dif cards as strings in this array - innerHTML for divs
-			var suit=Math.floor(n/13);
-			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
-			var val = n % 13;
-			var ctr = (val<10) ? suits[suit] : faces[val-10];
+	for (let n=0;n<52;n++) { // create 52 dif cards as strings in this array - innerHTML for divs
+			const suit=Math.floor(n/13);
+			const f=((suit==1 || suit==2) ? 'r' : 'b'); // optionally paint the red suits red
+			const val = n % 13;
+			const ctr = (val<10) ? suits[suit] : faces[val-10];
 			cards[n]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
 	}
 	for(n=0;n<ncards;n++) { // handle 52 and 104 items in deck
@@ -30,8 +30,8 @@ function createCards(){
 // a function to Fisher-Yate shuffle two decks together (104 cards);
 function shuffle(){
 	console.log("Shuffle "+ncards);
-	for(i=0; i<ncards; i++) { // do lots random interchanges
-		j=Math.floor(Math.random() * 52);
+	for(let i=0; i<ncards; i++) { // do lots random interchanges
+		const j=Math.floor(Math.random() * 52);
 		[deck[i],deck[j]]=[deck[j],deck[i]];
 		//	console.log("i,j="+i+','+j);
     }

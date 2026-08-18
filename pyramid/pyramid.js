@@ -6,6 +6,7 @@ var cardno=-1; // make this global for ease of debugging
 var score=0;
 var click1; // which card was clicked first?
 var click2; // which card was clicked second?
+var nuked=Array(52).fill(false); // this track which cards have been nuked, originally set to false
 const offsets=[1,2,2,3,3,3,4,4,4,4,5,5,5,5,5,6,6,6,6,6,6];
 const xi=[44,38,32,26,20,14,8]; // left of first card;
 const status=document.getElementById("status");
@@ -100,8 +101,8 @@ function next(){ // put the next flipped card into the flip cell
     console.log("Next "+ndealt);
     showStatus("Next..");
     // check if the next card was already deleted, if so skip them
-    while(deck[ndealt]==-1 && ndealt<52) ndealt++;
-    if(ndealt>=52) {ndealt=28;while(deck[ndealt]==-1 && ndealt<52) ndealt++;}
+    while(nuked[ndealt] && ndealt<52) ndealt++;
+    if(ndealt>=52) {ndealt=28;while(nuked[ndealt] && ndealt<52) ndealt++;}
     makeCard(ndealt,12,10);
     ndealt++;
     if(ndealt==53)ndealt=28;
@@ -126,7 +127,7 @@ function nuke(cardno){ // try it the simplest way.
         realcardno=deck.indexOf(realcard);
         console.log("Card s="+s+" b="+b+" suit="+suit+" converts to "+realcardno );
     }
-    deck[realcardno]=-1; // tag as already nuked
+    nuked[realcardno]=true; // tag as already nuked
     document.body.removeChild(card);
     nclicked=0;
     score++;
@@ -134,7 +135,8 @@ function nuke(cardno){ // try it the simplest way.
 }
 
 function clearBoard(){
-    for(i=0;i<28;i++) removeCard(i);
+    for(i=0;i<29;i++) removeCard(i);
+    nuked.fill(false);
     nclicked=0;
     click1=0;
     click2=0;
