@@ -19,12 +19,12 @@ function showStatus(s){  // pass in anything beyond score and nclicked
     status.innerHTML=s2;
 }
 
-function pop(i){ // do various things when a card is clicked
-    console.log("pop i="+i+" nclicked="+nclicked);
+function pop(cardno){ // do various things when a card is clicked
+    console.log("pop cardno="+cardno+" nclicked="+nclicked);
     // first determine if card is visible
-    if(i>20) visibility=true;
+    if(cardno>20) visibility=true;
     else {
-        left=i+offsets[i]; right=left+1;
+        left=cardno+offsets[cardno]; right=left+1;
         leftcard=document.getElementById("cd"+left);
         rightcard=document.getElementById("cd"+right);
         visibility=!leftcard && !rightcard;
@@ -33,26 +33,28 @@ function pop(i){ // do various things when a card is clicked
         showStatus("Not clickable");
         return;
     }
-    card=document.getElementById("cd"+i);
+    card=document.getElementById("cd"+cardno);
     s=card.innerHTML.substring(14,18); // This should show the value and suit symbols
+    console.log("Visibility of cardno="+cardno+" s="+s);
     nclicked++;
     v=1+vals.indexOf(s.substring(0,2).trim());
+    console.log("Pop cardno="+cardno+" v="+v);
     // toggle background color between white and yellow adjust nclicked
     if(nclicked==1) {
         v1=v;
-        click1=i
+        click1=cardno
         console.log("Card says "+s+" v1="+v1);
         showStatus("v1="+v1);
-        if(v1==13) {
+        if(v1==13) { // Kings can jump up on their own
             nclicked=0;
-            nuke(i); // get rid of the card, replace it with a blank cell
+            nuke(cardno); // get rid of the card
             showStatus("success");
         }
     }
     if((nclicked)==2) {
         v2=v;
-        click2=i;
-        console.log("Card says "+s+" v2="+v2);
+        click2=cardno;
+        console.log("Card2 says "+s+" v2="+v2);
         if((v1+v2)==13) {// erase both cards
             nuke(click1);
             nuke(click2);
@@ -90,11 +92,11 @@ function whiten(cardno) {
     if(cardno==click2) click2=-1;
 }
 
-function next(){
-    if(nclicked && click1<28) whiten(click1);
-    if(nclicked && click2<28) whiten(click2);
+function next(){ // put the next flipped card into the flip cell
+    if(nclicked) whiten(click1);
+    if(nclicked) whiten(click2);
+    removeCard(28); // delete the old card
     nclicked=0; click1=-1; click2=-1;
-    if(ndealt>28) removeCard(ndealt-1); // disappear the previous card
     console.log("Next "+ndealt);
     showStatus("Next..");
     // check if the next card was already deleted, if so skip them
@@ -102,6 +104,7 @@ function next(){
     if(ndealt>=52) {ndealt=28;while(deck[ndealt]==-1 && ndealt<52) ndealt++;}
     makeCard(ndealt,12,5);
     ndealt++;
+    if(ndealt==53)ndealt=28;
 }
 
 function removeCard(cardno){
@@ -128,14 +131,14 @@ function clearBoard(){
 }   
 
 function makeCard(cardno, x,y) { // add a card document at large
-    console.log("MakeCard i="+i+" j="+j);
+    console.log("MakeCard cardno="+cardno+" x="+x+" y="+y);
     card=document.createElement("div");
-    card.id="cd"+cardno;
+    card.id="cd"+Math.min(28,cardno);
     card.classList.add("card");
     card.style.position="absolute";
     card.style.left=x+"vw";
     card.style.top=y+"vw";
-    card.setAttribute("onclick","pop("+cardno+");");
+    card.setAttribute("onclick","pop("+Math.min(28,cardno)+");");
     card.style.backgroundColor="white";
     card.innerHTML=cards[deck[cardno]];
     document.body.appendChild(card);
