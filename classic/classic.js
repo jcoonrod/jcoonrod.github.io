@@ -20,20 +20,22 @@ createCards(); // Do this differently depending on number of suits.
 
 // When you click on the reserve, it flips up to 3 cards
 function next3(){ // this now only gets called if there are cards to deal
-	n=Math.min(3,reserve.length);
+	n=Math.min(3,reserve.length); // how many cards in reseerve
 	if(ireserve>=(reserve.length-1)) ireserve=0;
 	// first, clear out what is there
 	for(i=0;i<3;i++) {
 		document.getElementById("s"+i).innerHTML="";
 		freecells[i]=-1;
 	}
+	if(n<=3) document.getElementById("res").innerHTML=""; // Disappear when no more to click
 	for(i=0;i<n;i++) {
 		document.getElementById("s"+i).innerHTML=cards[deck[reserve[ireserve]]];
 		freecells[i]=reserve[ireserve]; //cardNo
 		ireserve++;
-		if(ireserve>=(reserve.length-1)) ireserve=0; // loop around
+		if(ireserve==(reserve.length)) ireserve=0; // loop around
 	}
 	console.log("next "+n+" ireserve="+ireserve+" freecells="+freecells);
+	res.innerHTML=" "+reserve.length;
 }
 
 // flip over card in cascade and put onclick in it
@@ -60,6 +62,7 @@ function deal(){
 	ireserve=0; // Where to start on turning up cards
 	for(i=28;i<ncards;i++) reserve[i-28]=i; // i is the cardNo (index) within deck
 	res.innerHTML=reserve.length;
+	document.getElementById("r0").innerHTML="<img src=/back.jpg draggable=false width=100% height=100%>";
 }
 
 function clearBoard(){	document.getElementById('r0').innerHTML=back;
@@ -70,6 +73,7 @@ function clearBoard(){	document.getElementById('r0').innerHTML=back;
   for(j=0;j<nfree;j++) document.getElementById("s"+j).innerHTML="";
   for(j=0;j<4;j++) document.getElementById("a"+j).innerHTML="";
   aces=[-1,-1,-1,-1];
+  document.getElementById("r0").innerHTML="";
 }
 
 // when a "freecell" is clicked, see if it will map to a column
@@ -120,7 +124,7 @@ function tryDrop(event){ // this is called with argument "this";
 		reserve.splice(reserveNo,1); // 
 		console.log("cardNo="+cardNo+" reserveNo="+reserveNo+" new length of reserve="+reserve.length);
 		n=reserve.length;
-		res.innerHTML=n;
+		res.innerHTML=" "+n;
 		if(n==0) document.getElementById("r0").innerHTML="";
 	};
 }
