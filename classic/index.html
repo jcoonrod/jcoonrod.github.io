@@ -12,11 +12,10 @@
 	<title>Classic Solitaire</title>
 	<link rel="stylesheet" href="/style.css">
   <script src="/confetti.browser.min.js"></script>
-  <script src="/common.js"></script>
   <script src="classic.js" defer></script>
 </head>
   
-<body tabindex="-1">
+<body>
 <div class="dropdown">
   <button class="dropbtn">Classic</button>
   <div class="dropdown-content">
@@ -26,7 +25,7 @@
   </div>
 </div>
 <div class="buttons">
-  <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
+  <button class="dropbtn" onclick="location.reload();">New</button>
 	<button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
   <span id=res> 24</span>
 </div>
