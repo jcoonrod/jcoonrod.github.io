@@ -17,7 +17,10 @@ function next3(){
 	imax=Math.min(nchildren("r0"),3); //
 	i=0;
 	while(i<imax){
+		conditionalPrepend("s"+i,"r0"); // still something there?
 		addCard(getTopId("r0"),"s"+i,0);
+		faceUp("s"+i);
+		i++;
 	}
 }
 

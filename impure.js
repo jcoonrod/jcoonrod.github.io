@@ -13,6 +13,9 @@ function appendCard(parentId,childId,y,content,color,clickable){ // create a new
 function nchildren(destId) { // how many children in cascade j?
 	return document.getElementById(destId).childElementCount;
 }
+function conditionalPrepend(srcId,destId){
+	if(nchildren(srcId)) document.getElementById(destId).prepend(document.getElementById("srcId"));
+}
 function getTopId(destId) {
 	return document.getElementById(destId).lastElementChild.id;
 }
