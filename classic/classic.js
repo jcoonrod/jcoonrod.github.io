@@ -1,3 +1,4 @@
+// NEXT: change addCard to addStack, implement next3
 // New project to go with pure functions only and remove the common script for now
 // for now, we will have to pass state variable in as parameters to minimize global variables
 // 1. Auto start on load
@@ -13,13 +14,15 @@ deal(deck); // deal the first 28 to the cascades and 24 to the reserve
 
 // pure next3 function
 function next3(){
-	n=nchildren("r0"); // home many cards in reserve
+	imax=Math.min(nchildren("r0"),3); //
 	i=0;
-	while(i)
+	while(i<imax){
+		addCard(getTopId("r0"),"s"+i,0);
+	}
 }
 
 // pure functions mostly replacing the old common.js functions for now
-function createContent(i){ // i runs 0 to 52
+function createContent(i){ // i runs 0 to 51
 	const suits = ["♠","♥","♦","♣"];
 	const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
 	const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
