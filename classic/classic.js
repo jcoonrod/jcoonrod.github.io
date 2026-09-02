@@ -1,4 +1,4 @@
-// NEXT: change addCard to addStack, implement next3
+// NEXT: change addCard to addStack, implement next3 with restart when empty
 // New project to go with pure functions only and remove the common script for now
 // for now, we will have to pass state variable in as parameters to minimize global variables
 // 1. Auto start on load
