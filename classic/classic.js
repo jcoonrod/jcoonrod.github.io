@@ -70,17 +70,17 @@ function deal(deck){
 		y=(5*j)+"vw";
 		let cardId=deck[ndealt];
 		const content=createContent(cardId);		
-		appendCard("c"+j,"v"+cardId,y,content,color(cardId),1); // faceup
+		dealCard("c"+j,"v"+cardId,y,content,color(cardId),1); // faceup
 		ndealt++;
 		for (i=j+1;i<7;i++){ // the rest of the row takes default face down
 			cardId=deck[ndealt];
-			appendCard("c"+i,"v"+cardId,y,"<img src=/back.jpg>",color(cardId),0); // not clickable
+			dealCard("c"+i,"v"+cardId,y,"<img src=/back.jpg>",color(cardId),0); // not clickable
 			ndealt++;
 		}
 	}
 	while(ndealt<52){
 		cardId=deck[ndealt];
-		appendCard("r0","v"+cardId,0,"<img src=/back.jpg>",color(cardId),0);
+		dealCard("r0","v"+cardId,0,"<img src=/back.jpg>",color(cardId),0);
 		ndealt++;
 	}
 }
@@ -88,17 +88,22 @@ function deal(deck){
 // try to make this clear
 function tryMove(srcId) { // When cascade card is clicked. Must delete it before it can be appended
 	moved=tryCascade(srcId); // returns cascade number if one can move there
-	if(!moved) tryAce(srcId);
+	if(!moved) moved=tryAce(srcId);
 	return moved;
 }
 function tryAce(srcId){
 	const cardNo=srcId.substring(1);
 	const value=cardNo%13;
 	const suit=Math.floor(srcId.substring(1)/13);
-	const foundation="s"+suit;
+	const foundation="a"+suit;
 	const foundation_level=nchildren(foundation);
-	console.log("tryAce",suit,value,foundation_level);
-	if(value==foundation_level+1) appendCard(srcId,foundation);
+	console.log("tryAce suit=",suit,"value=",value,"foundation_level",foundation_level);
+	if(value==foundation_level) {
+		addCard(srcId,foundation,0);
+		moved=1;
+	}
+	console.log("tryAce moved=",moved);
+	return moved;
 }
 function tryCascade(srcId){ // move to another cascade if color mismatch and value one above
 	const parent=getParent(srcId);

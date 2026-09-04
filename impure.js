@@ -1,5 +1,5 @@
 // impure functions pushed to the edge to handle dom
-function appendCard(parentId,childId,y,content,color,clickable){ // create a new card with absolute offset string y
+function dealCard(parentId,childId,y,content,color,clickable){ // create a new card with absolute offset string y
 	let child=document.createElement("div");
 	child.id=childId;
 	child.classList="card "+color;
@@ -16,7 +16,8 @@ function nchildren(destId) { // how many children in cascade j?
 	return n;
 }
 function getParent(childId){
-	
+	console.log("getParent",childId);
+	return document.getElementById(childId).parentElement;
 }
 function moveAll(srcId,destId){ // move all the children
 	const nchildren=n;
