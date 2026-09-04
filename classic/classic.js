@@ -1,4 +1,4 @@
-// NEXT: change addCard to addStack, implement next3 with restart when empty
+// NEXT: change addCard to addStack, implement next3 with reserve when empty
 // New project to go with pure functions only and remove the common script for now
 // for now, we will have to pass state variable in as parameters to minimize global variables
 // 1. Auto start on load
@@ -14,13 +14,23 @@ deal(deck); // deal the first 28 to the cascades and 24 to the reserve
 
 // pure next3 function
 function next3(){
-	imax=Math.min(nchildren("r0"),3); //
-	i=0;
-	while(i<imax){
-		conditionalPrepend("s"+i,"r0"); // still something there?
-		addCard(getTopId("r0"),"s"+i,0);
-		faceUp("s"+i);
-		i++;
+	let n=nchildren("r0"); // How many in reserve?
+	if(n==0){
+		moveAll("s0","r0");
+		moveAll("s1","r0");
+		moveAll("s2","r0");
+	}
+	n=nchildren("r0");
+	if(n==0) { //if this happens, we are done
+		resetCard("r0","<h2>Reserve Empty.</h2>");
+	}else {
+		const imax=Math.min(n,3); // How many can we flip up?
+		i=0;
+		while(i<imax){
+			addCard(getTopId("r0"),"s"+i,0);
+			faceUp("s"+i);
+			i++;
+		}
 	}
 }
 
@@ -81,9 +91,17 @@ function tryMove(srcId) { // When cascade card is clicked. Must delete it before
 	if(!moved) tryAce(srcId);
 	return moved;
 }
-function tryAce(srcId){}
+function tryAce(srcId){
+	const cardNo=srcId.substring(1);
+	const value=cardNo%13;
+	const suit=Math.floor(srcId.substring(1)/13);
+	const foundation="s"+suit;
+	const foundation_level=nchildren(foundation);
+	console.log("tryAce",suit,value,foundation_level);
+	if(value==foundation_level+1) appendCard(srcId,foundation);
+}
 function tryCascade(srcId){ // move to another cascade if color mismatch and value one above
-	const parent=document.getElementById(srcId).parentElement;
+	const parent=getParent(srcId);
 	const cardId=srcId.substring(1);
 	const srcValue=cardId%13;
 	const srcColor=color(cardId);

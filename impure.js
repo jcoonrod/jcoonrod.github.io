@@ -11,10 +11,19 @@ function appendCard(parentId,childId,y,content,color,clickable){ // create a new
 	document.getElementById(parentId).appendChild(child);
 }
 function nchildren(destId) { // how many children in cascade j?
-	return document.getElementById(destId).childElementCount;
+	const n=document.getElementById(destId).childElementCount;
+	console.log("nchildren",destId,n);
+	return n;
 }
-function conditionalPrepend(srcId,destId){
-	if(nchildren(srcId)) document.getElementById(destId).prepend(document.getElementById("srcId"));
+function getParent(childId){
+	
+}
+function moveAll(srcId,destId){ // move all the children
+	const nchildren=n;
+	console.log("moveAll",srcId,n);
+	while(getTopId(srcId)){
+	 	document.getElementById(destId).append(document.getElementById("srcId"));
+	}
 }
 function getTopId(destId) {
 	return document.getElementById(destId).lastElementChild.id;
@@ -34,4 +43,8 @@ function faceUp(cascadeId){
         child.setAttribute("onclick","tryMove(this.id);");
         child.innerHTML=createContent(cardId);
     }
+}
+function resetCard(cardId,content){
+	console.log("resetCard",cardId,content);
+	document.getElementById("cardId").innerHTML=content;
 }
