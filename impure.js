@@ -19,15 +19,6 @@ function getParent(childId){
 	console.log("getParent",childId);
 	return document.getElementById(childId).parentElement;
 }
-function moveAll(srcId,destId){ // move all the children
-	const n=nchildren(srcId);
-	console.log("moveAll",srcId,n);
-	for(let i=0;i<n;i++){
-		cardId=getTopId(srcId); // find the top child
-		console.log("move",cardId,destId);
-	 	addCard(cardId,destId,0);
-	}
-}
 function getTopId(destId) {
 	return document.getElementById(destId).lastElementChild.id;
 }
@@ -39,13 +30,18 @@ function addCard(srcId,destId,y){
 	return true;
 }
 function faceUp(cascadeId){
-    parent=document.getElementById(cascadeId);
-    child=parent.lastElementChild;
-    if(child){
+    if(nchildren(cascadeId)){
+		child=document.getElementById(cascadeId).lastElementChild;
+		console.log("faceUp",cascadeId,child.id);
         cardId=child.id.substring(1);
         child.setAttribute("onclick","tryMove(this.id);");
         child.innerHTML=createContent(cardId);
     }
+}
+function faceDn(cardId){
+	card=document.getElementById(cardId);
+	card.removeAttribute("onclick");
+	card.innerHTML="<img src=/back.jpg>";
 }
 function resetCard(cardId,content){
 	console.log("resetCard",cardId,content);

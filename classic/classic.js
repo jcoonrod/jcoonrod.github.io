@@ -1,4 +1,4 @@
-// NEXT: change addCard to addStack, implement next3 with reserve when empty
+// NEXT: change addCard to addStack
 // New project to go with pure functions only and remove the common script for now
 // for now, we will have to pass state variable in as parameters to minimize global variables
 // 1. Auto start on load
@@ -67,14 +67,14 @@ function color(i){
 function deal(deck){
 	let ndealt=0;
 	for (j=0;j<7;j++){ // j here indicated which cascade
-		y=5*j;
+		iy=5*j;
 		let cardId=deck[ndealt];
 		const content=createContent(cardId);		
-		dealCard("c"+j,"v"+cardId,y,content,color(cardId),1); // faceup
+		dealCard("c"+j,"v"+cardId,iy,content,color(cardId),1); // faceUp
 		ndealt++;
 		for (i=j+1;i<7;i++){ // the rest of the row takes default face down
 			cardId=deck[ndealt];
-			dealCard("c"+i,"v"+cardId,0,"<img src=/back.jpg>",color(cardId),0); // not clickable
+			dealCard("c"+i,"v"+cardId,iy,"<img src=/back.jpg>",color(cardId),0); // not clickable
 			ndealt++;
 		}
 	}
@@ -87,11 +87,14 @@ function deal(deck){
 
 // try to make this clear
 function tryMove(srcId) { // When cascade card is clicked. Must delete it before it can be appended
-	moved=tryCascade(srcId); // returns cascade number if one can move there
-	if(!moved) moved=tryAce(srcId);
+	let moved=false; // must be local
+	moved=tryAce(srcId);
+	if(!moved) moved=tryCascade(srcId); // returns cascade number if one can move there
 	return moved;
 }
 function tryAce(srcId){
+	let moved=false;
+	const oldParent=getParent(srcId);
 	const cardNo=srcId.substring(1);
 	const value=cardNo%13;
 	const suit=Math.floor(srcId.substring(1)/13);
@@ -100,24 +103,37 @@ function tryAce(srcId){
 	console.log("tryAce suit=",suit,"value=",value,"foundation_level",foundation_level);
 	if(value==foundation_level) {
 		addCard(srcId,foundation,0);
-		parent=getParent(srcId);
-		faceUp(parent.id);
-		moved=1;
+		faceUp(oldParent.id);
+		moved=true;
 	}
 	console.log("tryAce moved=",moved);
 	return moved;
 }
+function moveAll(srcId,destId){ // move all the children to reserve
+	const n=nchildren(srcId);
+	console.log("moveAll",srcId,n);
+	for(let i=0;i<n;i++){
+		cardId=getTopId(srcId); // find the top child
+		console.log("move",cardId,destId);
+	 	addCard(cardId,destId,0);
+		faceDn(cardId); // must remove onclick
+	}
+}
+
 function tryCascade(srcId){ // move to another cascade if color mismatch and value one above
 	const parent=getParent(srcId);
 	const cardId=srcId.substring(1);
 	const srcValue=cardId%13;
 	const srcColor=color(cardId);
-	console.log("TryCascade ",srcId,srcValue,srcColor,parent);
+	console.log("TryCascade ",srcId,srcValue,srcColor,parent.id);
 	j=0;
 	let moved=false;
 	while(j<7 && !moved) { // step through cascades until a move happens
 		n=nchildren("c"+j); // new impure function
-		if(n==0 && srcValue==12) moved=addCard(srcId,"c"+j,0); // add to empty cascade
+		if(n==0 && srcValue==12) {
+			moved=addCard(srcId,"c"+j,0); // add to empty cascade
+			faceUp(parentId); 
+		}
 		if(!moved && n){
 			const topCardId=getTopId("c"+j).substring(1); // cardId at top of 
 			const topValue=topCardId%13;
