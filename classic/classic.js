@@ -67,14 +67,14 @@ function color(i){
 function deal(deck){
 	let ndealt=0;
 	for (j=0;j<7;j++){ // j here indicated which cascade
-		y=(5*j)+"vw";
+		y=5*j;
 		let cardId=deck[ndealt];
 		const content=createContent(cardId);		
 		dealCard("c"+j,"v"+cardId,y,content,color(cardId),1); // faceup
 		ndealt++;
 		for (i=j+1;i<7;i++){ // the rest of the row takes default face down
 			cardId=deck[ndealt];
-			dealCard("c"+i,"v"+cardId,y,"<img src=/back.jpg>",color(cardId),0); // not clickable
+			dealCard("c"+i,"v"+cardId,0,"<img src=/back.jpg>",color(cardId),0); // not clickable
 			ndealt++;
 		}
 	}
@@ -100,6 +100,8 @@ function tryAce(srcId){
 	console.log("tryAce suit=",suit,"value=",value,"foundation_level",foundation_level);
 	if(value==foundation_level) {
 		addCard(srcId,foundation,0);
+		parent=getParent(srcId);
+		faceUp(parent.id);
 		moved=1;
 	}
 	console.log("tryAce moved=",moved);

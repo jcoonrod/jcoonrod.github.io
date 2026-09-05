@@ -5,7 +5,7 @@ function dealCard(parentId,childId,y,content,color,clickable){ // create a new c
 	child.classList="card "+color;
 	child.style.position="absolute";
 	child.style.width="100%";
-	child.style.top=y;
+	child.style.top=y+"vw";
 	child.innerHTML=content;
 	if(clickable) child.setAttribute("onclick","tryMove(this.id);");
 	document.getElementById(parentId).appendChild(child);
@@ -20,20 +20,22 @@ function getParent(childId){
 	return document.getElementById(childId).parentElement;
 }
 function moveAll(srcId,destId){ // move all the children
-	const nchildren=n;
+	const n=nchildren(srcId);
 	console.log("moveAll",srcId,n);
-	while(getTopId(srcId)){
-	 	document.getElementById(destId).append(document.getElementById("srcId"));
+	for(let i=0;i<n;i++){
+		cardId=getTopId(srcId); // find the top child
+		console.log("move",cardId,destId);
+	 	addCard(cardId,destId,0);
 	}
 }
 function getTopId(destId) {
 	return document.getElementById(destId).lastElementChild.id;
 }
 function addCard(srcId,destId,y){
+	console.log("addCard",srcId,destId,y);
 	child=document.getElementById(srcId);
 	child.style.top=y+"vw";
 	document.getElementById(destId).append(child);
-	console.log("addCard",srcId,destId);
 	return true;
 }
 function faceUp(cascadeId){
