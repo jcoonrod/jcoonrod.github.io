@@ -1,4 +1,3 @@
-// NEXT: change addCard to addStack
 // New project to go with pure functions only and remove the common script for now
 // for now, we will have to pass state variable in as parameters to minimize global variables
 // 1. Auto start on load
@@ -125,23 +124,26 @@ function tryCascade(srcId){ // move to another cascade if color mismatch and val
 	const cardId=srcId.substring(1);
 	const srcValue=cardId%13;
 	const srcColor=color(cardId);
-	console.log("TryCascade ",srcId,srcValue,srcColor,parent.id);
-	j=0;
+	let j=0;
 	let moved=false;
 	while(j<7 && !moved) { // step through cascades until a move happens
-		n=nchildren("c"+j); // new impure function
-		if(n==0 && srcValue==12) {
-			moved=addCard(srcId,"c"+j,0); // add to empty cascade
-			faceUp(parentId); 
-		}
-		if(!moved && n){
-			const topCardId=getTopId("c"+j).substring(1); // cardId at top of 
-			const topValue=topCardId%13;
-			const topColor=color(topCardId);
-			console.log("Cascade ",j,topCardId,topValue,topColor);
-			if((topColor!==srcColor) && (topValue==(srcValue+1))) {
-				moved=addCard(srcId,"c"+j,n*5);
-				faceUp(parent.id);
+		console.log("TryCascade j=",j,"srcId",srcId,srcValue,srcColor,parent.id);
+		if(parent.id!==("c"+j)){
+			const n=nchildren("c"+j); // impure function
+			if(n==0 && srcValue==12) {
+				moved=addCard(srcId,"c"+j,0); // add to empty cascade
+				faceUp(parent.id); 
+			}
+			if(!moved && n){
+				const topCardId=getTopId("c"+j).substring(1); // cardId at top of 
+				const topValue=topCardId%13;
+				const topColor=color(topCardId);
+				console.log("Cascade srcId=",srcId,"j=",j,"top id=",topCardId,"val=",topValue,"color",topColor);
+				if((topColor!==srcColor) && (topValue==(srcValue+1))) {
+					const stack=getStack(srcId); // get things that will move
+					for (i=0;i<stack.length;i++) moved=addCard(stack[i],"c"+j,(n+i)*5);
+					faceUp(parent.id);
+				}
 			}
 		}
 		j++;

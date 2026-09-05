@@ -1,4 +1,19 @@
 // impure functions pushed to the edge to handle dom
+function getStack(cardId){ // return array from this card to top
+	const parent=document.getElementById(cardId).parentElement;
+	let stack=[];
+	console.log("getStack",parent.id);
+	const children=parent.children;
+	let start=-1;
+	let i=0;
+	for (let child of children){ // run through them
+		if(child.id==cardId) start=i;
+		if(start>-1) stack.push(child.id);
+		i++;
+		console.log("getStack",i,stack);
+	}
+	return stack;
+}
 function dealCard(parentId,childId,y,content,color,clickable){ // create a new card with absolute offset string y
 	let child=document.createElement("div");
 	child.id=childId;
