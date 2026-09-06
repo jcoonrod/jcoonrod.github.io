@@ -28,7 +28,6 @@
 <div class="buttons">
   <button class="dropbtn" onclick="location.reload();">New</button>
 	<button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
-  <span id=res> 24</span>
 </div>
 <!--First row is the reserve (r0) dealt from reserve (s0-2) and foundation piles (a0-3)-->
 <div class=row>
@@ -42,8 +41,9 @@
   <div id=a3 class=cell></div>
 </div>
 <!-- make sure the blank row has some space-->
-<div class=row><p>&nbsp;</p></div>
-
+<div class=row><table><tr>
+  <td>Reserve and three flipped up</td>
+  <td>Foundations: ♠ ♥ ♦ ♣"</td></tr></table></div>
 <div class=row>
   <div id=c0 class=c></div>
   <div id=c1 class=c></div>

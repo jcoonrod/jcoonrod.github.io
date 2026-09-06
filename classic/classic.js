@@ -21,7 +21,10 @@ function next3(){
 	}
 	n=nchildren("r0");
 	if(n==0) { //if this happens, we are done
-		resetCard("r0","<h2>Reserve Empty.</h2>");
+		const win=nchildren("a0")+nchildren("a1")+nchildren("a2")+nchildren("a3");
+		console.log("Win?",win);
+		if(win==52) confetti(
+		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
 	}else {
 		const imax=Math.min(n,3); // How many can we flip up?
 		i=0;
@@ -86,7 +89,7 @@ function deal(deck){
 
 // try to make this clear
 function tryMove(srcId) { // When cascade card is clicked. Must delete it before it can be appended
-	let moved=false; // must be local
+	let moved=false; // local variable
 	moved=tryAce(srcId);
 	if(!moved) moved=tryCascade(srcId); // returns cascade number if one can move there
 	return moved;
@@ -118,6 +121,14 @@ function moveAll(srcId,destId){ // move all the children to reserve
 		faceDn(cardId); // must remove onclick
 	}
 }
+function addStack(srcId,destId){ // add a stack starting with srcId to dest cascade	let moved=false;
+	const oldParent=getParent(srcId);
+	const n=nchildren(destId);
+	const stack=getStack(srcId); // get arracy of cards to will move
+	for (i=0;i<stack.length;i++) moved=addCard(stack[i],destId,(n+i)*5);
+	faceUp(oldParent.id); //
+	return moved;
+}
 
 function tryCascade(srcId){ // move to another cascade if color mismatch and value one above
 	const parent=getParent(srcId);
@@ -130,20 +141,13 @@ function tryCascade(srcId){ // move to another cascade if color mismatch and val
 		console.log("TryCascade j=",j,"srcId",srcId,srcValue,srcColor,parent.id);
 		if(parent.id!==("c"+j)){
 			const n=nchildren("c"+j); // impure function
-			if(n==0 && srcValue==12) {
-				moved=addCard(srcId,"c"+j,0); // add to empty cascade
-				faceUp(parent.id); 
-			}
+			if(n==0 && srcValue==12) moved=addStack(srcId,"c"+j);
 			if(!moved && n){
 				const topCardId=getTopId("c"+j).substring(1); // cardId at top of 
 				const topValue=topCardId%13;
 				const topColor=color(topCardId);
 				console.log("Cascade srcId=",srcId,"j=",j,"top id=",topCardId,"val=",topValue,"color",topColor);
-				if((topColor!==srcColor) && (topValue==(srcValue+1))) {
-					const stack=getStack(srcId); // get things that will move
-					for (i=0;i<stack.length;i++) moved=addCard(stack[i],"c"+j,(n+i)*5);
-					faceUp(parent.id);
-				}
+				if((topColor!==srcColor) && (topValue==(srcValue+1))) addStack(srcId,"c"+j);
 			}
 		}
 		j++;

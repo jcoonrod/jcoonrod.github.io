@@ -13,6 +13,8 @@ div.c10 {height:80vw;width:10%;position:relative;margin:0;border:0;}
 .b {color:black;}
 h2{font-size:4vw;padding:0;margin:0;font-weight:bold;position:relative; top:-0.5vw;}
 h1{font-size:8vw;line-height:1.2; padding:0;margin:0;font-weight:normal;text-align: center;position:relative; top:-2vw;}
+table {width:100%;}
+td{width:50%;text-align:left;color:yellow;}
 .card {
   background: white;
   padding: 0 0.2vw;margin:0;
