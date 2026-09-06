@@ -11,6 +11,13 @@
 const deck=shuffle(); // new pure function creates a shuffled deck;
 deal(deck); // deal the first 28 to the cascades and 24 to the reserve
 
+function tryWin(){
+	const win=nchildren("a0")+nchildren("a1")+nchildren("a2")+nchildren("a3");
+	console.log("Win?",win);
+	if(win==52) confetti(
+		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
+}
+
 // pure next3 function
 function next3(){
 	let n=nchildren("r0"); // How many in reserve?
@@ -20,12 +27,8 @@ function next3(){
 		moveAll("s2","r0");
 	}
 	n=nchildren("r0");
-	if(n==0) { //if this happens, we are done
-		const win=nchildren("a0")+nchildren("a1")+nchildren("a2")+nchildren("a3");
-		console.log("Win?",win);
-		if(win==52) confetti(
-		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
-	}else {
+	if(n==0) tryWin();
+	else {
 		const imax=Math.min(n,3); // How many can we flip up?
 		i=0;
 		while(i<imax){
@@ -107,6 +110,7 @@ function tryAce(srcId){
 		addCard(srcId,foundation,0);
 		faceUp(oldParent.id);
 		moved=true;
+		tryWin();
 	}
 	console.log("tryAce moved=",moved);
 	return moved;

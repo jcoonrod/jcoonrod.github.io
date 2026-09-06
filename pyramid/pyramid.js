@@ -1,7 +1,8 @@
+// start a slow process of pure functions so solve the bugs
 const ncards=52;
 var nlast=52; //this will decrease as we delete cards from the stack
 var ndealt=0;
-var nclicked=0;
+var nclicked=0; // this is the problem - should never exceed 2
 var cardno=-1; // make this global for ease of debugging
 var score=0;
 var click1; // which card was clicked first?
@@ -37,6 +38,13 @@ function pop(cardno){ // do various things when a card is clicked
     const card=document.getElementById("cd"+cardno);
     const s=card.innerHTML.substring(14,18); // This should show the value and suit symbols
     console.log("Visibility of cardno="+cardno+" s="+s);
+    // check if this card is already yellow
+    const backgroundColor = card.style.backgroundColor;
+    if(backgroundColor=="yellow") {
+        whiten(cardno);
+        nclicked--;
+    } else yellow(cardno);
+
     nclicked++;
     const v=1+vals.indexOf(s.substring(0,2).trim());
     console.log("Pop cardno="+cardno+" v="+v);
@@ -66,11 +74,11 @@ function pop(cardno){ // do various things when a card is clicked
             showStatus("v1+v2="+sum);
         }
     }
-    const backgroundColor = card.style.backgroundColor;
-    if(backgroundColor=="yellow") {
-        card.style.backgroundColor="white";
-        nclicked--;
-    } else if(nclicked!==0) card.style.backgroundColor="yellow";
+    if(nclicked>2) { // whiten both if this happens
+        whiten(click1);
+        whiten(click2)
+        nclicked=0;
+    }
     showStatus("");
 
 }
@@ -89,8 +97,11 @@ function deal(){
 function whiten(cardno) {
     document.getElementById("cd"+cardno).style.backgroundColor="white";
     nclicked--;
-    if(cardno==click1) click1=-1;
+    if(cardno==click1) click1=-1; // state variable we will want to change
     if(cardno==click2) click2=-1;
+}
+function yellow(cardno) {
+    document.getElementById("cd"+cardno).style.backgroundColor="yellow";
 }
 
 function next(){ // put the next flipped card into the flip cell
