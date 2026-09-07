@@ -15,23 +15,24 @@
   <script src="/impure.js"></script>
   <script src="classic.js" defer></script>
 </head>
-  
 <body>
 <div class="dropdown">
   <button class="dropbtn">Classic</button>
   <div class="dropdown-content">
     <a href="/classic">Classic</a>
     <a href="/">Freecell</a>
+    <a href="/pyramid">Pyramid</a>
     <a href="/spider">Spider</a>
   </div>
 </div>
 <div class="buttons">
   <button class="dropbtn" onclick="location.reload();">New</button>
-	<button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
+	<button class="dropbtn" onclick="clearBoard();deal(deck);">Replay</button>
+  <a class="dropbtn" href="help.html" target="_blank">🛈</a> 
 </div>
 <!--First row is the reserve (r0) dealt from reserve (s0-2) and foundation piles (a0-3)-->
 <div class=row>
-  <div id=r0 class=cell onclick="next3();"></div> 
+  <div id=r0 class=cell onclick="next3();">Click to flip up next 3</div> 
   <div id=s0 class=cell></div>
   <div id=s1 class=cell></div>
   <div id=s2 class=cell></div>
@@ -42,7 +43,7 @@
 </div>
 <!-- make sure the blank row has some space-->
 <div class=row><table><tr>
-  <td>Reserve +3 flipped</td>
+  <td>Stock pile +3 flipped</td>
   <td>Foundations: ♠ ♥ ♦ ♣"</td></tr></table></div>
 <div class=row>
   <div id=c0 class=c></div>

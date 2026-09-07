@@ -6,7 +6,7 @@ var moves = [];
 nfoundation=0; // how many foundation piles have gone up?
 nempty = 0; // computed # empty cascades
 var nsuit = document.cookie.substr(5,1); 
-if (nsuit=='') nsuit=2; // default is twp suits
+if (nsuit!==1 || nsuit!==4) nsuit=2; // default is twp suits
 var first=0; // index within the nodes for the first that could be moved
 var last=0; // " the top card
 document.getElementById("s0").innerHTML=back;

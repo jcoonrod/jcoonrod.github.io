@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FreeCell using Div a NotoSans2 for the cards -->
+<!-- One-Click FreeCell -->
 <html lang=en>
 <head>
 	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -31,6 +31,7 @@
   <button class="dropbtn" onclick="shuffle(); deal()">New Game</button>
   <button class="dropbtn" onclick="deal()">Replay</button>
   <button class="dropbtn" onclick="undo()">Undo</button>
+  <a class="dropbtn" href="help.html" target="_blank">🛈</a> 
 </div>
 <!-- Freecells are red and Foundations are Blue--> 
 <div class=row>
@@ -43,7 +44,9 @@
   <div id=a2 class="card blueborder"></div>
   <div id=a3 class="card blueborder"></div>
 </div>
-<div class=row>&nbsp;</div>
+<div class=row><table><tr>
+  <td>Four FreeCells</td>
+  <td>Foundations: ♠ ♥ ♦ ♣"</td></tr></table></div>
 <!-- Unlike other games, we click on columns not the cards-->
 <div class=row>
   <div id=c0 class=c onclick="popStack(0)"></div>

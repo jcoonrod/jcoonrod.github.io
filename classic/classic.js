@@ -71,7 +71,7 @@ function color(i){
 
 function deal(deck){
 	let ndealt=0;
-	for (j=0;j<7;j++){ // j here indicated which cascade
+	for (j=0;j<7;j++){ // j here indicates which cascade
 		iy=5*j;
 		let cardId=deck[ndealt];
 		const content=createContent(cardId);		
@@ -158,9 +158,10 @@ function tryCascade(srcId){ // move to another cascade if color mismatch and val
 	}
 	return moved;
 }
-function clearBoard(){	document.getElementById('r0').innerHTML=back;
-  for(j=0;j<ncol;j++) { // clear cascades
+function clearBoard(){
+  for(j=0;j<7;j++) { // clear cascades
     const cascade=document.getElementById("c"+j);
+	console.log("clearBoard j",j);
     while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
   }
   for(j=0;j<3;j++) document.getElementById("s"+j).innerHTML="";
