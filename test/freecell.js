@@ -29,12 +29,12 @@ function shuffle(){
 	return deck;
 }
 
-function deal(){ // this moves slowly on purpose
+function deal(deck){ // this moves slowly on purpose
     for(i=0;i<52;i++){
-        const j=Math.floor(i/8);
+        const j=i%8; // which cascade?
         const cardId=deck[i];
         const content=createContent(cardId);
-        const iy=j*5;
+        const iy=5*Math.floor(i/8);
         console.log("deal i="+i+" cardId="+cardId+" j="+j);
         dealCard("c"+j,"v"+cardId,iy,content,color(cardId),1)
     }
