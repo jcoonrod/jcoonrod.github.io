@@ -26,11 +26,12 @@
     <a href="/classic">Classic</a>
     <a href="/pyramid">Pyramid</a>
     <a href="/spider">Spider</a>
+    <a href="/test">test</a>
   </div>
 </div>
 <div class="buttons">
-  <button class="dropbtn" onclick="shuffle(); deal()">New Game</button>
-  <button class="dropbtn" onclick="deal()">Replay</button>
+  <button class="dropbtn" onclick="location.reload()">New Game</button>
+  <button class="dropbtn" onclick="clearBoard();deal(deck)">Replay</button>
   <button class="dropbtn" onclick="undo()">Undo</button>
   <a class="dropbtn" href="help.html" target="_blank">🛈</a> 
 </div>
@@ -46,7 +47,7 @@
   <div id=a3 class=cell></div>
 </div>
 <div class=row><table><tr>
-  <td>Four FreeCells</td>
+  <td>Four FreeCells <span id=message></span></td>
   <td>Foundations: ♠ ♥ ♦ ♣"</td></tr></table></div>
 <!-- Unlike other games, we click on columns not the cards-->
 <div class=row>

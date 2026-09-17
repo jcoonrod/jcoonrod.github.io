@@ -99,7 +99,7 @@ function tryMove(srcId) { // When cascade card is clicked. Must delete it before
 }
 function tryAce(srcId){
 	let moved=false;
-	const oldParent=getParent(srcId);
+	const oldParentId=getParentId(srcId);
 	const cardNo=srcId.substring(1);
 	const value=cardNo%13;
 	const suit=Math.floor(srcId.substring(1)/13);
@@ -108,7 +108,7 @@ function tryAce(srcId){
 	console.log("tryAce suit=",suit,"value=",value,"foundation_level",foundation_level);
 	if(value==foundation_level) {
 		addCard(srcId,foundation,0);
-		faceUp(oldParent.id);
+		faceUp(oldParentId);
 		moved=true;
 		tryWin();
 	}
@@ -126,16 +126,16 @@ function moveAll(srcId,destId){ // move all the children to reserve
 	}
 }
 function addStack(srcId,destId){ // add a stack starting with srcId to dest cascade	let moved=false;
-	const oldParent=getParent(srcId);
+	const oldParentId=getParentId(srcId);
 	const n=nchildren(destId);
 	const stack=getStack(srcId); // get arracy of cards to will move
 	for (i=0;i<stack.length;i++) moved=addCard(stack[i],destId,(n+i)*5);
-	faceUp(oldParent.id); //
+	faceUp(oldParentId); //
 	return moved;
 }
 
 function tryCascade(srcId){ // move to another cascade if color mismatch and value one above
-	const parent=getParent(srcId);
+	const parentId=getParentId(srcId);
 	const cardId=srcId.substring(1);
 	const srcValue=cardId%13;
 	const srcColor=color(cardId);
@@ -143,7 +143,7 @@ function tryCascade(srcId){ // move to another cascade if color mismatch and val
 	let moved=false;
 	while(j<7 && !moved) { // step through cascades until a move happens
 		console.log("TryCascade j=",j,"srcId",srcId,srcValue,srcColor,parent.id);
-		if(parent.id!==("c"+j)){
+		if(parentId!==("c"+j)){
 			const n=nchildren("c"+j); // impure function
 			if(n==0 && srcValue==12) moved=addStack(srcId,"c"+j);
 			if(!moved && n){

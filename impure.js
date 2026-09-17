@@ -30,9 +30,12 @@ function nchildren(destId) { // how many children in cascade j?
 	console.log("nchildren",destId,n);
 	return n;
 }
-function getParent(childId){
+function showMessage(message){
+	document.getElementById("message").innerHTML=message;
+}
+function getParentId(childId){
 	console.log("getParent",childId);
-	return document.getElementById(childId).parentElement;
+	return document.getElementById(childId).parentElement.id;
 }
 function getTopId(destId) {
 	return document.getElementById(destId).lastElementChild.id;
