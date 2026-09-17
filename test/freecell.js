@@ -1,4 +1,5 @@
 // pure function version of freecell, copying much from Classic
+// changes from classic - 8 columns instead of 7, limit on stack move, no faceup needed
 deal(shuffle()); 
 
 function deal(deck){ // this moves slowly on purpose
@@ -51,9 +52,10 @@ function color(i){
 // try to make this clear
 function tryMove(srcId) { // When cascade card is clicked. Must delete it before it can be appended
 	let moved=false; // local variable
-  const srcType=srcId.substring(0,1);
+	const srcType=srcId.substring(0,1);
+	console.log("tryMove srcId=",srcId,"type",srcType);
 	moved=tryAce(srcId);
-	if(!moved) moved=tryCascade(srcId); // returns true if moved
+	if(!moved) moved=tryCascade(srcId,8); // returns true if moved
   if(!moved && srcType!=='s') moved=tryFree(srcId); // try moving it to a freecell if any are free
 	return moved;
 }
@@ -80,7 +82,7 @@ function tryAce(srcId){
 	console.log("tryAce suit=",suit,"value=",value,"foundation_level",foundation_level);
 	if(value==foundation_level) {
 		addCard(srcId,foundation,0);
-		faceUp(oldParent.id);
+//		faceUp(oldParent.id);
 		moved=true;
 		tryWin();
 	}
@@ -102,18 +104,18 @@ function addStack(srcId,destId){ // add a stack starting with srcId to dest casc
 	const n=nchildren(destId);
 	const stack=getStack(srcId); // get arracy of cards to will move
 	for (i=0;i<stack.length;i++) moved=addCard(stack[i],destId,(n+i)*5);
-	faceUp(oldParent.id); //
+//	faceUp(oldParent.id); //
 	return moved;
 }
 
-function tryCascade(srcId){ // move to another cascade if color mismatch and value one above
+function tryCascade(srcId,nCascades){ // move to another cascade if color mismatch and value one above
 	const parent=getParent(srcId);
 	const cardId=srcId.substring(1);
 	const srcValue=cardId%13;
 	const srcColor=color(cardId);
 	let j=0;
 	let moved=false;
-	while(j<7 && !moved) { // step through cascades until a move happens
+	while(j<nCascades && !moved) { // step through cascades until a move happens
 		console.log("TryCascade j=",j,"srcId",srcId,srcValue,srcColor,parent.id);
 		if(parent.id!==("c"+j)){
 			const n=nchildren("c"+j); // impure function
