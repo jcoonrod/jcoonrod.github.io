@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<!-- One-click Spider Solitaire Pure version - all in one HTML page -->
+<html lang=en>
+<head>
+	<meta name="google" content="notranslate">
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<link rel='shortcut icon' href='/back.png'>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<meta name="description" content="Spider Solitaire Game by John Coonrod"/>
+	<title>Spider</title>
+	<link rel="stylesheet" href="/style.css">
+	<script src="/confetti.browser.min.js"></script>
+	<script src="/impure.js"></script>
+	<script src="spider.js" defer></script>
+</head>
+  
+<body tabindex="-1">
+<div class="dropdown">
+  <button class="dropbtn">Spider</button>
+  <div class="dropdown-content">
+    <a href="/test">Test Spider</a>
+    <a href="/classic">Classic</a>
+    <a href="/">Freecell</a>
+    <a href="/spider">Spider</a>
+    <a href="/pyramid">Pyramid</a>
+  </div>
+</div>
+<div class="buttons">
+  <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
+	<button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
+  <button class="dropbtn" id=suitlist onclick="changeSuits()"></button>
+  <a class="dropbtn" href="help.html" target="_blank">🛈</a> 
+  <span id="sofar">      </span>
+</div>
+
+<div class=row>
+  <div id=s0 class="card blueborder" onclick="if(ndealt==0){shuffle();deal();}else{next10();}"></div> 
+  <div id=s1 class="x"></div>
+  <div id=a0 class="card blueborder"></div>
+  <div id=a1 class="card blueborder"></div>
+  <div id=a2 class="card blueborder"></div>
+  <div id=a3 class="card blueborder"></div>
+  <div id=a4 class="card blueborder"></div>
+  <div id=a5 class="card blueborder"></div>
+  <div id=a6 class="card blueborder"></div>
+  <div id=a7 class="card blueborder"></div>
+</div>
+<table><tr><td>Stock Pile and Eight Foundations</td></tr></table>
+<div class=row>
+  <div id=c0 class=c10></div>
+  <div id=c1 class=c10></div>
+  <div id=c2 class=c10></div>
+  <div id=c3 class=c10></div>
+  <div id=c4 class=c10></div>
+  <div id=c5 class=c10></div>
+  <div id=c6 class=c10></div>
+  <div id=c7 class=c10></div>
+  <div id=c8 class=c10></div>
+  <div id=c9 class=c10></div>
+</div>
+</body>
+</html>

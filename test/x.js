@@ -1,4 +1,4 @@
-// pure function version of freecell, copying much from Classic
+// pure function version of Spider
 // changes from classic - 8 columns instead of 7, limit on stack move, no faceup needed
 // Any card or stack can drop to an empty column, not just kings 
 const deck=shuffle();
