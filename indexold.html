@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- One-Click FreeCell -- Pure Function Version-->
+<!-- One-Click FreeCell -->
 <html lang=en>
 <head>
 	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -11,10 +11,9 @@
   <meta name="viewport" content="width=device-width">
   <meta name="theme-color" content="green"/>
   <meta name="description" content="One-Click FreeCell Game by John Coonrod"/>
-	<title>Test</title>
-  <link rel="stylesheet" href="/style.css">
+	<title>One-click Freecell</title>
+  <link rel="stylesheet" href="style.css">
   <script src="/confetti.browser.min.js"></script>
-  <script src="/impure.js" defer></script>
   <script src="freecell.js" defer></script>
 </head>
   
@@ -26,39 +25,39 @@
     <a href="/classic">Classic</a>
     <a href="/pyramid">Pyramid</a>
     <a href="/spider">Spider</a>
-    <a href="/test">test</a>
+    <a href="/test">Test</a>
   </div>
 </div>
 <div class="buttons">
-  <button class="dropbtn" onclick="location.reload()">New Game</button>
-  <button class="dropbtn" onclick="clearBoard();deal(deck)">Replay</button>
+  <button class="dropbtn" onclick="shuffle(); deal()">New Game</button>
+  <button class="dropbtn" onclick="deal()">Replay</button>
   <button class="dropbtn" onclick="undo()">Undo</button>
   <a class="dropbtn" href="help.html" target="_blank">🛈</a> 
 </div>
 <!-- Freecells are red and Foundations are Blue--> 
 <div class=row>
-  <div id=s0 class=cell></div>
-  <div id=s1 class=cell></div>
-  <div id=s2 class=cell></div>
-  <div id=s3 class=cell></div>
-  <div id=a0 class=cell></div>
-  <div id=a1 class=cell></div>
-  <div id=a2 class=cell></div>
-  <div id=a3 class=cell></div>
+  <div id=s0 class="card redborder" onclick="dropFree(0)"></div>
+  <div id=s1 class="card redborder" onclick="dropFree(1)"></div>
+  <div id=s2 class="card redborder" onclick="dropFree(2)"></div>
+  <div id=s3 class="card redborder" onclick="dropFree(3)"></div>
+  <div id=a0 class="card blueborder"></div>
+  <div id=a1 class="card blueborder"></div>
+  <div id=a2 class="card blueborder"></div>
+  <div id=a3 class="card blueborder"></div>
 </div>
 <div class=row><table><tr>
-  <td>Four FreeCells <span id=message></span></td>
+  <td>Four FreeCells</td>
   <td>Foundations: ♠ ♥ ♦ ♣"</td></tr></table></div>
 <!-- Unlike other games, we click on columns not the cards-->
 <div class=row>
-  <div id=c0 class=c></div>
-  <div id=c1 class=c></div>
-  <div id=c2 class=c></div>
-  <div id=c3 class=c></div>
-  <div id=c4 class=c></div>
-  <div id=c5 class=c></div>
-  <div id=c6 class=c></div>
-  <div id=c7 class=c></div>
+  <div id=c0 class=c onclick="popStack(0)"></div>
+  <div id=c1 class=c onclick="popStack(1)"></div>
+  <div id=c2 class=c onclick="popStack(2)"></div>
+  <div id=c3 class=c onclick="popStack(3)"></div>
+  <div id=c4 class=c onclick="popStack(4)"></div>
+  <div id=c5 class=c onclick="popStack(5)"></div>
+  <div id=c6 class=c onclick="popStack(6)"></div>
+  <div id=c7 class=c onclick="popStack(7)"></div>
 </div>
 </body>
 </html>

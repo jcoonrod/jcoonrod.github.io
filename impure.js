@@ -1,4 +1,7 @@
 // impure functions pushed to the edge to handle dom
+function removeChildren(parentId){ // called primarily in clearBoard
+	document.getElementById(parentId).replaceChildren();
+}
 function getStack(cardId){ // return array from this card to top
 	const parent=document.getElementById(cardId).parentElement;
 	let stack=[];

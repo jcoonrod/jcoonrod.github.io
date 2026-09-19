@@ -144,13 +144,10 @@ function tryCascade(srcId){ // move to another cascade if color mismatch and val
 	}
 	return moved;
 }
-function clearBoard(){ // no r0
-  for(j=0;j<8;j++) { // clear cascades
-    const cascade=document.getElementById("c"+j);
-	console.log("clearBoard j",j);
-    while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
-  }
-  for(j=0;j<4;j++) document.getElementById("s"+j).innerHTML="";
-  for(j=0;j<4;j++) document.getElementById("a"+j).innerHTML="";
+function clearBoard(){ // pure function
+	for(j=0;j<8;j++) removeChildren("c"+j);
+	for(j=0;j<4;j++) removeChildren("s"+j);
+	for(j=0;j<4;j++) removeChildren("a"+j);
+	removeChildren("message");
 }
 
