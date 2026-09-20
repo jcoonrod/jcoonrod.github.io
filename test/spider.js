@@ -59,10 +59,11 @@ function color(i){
 function deal(deck){
 	for(let i=0;i<54;i++){
 		const cardId=deck[i];
-		const j=Math.floor(i/8);
-		const iy=j*5;
-		const content=createContent(cardId);		
-		dealCard("c"+j,"v"+cardId,iy,content,color(cardId%52),(i<46)); // faceUp
+		const j=i%10;
+		const iy=Math.floor(i/10)*5;
+		const content=createContent(cardId%52);
+		console.log("deal i=",i,"cardId=",cardId,"j=",j);
+		dealCard("c"+j,"v"+cardId,iy,content,color(cardId%52),(i>43)); // faceUp
 	}
 	for(let i=54;i<104;i++){
 		cardId=deck[i];
@@ -77,13 +78,14 @@ function tryMove(srcId) { // When cascade card is clicked. Must delete it before
 	if(!moved) moved=tryCascade(srcId); // returns cascade number if one can move there
 	return moved;
 }
-function tryAce(srcId){
+function tryAce(srcId){ // we have to deal with 104 cards and 8 foundations
 	let moved=false;
-	const oldParentId=getParentId(srcId);
-	const cardNo=srcId.substring(1);
+	const oldParentId=getParentId(srcId); c0-c7
+	const cardId=srcId.substring(1)%52; // just 0-52
 	const value=cardNo%13;
+	const foundationId=Math.floor(srcId.substring(1)/13); 0-7;
 	const suit=Math.floor(srcId.substring(1)/13);
-	const foundation="a"+suit;
+	const foundation="a"+foundationId;
 	const foundation_level=nchildren(foundation);
 	console.log("tryAce suit=",suit,"value=",value,"foundation_level",foundation_level);
 	if(value==foundation_level) {

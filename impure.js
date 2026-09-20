@@ -18,14 +18,19 @@ function getStack(cardId){ // return array from this card to top
 	return stack;
 }
 function dealCard(parentId,childId,y,content,color,clickable){ // create a new card with absolute offset string y
+	// clickable also implies faceup
 	let child=document.createElement("div");
 	child.id=childId;
 	child.classList="card "+color;
 	child.style.position="absolute";
 	child.style.width="100%";
 	child.style.top=y+"vw";
-	child.innerHTML=content;
-	if(clickable) child.setAttribute("onclick","tryMove(this.id);");
+	if(clickable){
+		child.innerHTML=content;
+		child.setAttribute("onclick","tryMove(this.id);");
+	}else{
+		child.innerHTML="<img src=/back.jpg>";
+	}
 	document.getElementById(parentId).appendChild(child);
 }
 function nchildren(destId) { // how many children in cascade j?
