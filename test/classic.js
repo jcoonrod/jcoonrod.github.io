@@ -1,5 +1,15 @@
-const deck=shuffle(104); // new pure function creates a shuffled deck;
-deal(deck); // deal the first 54 to the cascades and 50 to the reserve
+// New project to go with pure functions only and remove the common script for now
+// for now, we will have to pass state variable in as parameters to minimize global variables
+// 1. Auto start on load
+// 2. On "new" button force a reload
+// 3. Change card div numbering to match the card index, making it easy to reveal color and value
+// 4. Create each card as they dealt 
+// 5. The flipped up cards are children of a span with id flipped
+// 6. A new pure shuffled deck is assigned to deck
+// 7. all impure functions now in /impure.js
+
+const deck=shuffle(); // new pure function creates a shuffled deck;
+deal(deck); // deal the first 28 to the cascades and 24 to the reserve
 
 function tryWin(){
 	const win=nchildren("a0")+nchildren("a1")+nchildren("a2")+nchildren("a3");
@@ -8,10 +18,14 @@ function tryWin(){
 		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
 }
 
-// pure next10 function
-function next10(){
+// pure next3 function
+function next3(){
 	let n=nchildren("r0"); // How many in reserve?
-	if(n){
+	if(n==0){
+		moveAll("s0","r0");
+		moveAll("s1","r0");
+		moveAll("s2","r0");
+	}
 	n=nchildren("r0");
 	if(n==0) tryWin();
 	else {
@@ -23,7 +37,6 @@ function next10(){
 			i++;
 		}
 	}
-}
 }
 
 // pure functions mostly replacing the old common.js functions for now
@@ -40,10 +53,10 @@ function createContent(i){ // i runs 0 to 51
 	return content;
 }
 
-function shuffle(n){
+function shuffle(){
 	let deck=[];
-	for (let i=0; i<n; i++) deck[i]=i;
-	for (let i=0; i<n; i++) { // do lots random interchanges
+	for (let i=0; i<52; i++) deck[i]=i;
+	for (let i=0; i<52; i++) { // do lots random interchanges
 		const j=Math.floor(Math.random() * 52);
 		[deck[i],deck[j]]=[deck[j],deck[i]];
     }
@@ -57,17 +70,23 @@ function color(i){
 // create the first 28 deck items in cascades and the second 24 in reserve
 
 function deal(deck){
-	for(let i=0;i<54;i++){
-		const cardId=deck[i];
-		const j=i%10;
-		const iy=Math.floor(i/10)*5;
-		const content=createContent(cardId%52);
-		console.log("deal i=",i,"cardId=",cardId,"j=",j);
-		dealCard("c"+j,"v"+cardId,iy,content,color(cardId%52),(i>43)); // faceUp
+	let ndealt=0;
+	for (j=0;j<7;j++){ // j here indicates which cascade
+		iy=5*j;
+		let cardId=deck[ndealt];
+		const content=createContent(cardId);		
+		dealCard("c"+j,"v"+cardId,iy,content,color(cardId),1); // faceUp
+		ndealt++;
+		for (i=j+1;i<7;i++){ // the rest of the row takes default face down
+			cardId=deck[ndealt];
+			dealCard("c"+i,"v"+cardId,iy,"<img src=/back.jpg>",color(cardId),0); // not clickable
+			ndealt++;
+		}
 	}
-	for(let i=54;i<104;i++){
-		cardId=deck[i];
+	while(ndealt<52){
+		cardId=deck[ndealt];
 		dealCard("r0","v"+cardId,0,"<img src=/back.jpg>",color(cardId),0);
+		ndealt++;
 	}
 }
 
@@ -78,14 +97,13 @@ function tryMove(srcId) { // When cascade card is clicked. Must delete it before
 	if(!moved) moved=tryCascade(srcId); // returns cascade number if one can move there
 	return moved;
 }
-function tryAce(srcId){ // we have to deal with 104 cards and 8 foundations
+function tryAce(srcId){
 	let moved=false;
-	const oldParentId=getParentId(srcId); c0-c7
-	const cardId=srcId.substring(1)%52; // just 0-52
+	const oldParentId=getParentId(srcId);
+	const cardNo=srcId.substring(1);
 	const value=cardNo%13;
-	const foundationId=Math.floor(srcId.substring(1)/13); 0-7;
 	const suit=Math.floor(srcId.substring(1)/13);
-	const foundation="a"+foundationId;
+	const foundation="a"+suit;
 	const foundation_level=nchildren(foundation);
 	console.log("tryAce suit=",suit,"value=",value,"foundation_level",foundation_level);
 	if(value==foundation_level) {
