@@ -7,12 +7,14 @@ var cascades=deal(deck);
 console.log(cascades);
 
 function deal(deck){
-	let cascades=[[]];
+	let cascades=[[],[],[],[],[],[],[]];
 	let ndealt=0;
 	for(let j=0;j<7;j++){
-		for(let i=0;i<j;i++){
-			cascades[j[i]]=deck[ndealt];
-			ndealt++;
+		cascades[j]=[deck[ndealt]];
+		ndealt++;
+		for(let i=j+1;i<7;i++){
+			cascades[i].push(deck[ndealt]);
+			ndealt++
 		}
 	}
 	return cascades;
