@@ -1,15 +1,22 @@
-// New project to go with pure functions only and remove the common script for now
-// for now, we will have to pass state variable in as parameters to minimize global variables
-// 1. Auto start on load
-// 2. On "new" button force a reload
-// 3. Change card div numbering to match the card index, making it easy to reveal color and value
-// 4. Create each card as they dealt 
-// 5. The flipped up cards are children of a span with id flipped
-// 6. A new pure shuffled deck is assigned to deck
-// 7. all impure functions now in /impure.js
-
+// Classic in virtual DOM
+// We want the vdom to be easily converted to a single HTML string
+// that displays cleanly, namely that we can iterate easily 
+// I'm thinking cascades is just a 2d array of cascades of card numbers.
 const deck=shuffle(); // new pure function creates a shuffled deck;
-deal(deck); // deal the first 28 to the cascades and 24 to the reserve
+var cascades=deal(deck);
+console.log(cascades);
+
+function deal(deck){
+	let cascades=[[]];
+	let ndealt=0;
+	for(let j=0;j<7;j++){
+		for(let i=0;i<j;i++){
+			cascades[j[i]]=deck[ndealt];
+			ndealt++;
+		}
+	}
+	return cascades;
+}
 
 function tryWin(){
 	const win=nchildren("a0")+nchildren("a1")+nchildren("a2")+nchildren("a3");
@@ -69,26 +76,6 @@ function color(i){
 
 // create the first 28 deck items in cascades and the second 24 in reserve
 
-function deal(deck){
-	let ndealt=0;
-	for (j=0;j<7;j++){ // j here indicates which cascade
-		iy=5*j;
-		let cardId=deck[ndealt];
-		const content=createContent(cardId);		
-		dealCard("c"+j,"v"+cardId,iy,content,color(cardId),1); // faceUp
-		ndealt++;
-		for (i=j+1;i<7;i++){ // the rest of the row takes default face down
-			cardId=deck[ndealt];
-			dealCard("c"+i,"v"+cardId,iy,"<img src=/back.jpg>",color(cardId),0); // not clickable
-			ndealt++;
-		}
-	}
-	while(ndealt<52){
-		cardId=deck[ndealt];
-		dealCard("r0","v"+cardId,0,"<img src=/back.jpg>",color(cardId),0);
-		ndealt++;
-	}
-}
 
 // try to make this clear
 function tryMove(srcId) { // When cascade card is clicked. Must delete it before it can be appended
