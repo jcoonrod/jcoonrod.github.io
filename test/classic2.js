@@ -4,17 +4,30 @@
 // I'm thinking cascades is just a 2d array of cascades of card numbers.
 const deck=shuffle(); // new pure function creates a shuffled deck;
 var cascades=deal(deck);
-console.log(cascades);
+document.getElementById("board").innerHTML=buildHTML(cascades);
+
+function buildHTML(cascades){
+	let myHTML=""; // this builds the 7 cascades as a div of divs
+	for(let j=0;j<7;j++){
+		const cascade=cascades[j];
+		myHTML+="<div class=c>"; // create the column
+		for(let i=0;i<j;i++) myHTML+=buildCard(i); // create each card in the cascade
+		myHTML+="</div>";
+	}
+	return myHTML;
+}
+
 
 function deal(deck){
 	let cascades=[[],[],[],[],[],[],[]];
 	let ndealt=0;
 	for(let j=0;j<7;j++){
-		cascades[j]=[deck[ndealt]];
+		cascades[j].push(deck[ndealt]);
 		ndealt++;
 		for(let i=j+1;i<7;i++){
 			cascades[i].push(deck[ndealt]);
 			ndealt++
+			console.log(i,ndealt,cascades[i]);
 		}
 	}
 	return cascades;
@@ -46,6 +59,9 @@ function next3(){
 			i++;
 		}
 	}
+}
+function buildCard(card){
+	return "<div v"+card+">"+createContent(card)+"</div>";
 }
 
 // pure functions mostly replacing the old common.js functions for now
