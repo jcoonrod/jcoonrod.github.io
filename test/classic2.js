@@ -3,15 +3,42 @@
 // that displays cleanly, namely that we can iterate easily 
 // I'm thinking cascades is just a 2d array of cascades of card numbers.
 const deck=shuffle(); // new pure function creates a shuffled deck;
-var cascades=deal(deck);
-document.getElementById("board").innerHTML=buildHTML(cascades);
+var cascades=deal(deck); // put the stock in casecades[7];
+var faceups=initializeFaceups(cascades); // determine faceup status of each card
+document.getElementById("tableau").innerHTML=buildHTML(cascades,faceups);
 
-function buildHTML(cascades){
+function initializeFaceups(cascades){
+	let faces=[];
+	for(i=0;i<52;i++) faces[i]=false;
+	for(j=0;j<7;j++) {
+		const cascade=cascades[j];
+		faces[cascade[j]]=true;
+	}
+	return faces; 
+}
+
+function buildCard(card,iy,faceup){
+	const s="position: absolute; width: 100%; top:"+iy+"vw;";
+	if(faceup){
+		const color=(card<13 || card>39 ? 'b' : 'r' );
+		return "<div class='card "+color+"' id=v"+card+" style='"+s+"'>"+createContent(card)+"</div>";
+	}else{
+		return "<div class='card "+color+"' id=v"+card+" style='"+s+"'><img src=/back.jpg></div>";
+	}
+}
+
+function buildHTML(cascades,faceups){
 	let myHTML=""; // this builds the 7 cascades as a div of divs
 	for(let j=0;j<7;j++){
 		const cascade=cascades[j];
-		myHTML+="<div class=c>"; // create the column
-		for(let i=0;i<j;i++) myHTML+=buildCard(i); // create each card in the cascade
+		myHTML+="<div  id=c"+j+" class=c>"; // create the column
+		for(let i=0;i<=j;i++) {
+			const card=cascade[i];
+			console.log("card",card);
+			const face=faceups[card];
+			console.log("buildHTML",i,j);
+			myHTML+=buildCard(cascade[i],i*5,faceups[cascade[i]]); // create each card in the cascade
+		}
 		myHTML+="</div>";
 	}
 	return myHTML;
@@ -19,16 +46,19 @@ function buildHTML(cascades){
 
 
 function deal(deck){
-	let cascades=[[],[],[],[],[],[],[]];
+	let cascades=[[],[],[],[],[],[],[],[],[],[],[]];
 	let ndealt=0;
 	for(let j=0;j<7;j++){
 		cascades[j].push(deck[ndealt]);
 		ndealt++;
 		for(let i=j+1;i<7;i++){
 			cascades[i].push(deck[ndealt]);
-			ndealt++
-			console.log(i,ndealt,cascades[i]);
+			ndealt++;
 		}
+	}
+	while(ndealt<52){
+		cascades[7].push(deck[ndealt]);
+		ndealt++;
 	}
 	return cascades;
 }
@@ -60,9 +90,7 @@ function next3(){
 		}
 	}
 }
-function buildCard(card){
-	return "<div v"+card+">"+createContent(card)+"</div>";
-}
+
 
 // pure functions mostly replacing the old common.js functions for now
 function createContent(i){ // i runs 0 to 51
