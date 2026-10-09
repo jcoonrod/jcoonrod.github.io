@@ -1,11 +1,73 @@
 // Classic in virtual DOM
 // We want the vdom to be easily converted to a single HTML string
-// that displays cleanly, namely that we can iterate easily 
-// I'm thinking cascades is just a 2d array of cascades of card numbers.
+// The vdom consists of an array of arrays: 15 cascades and 52 faceup booleans
+// 0-6 in in tableau, 7-10 in stock and 11-14 in foundations
 const deck=shuffle(); // new pure function creates a shuffled deck;
-var cascades=deal(deck); // put the stock in casecades[7];
+var cascades=deal(deck); // put the stock in cascades[7], aces start in cascades;
 var faceups=initializeFaceups(cascades); // determine faceup status of each card
-document.getElementById("tableau").innerHTML=buildHTML(cascades,faceups);
+repaint();
+function repaint(){
+	tableau=document.getElementById("tableau");
+	tableau.replaceChildren();
+	tableau.innerHTML=buildHTML(cascades,faceups);
+};
+
+function getSuit(card) {return Math.floor(card/13);}
+function getVal(card){return card % 13;}
+function getColor(card) {return (card<13 || card>38 ? "b" : "r");}
+// try to make this clear
+function tryMove(cascades,card,j) {
+	let moved=false; // local variable
+//	moved=tryAce(cascades,card,j);
+	if(!moved) moved=tryCascade(cascades,card,j); // returns cascade number if one can move there
+	if(moved) repaint(); // impure call
+	return moved;
+}
+function tryAce(cascades,card,j){
+	let moved=false;
+	const value=getVal(card);
+	const suit=getSuit(card);
+	const j2=7+
+	console.log("tryAce suit=",suit,"value=",value,"foundation_level",foundation_level);
+	if(value==foundation_level) {
+		addCard(srcId,foundation,0);
+		faceUp(oldParentId);
+		moved=true;
+		tryWin();
+	}
+	console.log("tryAce moved=",moved);
+	return moved;
+}
+// this should be easier as we are appending a slice to another array
+function tryCascade(cascades,card,j1){ // move to another cascade if color mismatch and value one above
+	const value1=getVal(card);
+	const color1=getColor(card);
+	const i1=cascades[j1].indexOf(card); // where i source cascade is it?
+	let moved=false;
+	for(let j2=0;j2<7;j2++) { // step through cascades until a move happens
+		n2=cascades[j2].length;
+//		console.log("try cascade=",cascades[j1],"card=",card,"i1=",i1,"j1 j2=",j1,j2,"n2=",n2);
+		if(n2==0 && value1==12) moved=moveAll(cascades,i1,j1,j2);
+		if(n2 && !moved){
+			card2=cascades[j2][n2-1]; // get the topcard on destination
+			const value2=getVal(card2);
+			const color2=getColor(card2);
+			console.log("color2=",color2,"value2=",value2);
+			if((color2!==color1) && (value2==(value1+1))) moved=moveAll(cascades,i1,j1,j2);
+		}
+	}
+	return moved;
+}
+
+function moveAll(cascades,i1,j1,j2){ // move all the children to reserve
+	const chunk=cascades[j1].splice(i1);
+	console.log("moveAll",i1,j1,j2,"chunk=",chunk);
+	cascades[j2].push(...chunk);
+	const n1=cascades[j1].length;
+	console.log("flip",j1,"n1=",n1);
+	if(n1) faceups[cascades[j1][n1-1]]=true; // flip last card faceup
+	return true
+}
 
 function initializeFaceups(cascades){
 	let faces=[];
@@ -17,27 +79,28 @@ function initializeFaceups(cascades){
 	return faces; 
 }
 
-function buildCard(card,iy,faceup){
+function buildCard(card,j,iy,faceup){ //
 	const s="position: absolute; width: 100%; top:"+iy+"vw;";
 	if(faceup){
-		const color=(card<13 || card>39 ? 'b' : 'r' );
-		return "<div class='card "+color+"' id=v"+card+" style='"+s+"'>"+createContent(card)+"</div>";
+		const color=getColor(card);
+		return "<div class='card "+color+"' id=v"+card+" style='"+s+
+		"' onclick='tryMove(cascades,"+card+","+j+");'>"+createContent(card)+"</div>";
 	}else{
-		return "<div class='card "+color+"' id=v"+card+" style='"+s+"'><img src=/back.jpg></div>";
+		return "<div class=card id=v"+card+" style='"+s+"'><img src=/back.jpg></div>";
 	}
 }
 
-function buildHTML(cascades,faceups){
+function buildHTML(cascades,faceups){ 
 	let myHTML=""; // this builds the 7 cascades as a div of divs
 	for(let j=0;j<7;j++){
 		const cascade=cascades[j];
 		myHTML+="<div  id=c"+j+" class=c>"; // create the column
-		for(let i=0;i<=j;i++) {
+		for(let i=0;i<cascade.length;i++) {
 			const card=cascade[i];
-			console.log("card",card);
+//			console.log("card",card);
 			const face=faceups[card];
-			console.log("buildHTML",i,j);
-			myHTML+=buildCard(cascade[i],i*5,faceups[cascade[i]]); // create each card in the cascade
+//			console.log("buildHTML",i,j);
+			myHTML+=buildCard(card,j,i*5,faceups[card]); // create each card in the cascade
 		}
 		myHTML+="</div>";
 	}
@@ -63,8 +126,8 @@ function deal(deck){
 	return cascades;
 }
 
-function tryWin(){
-	const win=nchildren("a0")+nchildren("a1")+nchildren("a2")+nchildren("a3");
+function tryWin(cascades){
+	win=cascades[11].length+cascades[12].length+cascades[13].length+cascades[14];
 	console.log("Win?",win);
 	if(win==52) confetti(
 		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
@@ -116,85 +179,4 @@ function shuffle(){
 	return deck;
 }
 
-function color(i){
-	return (i<13 || i>38 ? "b" : "r");
-}
-
-// create the first 28 deck items in cascades and the second 24 in reserve
-
-
-// try to make this clear
-function tryMove(srcId) { // When cascade card is clicked. Must delete it before it can be appended
-	let moved=false; // local variable
-	moved=tryAce(srcId);
-	if(!moved) moved=tryCascade(srcId); // returns cascade number if one can move there
-	return moved;
-}
-function tryAce(srcId){
-	let moved=false;
-	const oldParentId=getParentId(srcId);
-	const cardNo=srcId.substring(1);
-	const value=cardNo%13;
-	const suit=Math.floor(srcId.substring(1)/13);
-	const foundation="a"+suit;
-	const foundation_level=nchildren(foundation);
-	console.log("tryAce suit=",suit,"value=",value,"foundation_level",foundation_level);
-	if(value==foundation_level) {
-		addCard(srcId,foundation,0);
-		faceUp(oldParentId);
-		moved=true;
-		tryWin();
-	}
-	console.log("tryAce moved=",moved);
-	return moved;
-}
-function moveAll(srcId,destId){ // move all the children to reserve
-	const n=nchildren(srcId);
-	console.log("moveAll",srcId,n);
-	for(let i=0;i<n;i++){
-		cardId=getTopId(srcId); // find the top child
-		console.log("move",cardId,destId);
-	 	addCard(cardId,destId,0);
-		faceDn(cardId); // must remove onclick
-	}
-}
-function addStack(srcId,destId){ // add a stack starting with srcId to dest cascade	let moved=false;
-	const oldParentId=getParentId(srcId);
-	const n=nchildren(destId);
-	const stack=getStack(srcId); // get arracy of cards to will move
-	for (i=0;i<stack.length;i++) moved=addCard(stack[i],destId,(n+i)*5);
-	faceUp(oldParentId); //
-	return moved;
-}
-
-function tryCascade(srcId){ // move to another cascade if color mismatch and value one above
-	const parentId=getParentId(srcId);
-	const cardId=srcId.substring(1);
-	const srcValue=cardId%13;
-	const srcColor=color(cardId);
-	let j=0;
-	let moved=false;
-	while(j<7 && !moved) { // step through cascades until a move happens
-		console.log("TryCascade j=",j,"srcId",srcId,srcValue,srcColor,parent.id);
-		if(parentId!==("c"+j)){
-			const n=nchildren("c"+j); // impure function
-			if(n==0 && srcValue==12) moved=addStack(srcId,"c"+j);
-			if(!moved && n){
-				const topCardId=getTopId("c"+j).substring(1); // cardId at top of 
-				const topValue=topCardId%13;
-				const topColor=color(topCardId);
-				console.log("Cascade srcId=",srcId,"j=",j,"top id=",topCardId,"val=",topValue,"color",topColor);
-				if((topColor!==srcColor) && (topValue==(srcValue+1))) addStack(srcId,"c"+j);
-			}
-		}
-		j++;
-	}
-	return moved;
-}
-function clearBoard(){ // pure function version
-  for(j=0;j<7;j++) removeChildren("c"+j);
-  for(j=0;j<3;j++) removeChildren("s"+j);
-  for(j=0;j<4;j++) removeChildren("a"+j);
-  removeChildren("r0");
-}
 
