@@ -5,39 +5,60 @@
 const deck=shuffle(); // new pure function creates a shuffled deck;
 var cascades=deal(deck); // put the stock in cascades[7], aces start in cascades;
 var faceups=initializeFaceups(cascades); // determine faceup status of each card
+const board=document.getElementById("board");
+
+board.addEventListener('click', function(event) { // impure click handler
+	const div = event.target.closest('.card'); 
+	// If the user clicked the board background instead of a card, exit early
+	if (!div) return;
+	const parent=div.parentElement;
+//console.log(`Player clicked ${div.id} parent ${parent.id}`);
+	// now do the logic
+	const ctype=div.id.substring(0,1);
+	const card=parseInt(div.id.substring(1)); // this should be an integer
+	let moved=false;
+	if(ctype=='v'){ // the playing card ids
+//		console.log("tryMove",card,parent.id.substring(1));
+		moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));
+	}else if(div.id='c7'){
+		next3(cascades,faceups);
+		moved=true;
+	}
+	if(moved)repaint();
+});
+
 repaint();
+
 function repaint(){
-	board=document.getElementById("board");
-	board.replaceChildren();
 	board.innerHTML=buildHTML(cascades,faceups);
 };
 
 function getSuit(card) {return Math.floor(card/13);}
 function getVal(card){return card % 13;}
 function getColor(card) {return (card<13 || card>38 ? "b" : "r");}
+
 // try to make this clear
 function tryMove(cascades,card,j) {
 	let moved=false; // local variable
 	moved=tryAce(cascades,faceups,card,j);
 	if(!moved) moved=tryCascade(cascades,card,j); // returns cascade number if one can move there
-	if(moved) repaint(); // impure call
 	return moved;
 }
 function tryAce(cascades,faceups,card,j){
 	let moved=false;
 	const value=getVal(card);
 	const suit=getSuit(card);
-	const j2=10+suit;
+	const j2=11+suit;
 	const n2=cascades[j2].length;
 	foundation_level=(n2 ? getVal(cascades[j2][n2-1]) :-1); 
-	console.log("tryAce suit=",suit,"value=",value);
+//	console.log("tryAce suit=",suit,"value=",value);
 	if(value==(foundation_level+1)) {
 		cascades[j2].push(cascades[j].pop());
 		faceUp(cascades,faceups,j);
 		moved=true;
 		tryWin(cascades);
 	}
-	console.log("tryAce moved=",moved);
+//	console.log("tryAce moved=",moved);
 	return moved;
 }
 
@@ -46,9 +67,9 @@ function faceUp(cascades,faceups,j){// flip up top card if any
 	if(n) faceups[cascades[j][n-1]]=true;
 }
 
-
 // this should be easier as we are appending a slice to another array
 function tryCascade(cascades,card,j1){ // move to another cascade if color mismatch and value one above
+//	console.log("tryCascade",card,j1);
 	const value1=getVal(card);
 	const color1=getColor(card);
 	const i1=cascades[j1].indexOf(card); // where i source cascade is it?
@@ -58,10 +79,10 @@ function tryCascade(cascades,card,j1){ // move to another cascade if color misma
 //		console.log("try cascade=",cascades[j1],"card=",card,"i1=",i1,"j1 j2=",j1,j2,"n2=",n2);
 		if(n2==0 && value1==12) moved=moveAll(cascades,i1,j1,j2);
 		if(n2 && !moved){
-			card2=cascades[j2][n2-1]; // get the topcard on destination
+			const card2=cascades[j2][n2-1]; // get the topcard on destination
 			const value2=getVal(card2);
 			const color2=getColor(card2);
-			console.log("color2=",color2,"value2=",value2);
+//			console.log("color2=",color2,"value2=",value2);
 			if((color2!==color1) && (value2==(value1+1))) moved=moveAll(cascades,i1,j1,j2);
 		}
 	}
@@ -70,10 +91,10 @@ function tryCascade(cascades,card,j1){ // move to another cascade if color misma
 
 function moveAll(cascades,i1,j1,j2){ // move all the children to reserve
 	const chunk=cascades[j1].splice(i1);
-	console.log("moveAll",i1,j1,j2,"chunk=",chunk);
+//	console.log("moveAll",i1,j1,j2,"chunk=",chunk);
 	cascades[j2].push(...chunk);
 	const n1=cascades[j1].length;
-	console.log("flip",j1,"n1=",n1);
+//	console.log("flip",j1,"n1=",n1);
 	if(n1) faceups[cascades[j1][n1-1]]=true; // flip last card faceup
 	return true
 }
@@ -93,7 +114,7 @@ function buildCard(card,j,iy,faceup){ //
 	if(faceup){
 		const color=getColor(card);
 		return "<div class='card "+color+"' id=v"+card+" style='"+s+
-		"' onclick='tryMove(cascades,"+card+","+j+");'>"+createContent(card)+"</div>";
+		"'>"+createContent(card)+"</div>";
 	}else{
 		return "<div class=card id=v"+card+" style='"+s+"'><img src=/back.jpg></div>";
 	}
@@ -103,15 +124,15 @@ function buildHTML(cascades,faceups){
 	// First row... cascades 7 to 14
 	let myHTML="<div class=row>"; // this builds everything below the buttons
 	const n7=cascades[7].length; // show the stockpile?
-	if(n7) {myHTML+="<div class=card onclick='next3(cascades,faceups);repaint();'><img src=/back.jpg></div>";}
-	else {myHTML+="<div class=cell></div>";}
+	if(n7) {myHTML+="<div id=c7 class=card><img src=/back.jpg></div>";}
+	else {myHTML+="<div id=c7 class=card><h2> </h2><h1>♻</h1></div>";}
 	for(let j=8;j<15;j++) { // show next 3 and foundations if they are there
 		const n=cascades[j].length; // get the top card if any
 		if(n){
 			const topcard=cascades[j][n-1];
-			myHTML+=buildCard(topcard,j,0,true);
+			myHTML+="<div class=cell id=c"+j+">"+buildCard(topcard,j,0,true)+"</div>";
 			}
-		else{myHTML+="<div class=card></div>"}
+		else{myHTML+="<div class=cell id=c"+j+"></div>";}
 	}
 	myHTML+="</div><div class=row><table><tr><td>Stock pile +3 flipped</td>"
 	+"<td>Foundations: ♠ ♥ ♦ ♣</td></tr></table></div><div class=row>";
@@ -152,14 +173,14 @@ function deal(deck){
 
 function tryWin(cascades){
 	win=cascades[11].length+cascades[12].length+cascades[13].length+cascades[14];
-	console.log("Win?",win);
+//	console.log("Win?",win);
 	if(win==52) confetti(
 		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
 }
 
 // pure next3 function
 function next3(cascades,faceups){
-	console.log("Next 3")
+//	console.log("Next 3")
 	let n=cascades[7].length; // How many in reserve?
 	if(n==0){
 		moveAll(cascades,0,8,7);
@@ -173,7 +194,7 @@ function next3(cascades,faceups){
 		i=0;
 		while(i<imax){
 			const card=cascades[7].pop();
-			console.log("next i=",i,card);
+//			console.log("next i=",i,card);
 			faceups[card]=true;
 			cascades[8+i].push(card);
 			i++;
