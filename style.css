@@ -18,7 +18,7 @@ td{width:50%;text-align:center;color:yellow;}
 a {text-decoration: none;}
 
 .card {
-  background: white;
+  background-color: white;
   padding: 0 0.2vw;margin:0;
   box-sizing: border-box;
   width:12vw;

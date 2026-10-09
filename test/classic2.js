@@ -27,23 +27,24 @@ board.addEventListener('click', function(event) { // impure click handler
 	if(moved)repaint();
 });
 
-repaint();
+repaint(); // start the game
 
 function repaint(){
 	board.innerHTML=buildHTML(cascades,faceups);
 };
 
+// for timing reasons, these cannot be const arrow functions
 function getSuit(card) {return Math.floor(card/13);}
 function getVal(card){return card % 13;}
 function getColor(card) {return (card<13 || card>38 ? "b" : "r");}
 
-// try to make this clear
 function tryMove(cascades,card,j) {
 	let moved=false; // local variable
 	moved=tryAce(cascades,faceups,card,j);
 	if(!moved) moved=tryCascade(cascades,card,j); // returns cascade number if one can move there
 	return moved;
 }
+
 function tryAce(cascades,faceups,card,j){
 	let moved=false;
 	const value=getVal(card);
@@ -67,7 +68,7 @@ function faceUp(cascades,faceups,j){// flip up top card if any
 	if(n) faceups[cascades[j][n-1]]=true;
 }
 
-// this should be easier as we are appending a slice to another array
+// this should be easier as we are appending a splice to another array
 function tryCascade(cascades,card,j1){ // move to another cascade if color mismatch and value one above
 //	console.log("tryCascade",card,j1);
 	const value1=getVal(card);
@@ -120,12 +121,13 @@ function buildCard(card,j,iy,faceup){ //
 	}
 }
 
+// convert the virtual DOM data to html
 function buildHTML(cascades,faceups){ 
 	// First row... cascades 7 to 14
 	let myHTML="<div class=row>"; // this builds everything below the buttons
 	const n7=cascades[7].length; // show the stockpile?
 	if(n7) {myHTML+="<div id=c7 class=card><img src=/back.jpg></div>";}
-	else {myHTML+="<div id=c7 class=card><h2> </h2><h1>♻</h1></div>";}
+	else {myHTML+="<div id=c7 class=card><h2>&nbsp;</h2><h1>♻</h1></div>";}
 	for(let j=8;j<15;j++) { // show next 3 and foundations if they are there
 		const n=cascades[j].length; // get the top card if any
 		if(n){
@@ -141,9 +143,7 @@ function buildHTML(cascades,faceups){
 		myHTML+="<div  id=c"+j+" class=c>"; // create the column
 		for(let i=0;i<cascade.length;i++) {
 			const card=cascade[i];
-//			console.log("card",card);
 			const face=faceups[card];
-//			console.log("buildHTML",i,j);
 			myHTML+=buildCard(card,j,i*5,faceups[card]); // create each card in the cascade
 		}
 		myHTML+="</div>"; // end the cascade		
