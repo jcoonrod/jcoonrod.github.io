@@ -1,36 +1,64 @@
 <!DOCTYPE html>
-<!-- Classic Solitaire with virtual dom -->
+<!-- One-click Spider Solitaire using virtual DOM -->
 <html lang=en>
 <head>
-<!--  <link rel="manifest" href="manifest.json"> -->
 	<meta name="google" content="notranslate">
- 	<link rel="canonical" href="https://jcoonrod.github.io/classic" />
-  	<link rel='shortcut icon' href='/back.png'>
-  	<meta charset="utf-8">
-  	<meta name="viewport" content="width=device-width">
-  	<meta name="description" content="Classic Solitaire Game by John Coonrod"/>
-	<title>Classic Solitaire</title>
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<link rel='shortcut icon' href='/back.png'>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<meta name="description" content="Spider Solitaire Game by John Coonrod"/>
+	<title>Spider</title>
 	<link rel="stylesheet" href="/style.css">
-  <script src="/confetti.browser.min.js"></script>
-  <script src="classic2.js" defer></script>
+	<script src="/confetti.browser.min.js"></script>
+	<script src="spider.js" defer></script>
 </head>
-<body>
+  
+<body tabindex="-1">
 <div class="dropdown">
-  <button class="dropbtn">Test Classic</button>
+  <button class="dropbtn">Test Spider</button>
   <div class="dropdown-content">
-    <a href="/test">Test Classic</a>
+    <a href="/test">Test Spider</a>
     <a href="/classic">Classic</a>
     <a href="/">Freecell</a>
-    <a href="/pyramid">Pyramid</a>
     <a href="/spider">Spider</a>
+    <a href="/pyramid">Pyramid</a>
   </div>
 </div>
 <div class="buttons">
-  <button class="dropbtn" onclick="location.reload();">New</button>
-	<button class="dropbtn" onclick="clearBoard();deal(deck);">Replay</button>
+  <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
+	<button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
+  <button class="dropbtn" id=suitlist onclick="changeSuits()"></button>
   <a class="dropbtn" href="help.html" target="_blank">🛈</a> 
+  <span id="sofar">      </span>
 </div>
-<div id="board">
+
+<div class=row>
+  <div id=s0 class="card blueborder" onclick="if(ndealt==0){shuffle();deal();}else{next10();}"></div> 
+  <div id=s1 class="x"></div>
+  <div id=f0 class="card blueborder"></div>
+  <div id=f1 class="card blueborder"></div>
+  <div id=f2 class="card blueborder"></div>
+  <div id=f3 class="card blueborder"></div>
+  <div id=f4 class="card blueborder"></div>
+  <div id=f5 class="card blueborder"></div>
+  <div id=f6 class="card blueborder"></div>
+  <div id=f7 class="card blueborder"></div>
+</div>
+<table><tr><td>Stock Pile and Eight Foundations</td></tr></table>
+<div class=row>
+  <div id=c0 class=c10></div>
+  <div id=c1 class=c10></div>
+  <div id=c2 class=c10></div>
+  <div id=c3 class=c10></div>
+  <div id=c4 class=c10></div>
+  <div id=c5 class=c10></div>
+  <div id=c6 class=c10></div>
+  <div id=c7 class=c10></div>
+  <div id=c8 class=c10></div>
+  <div id=c9 class=c10></div>
 </div>
 </body>
 </html>
