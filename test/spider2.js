@@ -1,17 +1,94 @@
+// Convert spider to virtual dom version like classic
 // Going back and fixing the old spider js
-const expiry="Fri, 01 Jan 2038 00:00:01 GMT";
-const ncards=104;
-var toMove = []; // array of cards to move
-var moves = [];
-nfoundation=0; // how many foundation piles have gone up?
-nempty = 0; // computed # empty cascades
-var nsuit = document.cookie.substr(5,1); 
-if (nsuit!==1 || nsuit!==4) nsuit=2; // default is twp suits
-var first=0; // index within the nodes for the first that could be moved
-var last=0; // " the top card
-document.getElementById("s0").innerHTML=back;
-createCardsSpider(localStorage.nsuit);
-showSuits();
+// The deck of 104 cards may only contain 13, 26 or 52 different cards
+// so we need a second array to be able to map card to 
+if(!localStorage.nsuit) localStorage.nsuit=2;
+showSuits(); // bring and and fix localStorage as needed
+const deck=shuffle(); // new pure function creates a shuffled 104 cards set by suits;
+var cascades=deal(deck); // put the first 54 cards in 10 cascades and 50 in cascade[10];
+var faceups=initializeFaceups(cascades); // determine faceup status of each card
+const board=document.getElementById("board");
+
+function shuffle(){ 
+	let deck=[];
+	for (let i=0; i<104; i++) deck[i]=i;
+	for (let i=0; i<104; i++) { // do lots random interchanges
+		const j=Math.floor(Math.random() * 104);
+		[deck[i],deck[j]]=[deck[j],deck[i]];
+    }
+	return deck;
+}
+
+function deal(deck){
+	let cascades=[];
+	for(let j=0; j<10; j++) cascades[j]=[]; // Make it a 2d array
+	for(let i=0; i<54; i++) {j=i%10; cascades[j].push(deck[i]);}
+	return cascades;
+}
+
+function initializeFaceups(cascades){
+	let faces=[];
+	for(i=0;i<104;i++) faces[i]=false;
+	for(j=0;j<10;j++) {
+		const cascade=cascades[j];
+		faces[cascade[cascade.length-1]]=true;
+	}
+	return faces; 
+}
+
+// pure functions mostly replacing the old common.js functions for now
+function createContent(i,nsuits){ // i runs 0 to 103 in this case nsuits 1, 2 or 4
+	const imax=13*localStorage.nsuit;
+	const iactual=i%imax;
+	const suits = ["♠","♥","♦","♣"];
+	const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
+	const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+	const n=i%13; // index within the suit
+	const value=vals[i%13];
+	const suit=suits[Math.floor(iactual/13)];
+	const color=(suit=="♠" || suit=="♣" ? "b" : "r");
+	const face=(n<10 ? suit : faces[i%13-10]);
+	const content="<h2>"+value+" "+suit+"</h2><h1>"+face+"</h1>";
+	return content;
+}
+
+
+board.addEventListener('click', function(event) { // impure click handler
+	const div = event.target.closest('.card'); 
+	// If the user clicked the board background instead of a card, exit early
+	if (!div) return;
+	const parent=div.parentElement;
+//console.log(`Player clicked ${div.id} parent ${parent.id}`);
+	// now do the logic
+	const ctype=div.id.substring(0,1);
+	const card=parseInt(div.id.substring(1)); // this should be an integer
+	let moved=false;
+	if(ctype=='v'){ // the playing card ids
+//		console.log("tryMove",card,parent.id.substring(1));
+		moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));
+	}else if(div.id='c7'){
+		next3(cascades,faceups);
+		moved=true;
+	}
+	if(moved)repaint();
+});
+
+repaint(); // start the game
+
+function repaint(){
+	board.innerHTML=buildHTML(cascades,faceups);
+};
+
+// for timing reasons, these cannot be const arrow functions
+function getSuit(card) {return Math.floor(card/13);}
+function getVal(card){return card % 13;}
+function getColor(card) {return (card<13 || card>38 ? "b" : "r");}
+
+// var toMove = []; // array of cards to move
+// var moves = [];
+// document.getElementById("s0").innerHTML=back;
+// createCardsSpider(localStorage.nsuit);
+// showSuits();
 
 // FUNCTIONS from top down	// make numbers bigger for phones
 function showScores(){
@@ -24,45 +101,90 @@ function changeSuits(){
 	else if(localStorage.nsuit==4) {localStorage.nsuit=1;}
 	else{localStorage.nsuit=2;}
 	showSuits();
-	createCardsSpider(localStorage.nsuit);
 }
-function showSuits() {
+function showSuits() { // an impure function
+	const suits=['♠','♥','♦','♣'];
 	suitlist=suits[0];
 	if(localStorage.nsuit>1) suitlist+=suits[1];
 	if(localStorage.nsuit==4) suitlist+=suits[2]+suits[3];
 	document.getElementById("suitlist").innerHTML=suitlist;
+	return suitlist
 }		
-function createCardsSpider(nsuit){
-	m=nsuit*13; // creates 13, 26 or 52 cards
-	for (i=0;i<m;i++) { // create 52 dif cards as strings in this array - innerHTML for divs
-			var suit=Math.floor(i/13);
-			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
-			var val = i % 13;
-			var ctr = (val<10) ? suits[suit] : faces[val-10];
-			cards[i]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
-	}
-	for(i=0;i<ncards;i++) { // handle 52 and 104 items in deck
-		deck[i]=i%m;
-		flips[i]=0;
+function buildCard(card,j,iy,faceup){ // change absolute width
+	const s=(j<10 ? "position: absolute; width:100%; top:"+iy+"vw;" : "");
+	if(faceup){
+		const color=getColor(card);
+		return "<div class='card "+color+"' id=v"+card+" style='"+s+
+		"'>"+createContent(card)+"</div>";
+	}else{
+		return "<div class=card id=v"+card+" style='"+s+"'><img src=/back.jpg></div>";
 	}
 }
 
-function deal(){ // does different things if the game has not already started
- 	clearBoard();
-	var i=0;
-	var m = setInterval(frame,30);
-	function frame() { // use interval to deal the cards slowly
-	if(i==44) {
-		clearInterval(m);
-		ndealt=44;
-	    next10();
-    }else{
-      	j=i%10;
-      	appendCard(i,j,0); // here i is the position in the deck, 0 means face down
-      	i++;
-    	}
-  	}
+// convert the virtual DOM data to html -- must change the column class
+function buildHTML(cascades,faceups){ 
+	// First row... cascades 7 to 14
+//	let myHTML="<div class=row>"; // this builds everything below the buttons
+//	const n7=cascades[7].length; // show the stockpile?
+//	if(n7) {myHTML+="<div id=c7 class=card><img src=/back.jpg></div>";}
+//	else {myHTML+="<div id=c7 class=card><h2>&nbsp;</h2><h1>♻</h1></div>";}
+//	for(let j=8;j<15;j++) { // show next 3 and foundations if they are there
+//		const n=cascades[j].length; // get the top card if any
+//		if(n){
+//			const topcard=cascades[j][n-1];
+//			myHTML+="<div class=cell id=c"+j+">"+buildCard(topcard,j,0,true)+"</div>";
+//			}
+//		else{myHTML+="<div class=cell id=c"+j+"></div>";}
+//	}
+	myHTML="</div><div class=row><table><tr><td>Stock pile +8 foundations</td>"
+	+"</td></tr></table></div><div class=row>";
+	for(let j=0;j<10;j++){
+		const cascade=cascades[j];
+		myHTML+="<div  id=c"+j+" class=c10>"; // create the column
+		for(let i=0;i<cascade.length;i++) {
+			const card=cascade[i];
+			const face=faceups[card];
+			myHTML+=buildCard(card,j,i*5,faceups[card]); // create each card in the cascade
+		}
+		myHTML+="</div>"; // end the cascade		
+	}
+	myHTML+="</div>"; // end the row
+	return myHTML;
 }
+
+
+
+//function createCardsSpider(nsuit){
+//	m=nsuit*13; // creates 13, 26 or 52 cards
+//	for (i=0;i<m;i++) { // create 52 dif cards as strings in this array - innerHTML for divs
+//			var suit=Math.floor(i/13);
+//			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
+//			var val = i % 13;
+//			var ctr = (val<10) ? suits[suit] : faces[val-10];
+//			cards[i]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
+//	}
+//	for(i=0;i<ncards;i++) { // handle 52 and 104 items in deck
+//		deck[i]=i%m;
+//		flips[i]=0;
+//	}
+//}
+//
+//function deal(){ // does different things if the game has not already started
+// 	clearBoard();
+//	var i=0;
+//	var m = setInterval(frame,30);
+//	function frame() { // use interval to deal the cards slowly
+//	if(i==44) {
+//		clearInterval(m);
+//		ndealt=44;
+//	    next10();
+//    }else{
+//      	j=i%10;
+//      	appendCard(i,j,0); // here i is the position in the deck, 0 means face down
+//      	i++;
+//    	}
+//  	}
+//}
 function next10() { // put the next 10 face up
   if(ndealt<104) { // only do this if there are cards left
     var i=ndealt;
