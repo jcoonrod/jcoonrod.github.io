@@ -1,9 +1,29 @@
 // vdom freecell, copying much from Classic
-
 const deck=shuffle();
+console.log(deck);
 let cascades=deal(deck);
-const board=document.getElementById("board");
 repaint();
+
+const board=document.getElementById("board");
+console.log(board);
+board.addEventListener('click', function(event) { // impure click handler
+	const div = event.target.closest('.card'); 
+	if (!div) return;
+	const parent=div.parentElement;
+	console.log(`Player clicked ${div.id} parent ${parent.id}`);
+	// now do the logic
+	const ctype=div.id.substring(0,1);
+	const card=parseInt(div.id.substring(1)); // this should be an integer
+	let moved=false;
+	if(ctype=='v'){ // the playing card ids
+		console.log("tryMove",card,parent.id.substring(1));
+		moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));
+	}else if(ctype=='s'){ // is it on a freecell?
+		tryDrop(cascades);
+		moved=true;
+	if(moved)repaint();
+}});
+
 function repaint(){
 	board.innerHTML=buildHTML(cascades);
 };
@@ -117,18 +137,22 @@ function moveAll(cascades,i1,j1,j2){ // move all the j1 children to j2
 
 function tryAce(cascades,card,j){
 	let moved=false;
+	const cascade=cascades[j];
+	const n=cascade.length;
+	const topcard=cascade[n-1];
+	if(card!==topcard) return; // hop out if this isn't a topcard
 	const value=getVal(card);
 	const suit=getSuit(card);
-	const j2=11+suit;
+	const j2=12+suit;
 	const n2=cascades[j2].length;
 	foundation_level=(n2 ? getVal(cascades[j2][n2-1]) :-1); 
-//	console.log("tryAce suit=",suit,"value=",value);
+	console.log("tryAce suit=",suit,"value=",value,'foundation_level',foundation_level);
 	if(value==(foundation_level+1)) {
 		cascades[j2].push(cascades[j].pop());
 		moved=true;
 		tryWin(cascades);
 	}
-//	console.log("tryAce moved=",moved);
+	console.log("tryAce moved=",moved);
 	return moved;
 }
 
@@ -138,28 +162,6 @@ function tryWin(cascades){
 	if(win==52) confetti(
 		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
 }
-
-
-
-board.addEventListener('click', function(event) { // impure click handler
-	const div = event.target.closest('.card'); 
-	// If the user clicked the board background instead of a card, exit early
-	if (!div) return;
-	const parent=div.parentElement;
-	//console.log(`Player clicked ${div.id} parent ${parent.id}`);
-	// now do the logic
-	const ctype=div.id.substring(0,1);
-	const card=parseInt(div.id.substring(1)); // this should be an integer
-	let moved=false;
-	if(ctype=='v'){ // the playing card ids
-		console.log("tryMove",card,parent.id.substring(1));
-		moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));
-	}else if(ctype=='s'){ // is it on a freecell?
-		tryDrop(cascades);
-		moved=true;
-	if(moved)repaint();
-}});
-
 
 // pure functions mostly replacing the old common.js functions for now
 function createContent(i){ // i runs 0 to 51
@@ -182,6 +184,7 @@ function shuffle(){
 		const j=Math.floor(Math.random() * 52);
 		[deck[i],deck[j]]=[deck[j],deck[i]];
     }
+	console.log('shuffle',deck.length);
 	return deck;
 }
 
