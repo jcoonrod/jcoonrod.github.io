@@ -1,37 +1,39 @@
 <!DOCTYPE html>
-<!-- One-click Spider Solitaire using virtual DOM -->
+<!-- One-Click FreeCell -- vdom version-->
 <html lang=en>
 <head>
-	<meta name="google" content="notranslate">
 	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta name="google" content="notranslate">
+  <link rel='shortcut icon' href='/back.png'>
 	<meta http-equiv="Pragma" content="no-cache" />
 	<meta http-equiv="Expires" content="0" />
-	<link rel='shortcut icon' href='/back.png'>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width">
-	<meta name="description" content="Spider Solitaire Game by John Coonrod"/>
-	<title>Spider</title>
-	<link rel="stylesheet" href="/style.css">
-	<script src="/confetti.browser.min.js"></script>
-	<script src="spider2.js" defer></script>
-</head>  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="theme-color" content="green"/>
+  <meta name="description" content="One-Click FreeCell Game by John Coonrod"/>
+	<title>Test</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/confetti.browser.min.js"></script>
+  <script src="freecell2.js" defer></script>
+</head>
+  
 <body tabindex="-1">
 <div class="dropdown">
-  <button class="dropbtn">Test Spider</button>
+  <button class="dropbtn">Test Freecell</button>
   <div class="dropdown-content">
-    <a href="/test">Test Spider</a>
-    <a href="/classic">Classic</a>
+    <a href="/test">test</a>
     <a href="/">Freecell</a>
-    <a href="/spider">Spider</a>
+    <a href="/classic">Classic</a>
     <a href="/pyramid">Pyramid</a>
+    <a href="/spider">Spider</a>
+    <a href="/test">test</a>
   </div>
 </div>
 <div class="buttons">
-  <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
-	<button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
-  <button class="dropbtn" id=suitlist onclick="changeSuits()"></button>
+  <button class="dropbtn" onclick="location.reload()">New Game</button>
+  <button class="dropbtn" onclick="clearBoard();deal(deck)">Replay</button>
+  <button class="dropbtn" onclick="undo()">Undo</button>
   <a class="dropbtn" href="help.html" target="_blank">🛈</a> 
-  <span id="sofar">      </span>
 </div>
 <div id="board">
 </div>

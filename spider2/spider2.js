@@ -58,19 +58,16 @@ board.addEventListener('click', function(event) { // impure click handler
 	// If the user clicked the board background instead of a card, exit early
 	if (!div) return;
 	const parent=div.parentElement;
-//console.log(`Player clicked ${div.id} parent ${parent.id}`);
+	console.log(`Player clicked ${div.id} parent ${parent.id}`);
 	// now do the logic
 	const ctype=div.id.substring(0,1);
 	const card=parseInt(div.id.substring(1)); // this should be an integer
 	let moved=false;
 	if(ctype=='v'){ // the playing card ids
-//		console.log("tryMove",card,parent.id.substring(1));
-		moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));
-	}else if(div.id='c7'){
-		next3(cascades,faceups);
-		moved=true;
-	}
+	console.log("tryMove",card,parent.id.substring(1));
+	moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));	
 	if(moved)repaint();
+	};
 });
 
 repaint(); // start the game
@@ -153,38 +150,6 @@ function buildHTML(cascades,faceups){
 }
 
 
-
-//function createCardsSpider(nsuit){
-//	m=nsuit*13; // creates 13, 26 or 52 cards
-//	for (i=0;i<m;i++) { // create 52 dif cards as strings in this array - innerHTML for divs
-//			var suit=Math.floor(i/13);
-//			var f='b'; if(suit==1 || suit==2) f='r'; // optionally paint the red suits red
-//			var val = i % 13;
-//			var ctr = (val<10) ? suits[suit] : faces[val-10];
-//			cards[i]='<h2 class="'+f+'">'+vals[val]+' '+suits[suit]+'</h2><h1 class='+f+'>'+ctr+'</h1></div>';
-//	}
-//	for(i=0;i<ncards;i++) { // handle 52 and 104 items in deck
-//		deck[i]=i%m;
-//		flips[i]=0;
-//	}
-//}
-//
-//function deal(){ // does different things if the game has not already started
-// 	clearBoard();
-//	var i=0;
-//	var m = setInterval(frame,30);
-//	function frame() { // use interval to deal the cards slowly
-//	if(i==44) {
-//		clearInterval(m);
-//		ndealt=44;
-//	    next10();
-//    }else{
-//      	j=i%10;
-//      	appendCard(i,j,0); // here i is the position in the deck, 0 means face down
-//      	i++;
-//    	}
-//  	}
-//}
 function next10() { // put the next 10 face up
   if(ndealt<104) { // only do this if there are cards left
     var i=ndealt;
@@ -267,48 +232,14 @@ cascade.appendChild(card);
 	  faceUp(j);
 	}
 	
+function tryMove(cascades,card,j) {
+	let moved=false; // local variable
+	moved=tryAce(cascades,faceups,card,j);
+	if(!moved) moved=tryCascade(cascades,card,j); // returns cascade number if one can move there
+	return moved;
+}
 
-function tryMove(event) { // version .2 moves a stack by reading the z values
-    cardNo=event.id.substring(1);
-        console.log('cardNo='+cardNo);
-      if(flips[cardNo]) { // first, learn about the clicked card
-      	c1=deck[cardNo];
-		v1=c1%13; // value of clicked card
-		id='v'+cardNo; // node id
-		card1=document.getElementById(id);
-		z1=card1.style.zindex; // index within the nodes
-		cascade1=card1.parentNode;
-		j=parseInt(cascade1.id.substr(1));
-		nodes=cascade1.childNodes;
-		z2=nodes.length; // get the # of child nodes
-		console.log('z1='+z1+' z2='+z2+' id='+id+' v1='+v1);
-
-		// next - if this is more than one card, are they in the correct order?
-		nmove=0;
-		z=z1; v=v1; c=c1;
-		while(z<z2 && !nmove) { // make sure items in stack can move together
-			c2=deck[parseInt(nodes[z].id.substr(1))];
-			console.log('Check z='+z+' c='+c+' c2='+c2);
-			if(c!==(c2+1)) nmove=1;
-			c=c2;
-			z++;
-		}
-		if(!nmove && (v1==12) && ((z2-z1)==12)) { // detect a winning stack
-			console.log('Winning stack '+j+' cardNo='+cardNo);
-			moveUp(j,cardNo);
-			nmove=13;
-		}
-		if(!nmove) {
-			toMove.length=0;
-			for(z=z1;z<=z2;z++) toMove.push( parseInt(nodes[z-1].id.substr(1)) );
-		}
-				if(!nmove && v1!==12) trySame(toMove,c1,j); // first try moving to same suit
-				if(!nmove && nsuit>1 && v1!==12 ) tryStack(toMove,v1,j); // then consider not-same-suit columns
-				if(!nmove) nmove=tryEmpty(toMove,j); // then consider empty columns
-		}
-		trywin();
-	}
-function trywin(){
+	function trywin(){
 	if(nfoundation==8)confetti(
 		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
 }
