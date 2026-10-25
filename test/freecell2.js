@@ -114,15 +114,31 @@ function tryMove(cascades,card,j) { // can the clicked item move?
 	else moved=tryStack(cascades,card,j);
 	return moved;
 }
+
+function getMaxStack(cascades) {
+	// (N + 1) times 2^M where N # free cells and M is # free columns
+	let n=0; // number of free cells
+	let m=0; // number of open columns
+	for(let i=0;i<8;i++) if(cascades[i].length==0) m++;
+	for(i=8;i<12;i++) if(cascades[i].length==0) n++;
+	const maxStack=(n+1)*(2**m);
+	console.log("maxStack",maxStack, "n,m",n,m,);
+	return maxStack;
+}
+
 function tryStack(cascades,card,j){
 	let moved=false;
 	if(testStack(cascades,card,j)){
-		j2=scanColumns(cascades,card,j); // is there a place to move the stack? 
-			if(j2!==j) { // fail in scan returns j2==j
-			const chunk=cascades[j].splice(cascades[j].indexOf(card));
-			console.log("moveChunk",chunk,j2);
-			cascades[j2].push(...chunk);
-			moved=true;
+		const maxStack=getMaxStack(cascades);
+		const j2=scanColumns(cascades,card,j); // is there a place to move the stack? 
+		if(j2!==j) { // fail in scan returns j2==j
+			const ii=cascades[j].indexOf(card);
+			const n=cascades[j].length-ii;
+			if(n<=maxStack){
+				const chunk=cascades[j].splice(ii);
+				cascades[j2].push(...chunk);
+				moved=true;
+			}
 		}
 	}
 	return moved;
