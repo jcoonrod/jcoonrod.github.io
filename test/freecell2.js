@@ -1,9 +1,8 @@
 // vdom freecell, copying much from Classic
+// a moveable stack must be the same suit
 const deck=shuffle();
 console.log(deck);
-let cascades=deal(deck);
-repaint();
-
+var cascades=deal(deck);
 const board=document.getElementById("board");
 console.log(board);
 board.addEventListener('click', function(event) { // impure click handler
@@ -16,17 +15,32 @@ board.addEventListener('click', function(event) { // impure click handler
 	const card=parseInt(div.id.substring(1)); // this should be an integer
 	let moved=false;
 	if(ctype=='v'){ // the playing card ids
-		console.log("tryMove",card,parent.id.substring(1));
+		console.log("tryMove v",card,parent.id.substring(1));
 		moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));
-	}else if(ctype=='s'){ // is it on a freecell?
-		tryDrop(cascades);
-		moved=true;
+	}
 	if(moved)repaint();
-}});
+});
+
+repaint();
 
 function repaint(){
+	console.log("repaint");
 	board.innerHTML=buildHTML(cascades);
 };
+
+function tryFree(cascades,card,j){ // is there a free freecell to move to?
+	let moved=false;
+	let j2=8;
+	console.log("tryFree",card,j)
+	while(j2<12 && !moved){
+		if(cascades[j2].length==0){
+			cascades[j2][0]=cascades[j].pop();
+			moved=true;
+		}
+		j2++;
+	}
+	return moved;
+}
 
 function deal(deck){
 	let cascades=[[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]; // 8 in foundation + 4 freecells + 4 aces
@@ -53,16 +67,22 @@ function buildHTML(cascades){ // differs from classic
 	// First row... cascades 8 to 15 no iy
 	let myHTML='<div class=row>';
 	for(let j=8;j<16;j++) { // show next 4 and foundations if they are there
-		console.log("build j=",j);
+	//	console.log("build j=",j);
+		myHTML+="<div class=cell id=c"+j+">";
 		const n=cascades[j].length; // get the top card if any
-		myHTML+="<div class=cell id=c"+j+"></div>";
+		if(n){
+			card=cascades[j][n-1];
+			console.log("top of",j,card);
+			myHTML+=buildCard(card,j,0,true);
+		}
+		myHTML+="</div>";
 	}
 	myHTML+=`</div><div class=row><table><tr>
 		<td>Four FreeCells <span id=message></span></td>
 		<td>Foundations: ♠ ♥ ♦ ♣</td></tr></table></div>
 		<div class=row>`;
 	for(let j=0;j<8;j++){
-		console.log("build j=",j);
+	//	console.log("build j=",j);
 		const cascade=cascades[j];
 		myHTML+="<div  id=c"+j+" class=c>"; // create the column
 		for(let i=0;i<cascade.length;i++) {
@@ -80,52 +100,77 @@ function getSuit(card) {return Math.floor(card/13);}
 function getVal(card){return card % 13;}
 function getColor(card) {return (card<13 || card>38 ? "b" : "r");}
 
-function tryMove(cascades,card,j) {
+function tryMove(cascades,card,j) { // can the clicked item move?
+	// first, is it a top card or a stack of the same suit?
 	let moved=false; // local variable
-	moved=tryAce(cascades,card,j);
-	const color=getColor(card); 
-	const other=(color=='b' ? 'r' : 'b');
-	const val=getVal(card);
-	if(!moved) moved=tryCascade(cascades,val,j,color); // returns cascade number if one can move there
-	if(!moved) moved=tryCascade(cascades,val,j,other);
-	if(!moved) moved=tryFree(card);
+	const topCard=cascades[j][cascades[j].length-1];
+	console.log("tryMove",card,j,topCard);
+	if(card==topCard) {
+		moved=tryAce(cascades,card,j); // only top card is eligible
+		if(!moved) moved=tryCascade(cascades,card,j); // returns cascade number if one can move there
+		console.log("triedCascade",moved);
+		if(!moved) moved=tryFree(cascades,card,j);
+	}
+	else moved=tryStack(cascades,card,j);
 	return moved;
 }
-
-function tryCascade(cascades,val,j,color){ // returns moved
-	let i=1; 
+function tryStack(cascades,card,j){
 	let moved=false;
-	while(!moved && i<8){
-		const j2=j+i;
-		if(j2>7) j2=j2=8;
-		const n=cascades[j2].length;
-		const val2=cascades[j2][n-1];
-		i++;
-	}
-}
-
-// this should be easier as we are appending a splice to another array
-function tryCascade(cascades,card,j1){ // move to another cascade if color mismatch and value one above
-	console.log("tryCascade",card,j1);
-	const value1=getVal(card);
-	const color1=getColor(card);
-	const i1=cascades[j1].indexOf(card); // where i source cascade is it?
-	let moved=false;
-	for(let j2=0;j2<7;j2++) { // step through cascades until a move happens
-		n2=cascades[j2].length;
-		console.log("try cascade=",cascades[j1],"card=",card,"i1=",i1,"j1 j2=",j1,j2,"n2=",n2);
-		if(n2==0 && value1==12) moved=moveAll(cascades,i1,j1,j2);
-		if(n2 && !moved){
-			const card2=cascades[j2][n2-1]; // get the topcard on destination
-			const value2=getVal(card2);
-			const color2=getColor(card2);
-			console.log("color2=",color2,"value2=",value2);
-			if((color2!==color1) && (value2==(value1+1))) moved=moveAll(cascades,i1,j1,j2);
+	if(testStack(cascades,card,j)){
+		j2=scanColumns(cascades,card,j); // is there a place to move the stack? 
+			if(j2!==j) { // fail in scan returns j2==j
+			const chunk=cascades[j].splice(cascades[j].indexOf(card));
+			console.log("moveChunk",chunk,j2);
+			cascades[j2].push(...chunk);
+			moved=true;
 		}
 	}
 	return moved;
 }
 
+function scanColumns(cascades,card,j){
+	const val=getVal(card); 
+	const color=getColor(card);
+	let i=1; let moveable=false;
+	let j2=j;
+	while (i<8 && !moveable){
+		j2=(j+i)%8;
+		const n=cascades[j2].length;
+		moveable=(val==12 && n==0); // can move king to empty spot
+		if(!moveable) {
+			const val2=getVal(cascades[j2][n-1]);
+			const color2=getColor(cascades[j2][n-1]);
+			console.log("scan",j2,n,val2,color2);
+			moveable=(val2==(val+1) && color2!==color);
+		}
+		i++;
+	}
+	console.log("scanned",j2,moveable);
+	return (moveable ? j2 : j);
+}
+
+function testStack(cascades,card,j){ //
+	//does the stack follow the color/alternate and value rules?
+	const i=cascades[j].indexOf(card);
+	const n=cascades[j].length;
+	let legit=true; let k=i; 
+	while(legit && k<(n-1)){
+		let l=k+1;
+		legit=(getVal(cascades[j][k])==getVal(cascades[j][l]+1) 
+			&& getColor(cascades[j][k])!==getColor(cascades[j][l]) );
+		k++;
+	}
+	return legit;
+}
+function tryCascade(cascades,card,j){ // returns moved
+	const j2=scanColumns(cascades,card,j);
+	console.log("tryCascade",j,j2);
+	if(j2!==j) {
+		cascades[j2].push(cascades[j].pop());
+		return true;
+	}
+	return false;
+}
 
 function moveAll(cascades,i1,j1,j2){ // move all the j1 children to j2 
 	const chunk=cascades[j1].splice(i1);
@@ -188,11 +233,6 @@ function shuffle(){
 	return deck;
 }
 
-function color(i){
-	return (i<13 || i>38 ? "b" : "r");
-}
-
 function clearBoard(){ // pure function
 	removeChildren("board");
 }
-
