@@ -1,10 +1,6 @@
 // vdom freecell, copying much from Classic
 // a moveable stack must be the same suit
-const deck=shuffle();
-console.log(deck);
-var cascades=deal(deck);
 const board=document.getElementById("board");
-console.log(board);
 board.addEventListener('click', function(event) { // impure click handler
 	const div = event.target.closest('.card'); 
 	if (!div) return;
@@ -18,10 +14,58 @@ board.addEventListener('click', function(event) { // impure click handler
 		console.log("tryMove v",card,parent.id.substring(1));
 		moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));
 	}
-	if(moved)repaint();
+	if(moved){repaint();processFoundationJumps();}
 });
 
+// initial game play
+const deck=shuffle();
+console.log(deck);
+var cascades=deal(deck);
 repaint();
+
+// for timing reasons, these cannot be const arrow functions
+function getSuit(card) {return Math.floor(card/13);}
+function getVal(card){return (card==-1 ? -1 : card % 13);}
+function getColor(card) {return (card<13 || card>38 ? "b" : "r");}
+function getTopCard(cascade){ // just call it with 1-d array
+	if(cascade.length==0) return -1;
+	return cascade[cascade.length-1];
+}
+
+const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+async function processFoundationJumps() {
+    // Let the browser finish painting the previous move and sit for 1 second
+	console.log("processFoundationJumps");
+    await sleep(300);
+	moved=tryjump(cascades); // 
+    if(moved) {
+		repaint();
+        await processFoundationJumps(); 
+    }
+}
+
+function tryjump(cascades){
+	moved=false;
+	let j=0;
+	while(!moved && j<8) {
+		card=getTopCard(cascades[j]);
+		console.log("tryJump",j,"card",card);
+		if(card!==-1){
+			topVal=getVal(card);
+			topSuit=getSuit(card);
+			topFoundation=getTopCard(cascades[12+topSuit]);
+			console.log("val",topVal,"suit",topSuit,"topFoundation",topFoundation);
+			if(topVal==getVal(topFoundation)+1) {
+				moved=true;
+				console.log("moved to suit",topSuit);
+				cascades[12+topSuit].push(cascades[j].pop());
+				repaint();
+			}
+		}
+		j++;
+	}
+}
 
 function repaint(){
 	console.log("repaint");
@@ -95,15 +139,10 @@ function buildHTML(cascades){ // differs from classic
 	return myHTML;
 }
 
-// for timing reasons, these cannot be const arrow functions
-function getSuit(card) {return Math.floor(card/13);}
-function getVal(card){return card % 13;}
-function getColor(card) {return (card<13 || card>38 ? "b" : "r");}
-
 function tryMove(cascades,card,j) { // can the clicked item move?
 	// first, is it a top card or a stack of the same suit?
 	let moved=false; // local variable
-	const topCard=cascades[j][cascades[j].length-1];
+	const topCard=getTopCard(cascades[j]); // return -1 if cascade is empty
 	console.log("tryMove",card,j,topCard);
 	if(card==topCard) {
 		moved=tryAce(cascades,card,j); // only top card is eligible
