@@ -152,7 +152,7 @@ function scanColumns(cascades,card,j){
 	while (i<8 && !moveable){
 		j2=(j+i)%8;
 		const n=cascades[j2].length;
-		moveable=(val==12 && n==0); // can move king to empty spot
+		moveable=(n==0); // can move anything to empty cascade
 		if(!moveable) {
 			const val2=getVal(cascades[j2][n-1]);
 			const color2=getColor(cascades[j2][n-1]);
