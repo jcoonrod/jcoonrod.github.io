@@ -17,12 +17,6 @@ board.addEventListener('click', function(event) { // impure click handler
 	if(moved){repaint();processFoundationJumps();}
 });
 
-// initial game play
-const deck=shuffle();
-console.log(deck);
-var cascades=deal(deck);
-repaint();
-
 // for timing reasons, these cannot be const arrow functions
 function getSuit(card) {return Math.floor(card/13);}
 function getVal(card){return (card==-1 ? -1 : card % 13);}
@@ -35,20 +29,26 @@ function getTopCard(cascade){ // just call it with 1-d array
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 
 async function processFoundationJumps() {
-    // Let the browser finish painting the previous move and sit for 1 second
 	console.log("processFoundationJumps");
     await sleep(300);
-	moved=tryjump(cascades); // 
+	const moved=tryjump(cascades); 
     if(moved) {
 		repaint();
         await processFoundationJumps(); 
     }
 }
 
+// initial game play
+const deck=shuffle();
+console.log(deck);
+var cascades=deal(deck);
+repaint();
+processFoundationJumps();
+
 function tryjump(cascades){
 	moved=false;
 	let j=0;
-	while(!moved && j<8) {
+	while(!moved && j<12) {
 		card=getTopCard(cascades[j]);
 		console.log("tryJump",j,"card",card);
 		if(card!==-1){
@@ -65,6 +65,7 @@ function tryjump(cascades){
 		}
 		j++;
 	}
+	return moved;
 }
 
 function repaint(){
