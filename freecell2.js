@@ -30,10 +30,11 @@ const sleep = ms => new Promise(res => setTimeout(res, ms));
 
 async function processFoundationJumps() {
 	console.log("processFoundationJumps");
-    await sleep(300);
+    await sleep(200);
 	const moved=tryjump(cascades); 
     if(moved) {
 		repaint();
+		tryWin(cascades);
         await processFoundationJumps(); 
     }
 }
@@ -140,13 +141,14 @@ function buildHTML(cascades){ // differs from classic
 	return myHTML;
 }
 
+// this needs to work for freecells as well as tableau cards
 function tryMove(cascades,card,j) { // can the clicked item move?
 	// first, is it a top card or a stack of the same suit?
 	let moved=false; // local variable
 	const topCard=getTopCard(cascades[j]); // return -1 if cascade is empty
 	console.log("tryMove",card,j,topCard);
 	if(card==topCard) {
-		moved=tryAce(cascades,card,j); // only top card is eligible
+		if(j<8) moved=tryAce(cascades,card,j); // only top card in tableau is eligible
 		if(!moved) moved=tryCascade(cascades,card,j); // returns cascade number if one can move there
 		console.log("triedCascade",moved);
 		if(!moved) moved=tryFree(cascades,card,j);
@@ -183,14 +185,18 @@ function tryStack(cascades,card,j){
 	}
 	return moved;
 }
-
-function scanColumns(cascades,card,j){
+// this needs to work for both tableau (j<8) and free cells
+// if it scans all 8 columns, it won't move to itself - that's simpler
+function scanColumns(cascades,card,j){ // return destination of j if none
 	const val=getVal(card); 
 	const color=getColor(card);
-	let i=1; let moveable=false;
-	let j2=j;
-	while (i<8 && !moveable){
-		j2=(j+i)%8;
+	let i=0; // scan 0 through 7 
+	let j2=0; // make sure it isn't scoped inside loop
+	let moveable=false;
+	const joffset=(j>7 ? 0 : j+1); // make sure to move to the right
+	const ilimit=(j>7 ? 8 : 7); //scan 8 columns for freecells else 7
+	while (i<ilimit && !moveable){
+		j2=(i+joffset)%8; // circle around as needed
 		const n=cascades[j2].length;
 		moveable=(n==0); // can move anything to empty cascade
 		if(!moveable) {
@@ -202,7 +208,7 @@ function scanColumns(cascades,card,j){
 		i++;
 	}
 	console.log("scanned",j2,moveable);
-	return (moveable ? j2 : j);
+	return (moveable ? j2 : j); // returning source j means not movable
 }
 
 function testStack(cascades,card,j){ //
