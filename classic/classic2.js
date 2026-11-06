@@ -2,17 +2,12 @@
 // We want the vdom to be easily converted to a single HTML string
 // The vdom consists of an array of arrays: 15 cascades and 52 faceup booleans
 // 0-6 in in tableau, 7-10 in stock and 11-14 in foundations
-const deck=shuffle(); // new pure function creates a shuffled deck;
-var cascades=deal(deck); // put the stock in cascades[7], aces start in cascades;
-var faceups=initializeFaceups(cascades); // determine faceup status of each card
 const board=document.getElementById("board");
-
 board.addEventListener('click', function(event) { // impure click handler
 	const div = event.target.closest('.card'); 
-	// If the user clicked the board background instead of a card, exit early
 	if (!div) return;
 	const parent=div.parentElement;
-//console.log(`Player clicked ${div.id} parent ${parent.id}`);
+	console.log(`Player clicked ${div.id} parent ${parent.id}`);
 	// now do the logic
 	const ctype=div.id.substring(0,1);
 	const card=parseInt(div.id.substring(1)); // this should be an integer
@@ -27,16 +22,39 @@ board.addEventListener('click', function(event) { // impure click handler
 	if(moved)repaint();
 });
 
-repaint(); // start the game
-
 function repaint(){
 	board.innerHTML=buildHTML(cascades,faceups);
+	tryWin(cascades);
 };
 
 // for timing reasons, these cannot be const arrow functions
 function getSuit(card) {return Math.floor(card/13);}
 function getVal(card){return card % 13;}
 function getColor(card) {return (card<13 || card>38 ? "b" : "r");}
+function getTopCard(cascade){ // just call it with 1-d array
+	if(cascade.length==0) return -1;
+	return cascade[cascade.length-1];
+}
+
+const sleep = ms => new Promise(res => setTimeout(res, ms));
+
+async function processFoundationJumps() {
+	console.log("processFoundationJumps");
+    await sleep(200);
+	const moved=tryjump(cascades); 
+    if(moved) {
+		repaint();
+        await processFoundationJumps(); 
+    }
+}
+
+// initial game play
+const deck=shuffle();
+console.log(deck);
+var cascades=deal(deck);
+var faceups=initializeFaceups(cascades);
+repaint();
+processFoundationJumps();
 
 function tryMove(cascades,card,j) {
 	let moved=false; // local variable
@@ -110,6 +128,31 @@ function initializeFaceups(cascades){
 	return faces; 
 }
 
+function tryjump(cascades){
+	moved=false;
+	let j=0;
+	while(!moved && j<11) {
+		card=getTopCard(cascades[j]);
+		console.log("tryjump",j,"card",card);
+		if(card!==-1){
+			topVal=getVal(card);
+			topSuit=getSuit(card);
+			topFoundation=getTopCard(cascades[11+topSuit]);
+			console.log("val",topVal,"suit",topSuit,"topFoundation",topFoundation);
+			if(topVal==getVal(topFoundation)+1) {
+				moved=true;
+				console.log("moved to suit",topSuit);
+				cascades[11+topSuit].push(cascades[j].pop());
+				const n1=cascades[j].length;
+				if(n1) faceups[cascades[j][n1-1]]=true; // flip last card faceup
+				repaint();
+			}
+		}
+		j++;
+	}
+	return moved;
+}
+
 function buildCard(card,j,iy,faceup){ //
 	const s=(j<8 ? "position: absolute; top:"+iy+"vw;" : "");
 	if(faceup){
@@ -171,6 +214,7 @@ function deal(deck){
 	return cascades;
 }
 
+
 function tryWin(cascades){
 	win=cascades[11].length+cascades[12].length+cascades[13].length+cascades[14];
 //	console.log("Win?",win);
@@ -199,6 +243,7 @@ function next3(cascades,faceups){
 			cascades[8+i].push(card);
 			i++;
 		}
+		processFoundationJumps(); 
 	}
 }
 
