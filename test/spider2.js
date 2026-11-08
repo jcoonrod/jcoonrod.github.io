@@ -21,12 +21,13 @@ function shuffle(){
 
 function deal(deck){
 	let cascades=[];
-	for(let j=0; j<10; j++) cascades[j]=[]; // Make it a 2d array
+	for(let j=0; j<19; j++) cascades[j]=[]; // Make it a 2d array
 	for(let i=0; i<54; i++) {j=i%10; cascades[j].push(deck[i]);}
+	for(let i=54; i<104; i++) cascades[10].push(deck[i]);
 	return cascades;
 }
 
-function initializeFaceups(cascades){
+function initializeFaceups(cascades){ // turn the top cards up
 	let faces=[];
 	for(i=0;i<104;i++) faces[i]=false;
 	for(j=0;j<10;j++) {
@@ -80,19 +81,17 @@ function repaint(){
 function getSuit(card) {return Math.floor(card/13);}
 function getVal(card){return card % 13;}
 function getColor(card) {return (card<13 || card>38 ? "b" : "r");}
+function getTopCard(cascade){ // just call it with 1-d array
+	if(cascade.length==0) return -1;
+	return cascade[cascade.length-1];
+}
 
-// var toMove = []; // array of cards to move
-// var moves = [];
-// document.getElementById("s0").innerHTML=back;
-// createCardsSpider(localStorage.nsuit);
-// showSuits();
-
-// FUNCTIONS from top down	// make numbers bigger for phones
 function showScores(){
 	let w=localStorage.wins;
 	let t=localStorage.times;
 	sofar.innerHTML=localStorage.wins+'/'+localStorage.times;
 }
+
 function changeSuits(){
 	if(localStorage.nsuit==2) {localStorage.nsuit=4;}
 	else if(localStorage.nsuit==4) {localStorage.nsuit=1;}
@@ -120,19 +119,19 @@ function buildCard(card,j,iy,faceup){ // change absolute width
 
 // convert the virtual DOM data to html -- must change the column class
 function buildHTML(cascades,faceups){ 
-	// First row... cascades 7 to 14
-//	let myHTML="<div class=row>"; // this builds everything below the buttons
-//	const n7=cascades[7].length; // show the stockpile?
-//	if(n7) {myHTML+="<div id=c7 class=card><img src=/back.jpg></div>";}
-//	else {myHTML+="<div id=c7 class=card><h2>&nbsp;</h2><h1>♻</h1></div>";}
-//	for(let j=8;j<15;j++) { // show next 3 and foundations if they are there
-//		const n=cascades[j].length; // get the top card if any
-//		if(n){
-//			const topcard=cascades[j][n-1];
-//			myHTML+="<div class=cell id=c"+j+">"+buildCard(topcard,j,0,true)+"</div>";
-//			}
-//		else{myHTML+="<div class=cell id=c"+j+"></div>";}
-//	}
+	let myHTML="<div class=row>\n";
+	const blank="<"
+	for(j=10;j<19;j++){
+		myHTML+="<div id=c"+j+" class='card blueborder'>"
+		const face=(j>10);
+		console.log("build j=",j,cascades[j]);
+		const n=cascades[j].length;
+		if(n) {
+			card=cascades[j][n-1];
+			myHTML+=buildCard(card,j,0,face);
+		}
+		myHTML+="</div>\n";
+	}
 	myHTML="</div><div class=row><table><tr><td>Stock pile +8 foundations</td>"
 	+"</td></tr></table></div><div class=row>";
 	for(let j=0;j<10;j++){
@@ -151,20 +150,11 @@ function buildHTML(cascades,faceups){
 
 
 function next10() { // put the next 10 face up
-  if(ndealt<104) { // only do this if there are cards left
-    var i=ndealt;
-    var m = setInterval(frame,30);
-    function frame() {
-      if(i==(ndealt+10)) {
-        clearInterval(m);
-        ndealt=i;
-        if(ndealt==104) document.getElementById("s0").innerHTML="";
-      }else{
-        j=i%10;
-        appendCard(i,j,1);
-        i++;
-      }
-      }
+	for(let i=0;i<10;i++) {
+		j=(i+4)%10;// which column
+		card=cascades[10].pop();
+		faceup[card]=true;
+		cascades[j].push(card);
 	}
 }
 
@@ -180,76 +170,36 @@ function clearBoard(){
     for(j=0;j<8;j++) document.getElementById("f"+j).innerHTML="";
 }
 	
-  function faceUp(j) { // make sure top card is face up on this cascade
-    id=topCardId(j);
-    if(id) {
-      i=parseInt(id.substr(1));
-      flips[i]=1;
-      document.getElementById(id).innerHTML=cards[deck[i]];
-    }
-  }
-  
-function appendCard(i,j,up) { // add a card position i in the deck to the end of cascade j
-//when i>43, deal face up
-const cascade=document.getElementById("c"+j);
-z=cascade.childElementCount+1;
-var card=document.createElement("div");
-if(up) {card.innerHTML=cards[deck[i]];flips[i]=1;}else{card.innerHTML="<img width=100% src=/back.jpg>";flips[i]=0;}
-card.id="v"+i;
-card.classList.add("card");
-card.style.zindex=z.toString();
-card.style.position='absolute';
-card.setAttribute("onclick","tryMove(this);");
-card.style.width='100%';
-y=(z-1)*5;
-card.style.top=y.toString()+"vw";
-cascade.appendChild(card);
+function moveUp(cascades,j1) { // move a whole stack of 13 cards to a foundation
+	let j2=11;
+	while(j2<19 && cascades[j2].length) j2++;
+	n1=cascades[j1].length-13; // must be 13 or more
+	chunk=cascades[j1].splice(n1);
+	if(n1) faceups[cascades[j1][n1-1]]=true;
 }
-
-	function undo(){ // at the moment, this just works for cascade to cascade
-		if(moves.length) {
-			cardid=-1;
-			move=moves.pop();
-			cj=move[0]; j=move[1]; ck=move[2]; k=move[3]; n=move[4];
-			if(cj=='c' && ck=='c') {
-				toMove.length=0; // clear this array - a bit like remove stack
-				nodes=document.getElementById('c'+k).childNodes;
-				last=nodes.length-1; m=last-n+1;
-				removeStack(k,m);
-				appendStack(j,m);
-			}
-			if(cardid>-1 && cj=='c') {
-				appendCard(cardid,j);
-			}
-		}
-	}
-	
-	function moveUp(j,cardNo) { // move a whole stack of 13 cards to a foundation
-	  cascade=document.getElementById('c'+j);
-	  document.getElementById('f'+nfoundation).innerHTML=cards[deck[cardNo]];
-	  nfoundation++;
-	  for(i=0;i<13;i++) cascade.removeChild(cascade.lastChild);
-	  faceUp(j);
-	}
 	
 function tryMove(cascades,card,j) {
 	let moved=false; // local variable
-	moved=tryAce(cascades,faceups,card,j);
+	moved=tryAce(cascades,card,j); // can we move a stack up?
 	if(!moved) moved=tryCascade(cascades,card,j); // returns cascade number if one can move there
 	return moved;
 }
 
-	function trywin(){
-	if(nfoundation==8)confetti(
+function tryAce(cascades,card,j){ // try moving up 13 cards 
+	let moved=false;
+	const suit=getSuit[card];
+	let i=cascades[j].length-13; // start of stack
+	while(!moved && i && getSuit[cascades[j][i]]==suit && getVal[cascades[j][i]==(12-i)]) i++;
+	if(i==13)moveUp(cascades,j);
+}
+
+function trywin(){
+	let n=0; // how many have moved up?
+	for(let j=11;j<19;j++) if(cascades[j].length) n++;
+	if(n==8)confetti(
 		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
 }
-function topCardValue(m) { // return -1 on empty, or 0-12 value of top card
-  cascade2=document.getElementById('c'+m);
-  v2=-1;
-  if(cascade2) card=cascade2.lastElementChild;
-  if(card) v2=deck[ parseInt(card.id.substr(1))]%13;
-  return v2;
-}
+
 function trySame(toMove,c1,j) { // Try moving stack to the same suit
   nmove=0;
   k=1;  // first run through possible stack-to-stack moves
