@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<!-- Pyramid HTML - create cards via absolutelly placed dom nodes -->
+<!-- otherwise new/replay really don't work-->
+<html lang=en>
+<head>
+<meta name="google" content="notranslate">
+<link rel='shortcut icon' href='/back.png'>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<meta name="description" content="Pyramid Solitaire Game by John Coonrod"/>
+<title>Pyramid Solitaire</title>
+<link rel="stylesheet" href="/style.css">
+<script src="/confetti.browser.min.js"></script>
+<script src="/common.js"></script>
+<script src="pyramid.js" defer></script>
+</head>
+  
+<body tabindex="-1">
+<div class="dropdown">
+  <button class="dropbtn">Pyramid</button>
+  <div class="dropdown-content">
+    <a href="/pyramid">Pyramid</a>
+    <a href="/classic">Classic</a>
+    <a href="/">Freecell</a>
+    <a href="/spider">Spider</a>
+  </div>
+</div>
+<div class="buttons">
+    <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
+    <button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
+    <a class="dropbtn" href="help.html" target="_blank">🛈</a> 
+    Score: <span id="status">0</span>
+</div>
+<p>&nbsp;</p>
+<div id="stack" class="card" onclick="next();"><img src="/back.jpg"></div>
+</body>
+</html>
