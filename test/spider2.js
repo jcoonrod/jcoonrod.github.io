@@ -182,15 +182,16 @@ function clearBoard(){
 	
 function moveUp(cascades,j1) { // move a whole stack of 13 cards to a foundation
 	let j2=11;
-	while(j2<19 && cascades[j2].length) j2++;
+	while(j2<19 && cascades[j2].length>0){console.log("moveUp j2",j2); j2++;}
 	n1=cascades[j1].length-13; // must be 13 or more
 	chunk=cascades[j1].splice(n1);
+	console.log("chunk",chunk);
 	if(n1) faceups[cascades[j1][n1-1]]=true;
 }
 	
 function tryMove(cascades,card,j) {
 	let moved=false; // local variable
-	moved=tryAce(cascades,card,j); // can we move a stack up?
+	moved=tryAce(cascades,card,j,nsuit); // can we move a stack up?
 	if(!moved) moved=tryCascade(cascades,card,j,true); // returns cascade number if one can move there
 	if(!moved) moved=tryCascade(cascades,card,j,false); // returns cascade number if one can move there
 	return moved;
@@ -224,17 +225,18 @@ function moveAll(cascades,i1,j1,j2){ // move all the children to reserve
 }
 
 
-function tryAce(cascades,card,j){ // try moving up 13 cards 
+function tryAce(cascades,card,j,nsuit){ // try moving up 13 cards 
 	let moved=false;
-	const suit=getSuit[card];
-	const start=cascades[j].length-12; // start of stack position
+	const suit=getSuit(card,nsuit);
+	const start=cascades[j].length-13; // start of stack position
 	let i=0;
+	console.log("tryace card",card,"j",j,"suit",suit,"start",start);
 	while(!moved && i<13) {
 		const card2=cascades[j][start+i];
-		const suit2=getSuit[card];
-		const val2=getVal[card];
-		console.log("tryAce",j,"i",i,"card2",card2,"val2",val2,"suit2",suit2);
-		if(val2!==i || suit2!==suit) return false
+		const suit2=getSuit(card2,nsuit);
+		const val2=getVal(card2);
+		console.log("tryAce i",i,"card2",card2,"val2",val2,"suit2",suit2);
+		if(val2!==(12-i) || suit2!==suit) return false
 		i++;
 	}
 	if(i==13)moved=moveUp(cascades,j);
