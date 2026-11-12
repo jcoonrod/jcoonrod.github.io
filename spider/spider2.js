@@ -58,7 +58,7 @@ board.addEventListener('click', function(event) { // impure click handler
 	// If the user clicked the board background instead of a card, exit early
 	if (!div) return;
 	const parent=div.parentElement;
-	console.log(`Player clicked ${div.id} parent ${parent.id}`);
+	//console.log(`Player clicked ${div.id} parent ${parent.id}`);
 	// now do the logic
 	const ctype=div.id.substring(0,1);
 	const card=parseInt(div.id.substring(1)); // this should be an integer
@@ -129,9 +129,9 @@ function buildHTML(cascades,faceups,nsuit){
 	let myHTML="<div class=row>\n";
 	const blank="<"
 	for(j=10;j<19;j++){
-		myHTML+="<div id=c"+j+" class='card blueborder'>"
+		myHTML+="<div id=c"+j+" class='card blueborder'>";
 		const face=(j>10);
-		console.log("build j=",j,cascades[j]);
+		//console.log("build j=",j,cascades[j]);
 		const n=cascades[j].length;
 		if(n) {
 			card=cascades[j][n-1];
@@ -161,32 +161,20 @@ function next10(cascades,faceups,card) { // put the next 10 face up
 	for(let i=0;i<10;i++) {
 		j=(i+4)%10;// which column
 		card=cascades[10].pop();
-//		console.log("next ",j,card);
 		faceups[card]=true;
 		cascades[j].push(card);
 	}
 	return true;
 }
-
-function clearBoard(){
-    nfoundation=0; // how many foundation piles have gone up?
-	moves.length=0; // clear these working arrays
-	toMove.length=0;
-	document.getElementById('s0').innerHTML=back;
-    for(j=0;j<10;j++) { // clear cascades
-        const cascade=document.getElementById("c"+j);
-        while (cascade.firstChild) cascade.removeChild(cascade.firstChild);
-    }
-    for(j=0;j<8;j++) document.getElementById("f"+j).innerHTML="";
-}
 	
 function moveUp(cascades,j1) { // move a whole stack of 13 cards to a foundation
 	let j2=11;
-	while(j2<19 && cascades[j2].length>0){console.log("moveUp j2",j2); j2++;}
-	n1=cascades[j1].length-13; // must be 13 or more
-	chunk=cascades[j1].splice(n1);
-	console.log("chunk",chunk);
-	if(n1) faceups[cascades[j1][n1-1]]=true;
+	while(j2<19 && cascades[j2].length>0){//console.log("moveUp j2",j2); j2++;}
+		n1=cascades[j1].length-13; // must be 13 or more
+		chunk=cascades[j1].splice(n1);
+		if(n1>0) faceups[cascades[j1][n1-1]]=true;
+		cascades[j2].push(...chunk);
+	}
 }
 	
 function tryMove(cascades,card,j) {
@@ -202,7 +190,8 @@ function tryCascade(cascades,card,j1,same){ // move to another cascade if color 
 	const suit1=getSuit(card,nsuit);
 	const i1=cascades[j1].indexOf(card); // where i source cascade is it?
 	let moved=false;
-	for(let j2=0;j2<10;j2++) { // step through cascades until a move happens
+	for(let i2=1;i2<10;i2++) { // step through cascades rightward until a move happens
+		const j2=(j1+i2)%10; // handle the rollaround rightward
 		const n2=cascades[j2].length;
 		if(n2==0 && value1==12) moved=moveAll(cascades,i1,j1,j2);
 		if(n2 && !moved){
@@ -230,12 +219,12 @@ function tryAce(cascades,card,j,nsuit){ // try moving up 13 cards
 	const suit=getSuit(card,nsuit);
 	const start=cascades[j].length-13; // start of stack position
 	let i=0;
-	console.log("tryace card",card,"j",j,"suit",suit,"start",start);
+	//console.log("tryace card",card,"j",j,"suit",suit,"start",start);
 	while(!moved && i<13) {
 		const card2=cascades[j][start+i];
 		const suit2=getSuit(card2,nsuit);
 		const val2=getVal(card2);
-		console.log("tryAce i",i,"card2",card2,"val2",val2,"suit2",suit2);
+		//console.log("tryAce i",i,"card2",card2,"val2",val2,"suit2",suit2);
 		if(val2!==(12-i) || suit2!==suit) return false
 		i++;
 	}
@@ -257,7 +246,7 @@ function trySame(toMove,c1,j) { // Try moving stack to the same suit
 		m=(j+k)%10; // next cascade to the right
   		k++;
 		c2=deck[topCardId(m).substr(1)];
-//		console.log("Same k="+k+" c1="+c1+" c2="+c2);
+//		//console.log("Same k="+k+" c1="+c1+" c2="+c2);
 		if(c2==(c1+1)) nmove=moveStack(toMove,j,m);
     }
     return nmove;
@@ -272,7 +261,7 @@ function tryStack(toMove,v1,j) {
 			if(topCardValue(m)==-1) {nmove=moveStack(toMove,j,m);}
 			else {
 				v2=topCardValue(m);
-				console.log("Stack k="+k+" v1="+v1+" v2="+v2);
+				//console.log("Stack k="+k+" v1="+v1+" v2="+v2);
     	  if(v2==(v1+1)) nmove=moveStack(toMove,j,m);
 			}
     }
@@ -288,7 +277,7 @@ function tryEmpty(toMove,j) {
 }
 
 function moveStack(toMove,j,m){
-	console.log("moveStack j="+j+" m="+m);
+	//console.log("moveStack j="+j+" m="+m);
 	cascade1=document.getElementById('c'+j);
 	for(i=0;i<toMove.length;i++) cascade1.removeChild(cascade1.lastChild);
 	for(i=0;i<toMove.length;i++) appendCard(toMove[i],m,1);
