@@ -169,12 +169,15 @@ function next10(cascades,faceups,card) { // put the next 10 face up
 	
 function moveUp(cascades,j1) { // move a whole stack of 13 cards to a foundation
 	let j2=11;
-	while(j2<19 && cascades[j2].length>0){//console.log("moveUp j2",j2); j2++;}
-		n1=cascades[j1].length-13; // must be 13 or more
-		chunk=cascades[j1].splice(n1);
-		if(n1>0) faceups[cascades[j1][n1-1]]=true;
-		cascades[j2].push(...chunk);
-	}
+	while(j2<19 && cascades[j2].length>0){
+		//console.log("moveUp j2",j2); 
+		j2++;}
+	if(j2==19) return false; // already full? should be impossible
+	const n1=cascades[j1].length-13; // must be 13 or more
+	const chunk=cascades[j1].splice(n1);
+	//console.log("chunk",chunk);
+	if(n1>0) faceups[cascades[j1][n1-1]]=true;
+	cascades[j2].push(...chunk);
 }
 	
 function tryMove(cascades,card,j) {
@@ -218,7 +221,8 @@ function tryAce(cascades,card,j,nsuit){ // try moving up 13 cards
 	let moved=false;
 	const suit=getSuit(card,nsuit);
 	const start=cascades[j].length-13; // start of stack position
-	let i=0;
+	if(start<0) return false; // short cascades won't work
+	let i=0; // i marches through the cascade to see if it is moveable
 	//console.log("tryace card",card,"j",j,"suit",suit,"start",start);
 	while(!moved && i<13) {
 		const card2=cascades[j][start+i];
