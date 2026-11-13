@@ -127,7 +127,6 @@ function buildCard(card,j,iy,faceup,nsuit){ // change absolute width
 // convert the virtual DOM data to html -- must change the column class
 function buildHTML(cascades,faceups,nsuit){ 
 	let myHTML="<div class=row>\n";
-	const blank="<"
 	for(j=10;j<19;j++){
 		myHTML+="<div id=c"+j+" class='card blueborder'>";
 		const face=(j>10);
@@ -143,11 +142,11 @@ function buildHTML(cascades,faceups,nsuit){
 	+"</td></tr></table></div><div class=row>";
 	for(let j=0;j<10;j++){
 		const cascade=cascades[j];
-		myHTML+="<div  id=c"+j+" class=c10>"; // create the column
+		myHTML+="<div id=c"+j+" class=c>"; // create the column
 		for(let i=0;i<cascade.length;i++) {
 			const card=cascade[i];
 			const face=faceups[card];
-			myHTML+=buildCard(card,j,i*5,faceups[card],nsuit); // create each card in the cascade
+			myHTML+=buildCard(card,j,i*4,faceups[card],nsuit); // create each card in the cascade
 		}
 		myHTML+="</div>"; // end the cascade		
 	}
@@ -242,74 +241,3 @@ function trywin(){
 	if(n==8)confetti(
 		{particleCount: 100,spread: 70, origin: { y: 0.6 }});
 }
-
-function trySame(toMove,c1,j) { // Try moving stack to the same suit
-  nmove=0;
-  k=1;  // first run through possible stack-to-stack moves
-	while(k<10 && !nmove) {
-		m=(j+k)%10; // next cascade to the right
-  		k++;
-		c2=deck[topCardId(m).substr(1)];
-//		//console.log("Same k="+k+" c1="+c1+" c2="+c2);
-		if(c2==(c1+1)) nmove=moveStack(toMove,j,m);
-    }
-    return nmove;
-}
-	// 11/24 - include moves to empty in the same scan
-function tryStack(toMove,v1,j) {
-	nmove=0;
-	k=1;  // first run through possible stack-to-stack moves
-    while(k<10 && !nmove) {
-      m=(j+k)%10; // next cascade to the right
-      k++;
-			if(topCardValue(m)==-1) {nmove=moveStack(toMove,j,m);}
-			else {
-				v2=topCardValue(m);
-				//console.log("Stack k="+k+" v1="+v1+" v2="+v2);
-    	  if(v2==(v1+1)) nmove=moveStack(toMove,j,m);
-			}
-    }
-    return nmove;
-}
-function tryEmpty(toMove,j) {
-    k=1; // second, run through possible empty stack moves
-    while(k<10 && !nmove) { // first run through possible stack-to-stack moves
-        m=(j+k)%10; // next cascade to the right
-        k++;
-        if(topCardValue(m)==-1) nmove=moveStack(toMove,j,m);
-    }
-}
-
-function moveStack(toMove,j,m){
-	//console.log("moveStack j="+j+" m="+m);
-	cascade1=document.getElementById('c'+j);
-	for(i=0;i<toMove.length;i++) cascade1.removeChild(cascade1.lastChild);
-	for(i=0;i<toMove.length;i++) appendCard(toMove[i],m,1);
-    faceUp( parseInt(cascade1.id.substr(1)) ); // flip the top card in cascade j if not already flipped
-    return 1;
-  }
-function appendCard(i,j,up) { // add a card position i in the deck to the end of cascade j
-	  //when i>43, deal face up
-	    const cascade=document.getElementById("c"+j);
-		z=cascade.childElementCount+1;
-    var card=document.createElement("div");
-    if(up) {card.innerHTML=cards[deck[i]];flips[i]=1;}else{card.innerHTML="<img width=100% src=/back.jpg>";flips[i]=0;}
-    card.id="v"+i;
-    card.classList.add("card");
-    card.style.zindex=z.toString();
-    card.style.position='absolute';
-    card.setAttribute("onclick","tryMove(this);");
-    card.style.width='100%';
-    y=(z-1)*5;
-    card.style.top=y.toString()+"vw";
-    cascade.appendChild(card);
-	}
-
-
-  // Run through to see if any top cards can jump to the ace pile
-  function topCardId(j){
-    cascade=document.getElementById("c"+j);
-    topCard = cascade.lastChild;
-    return (topCard) ? topCard.id : ''; // what card is it? v0...
-  }
-  

@@ -134,13 +134,13 @@ function tryjump(cascades){
 }
 
 function buildCard(card,j,iy,faceup){ //
-	const s=(j<8 ? "position: absolute; top:"+iy+"vw;" : "");
+	const s=(j<8 ? "style='position: absolute; top:"+iy+"vw;'" : "");
 	if(faceup){
 		const color=getColor(card);
-		return "<div class='card "+color+"' id=v"+card+" style='"+s+
-		"'>"+createContent(card)+"</div>";
+		return "<div class='card "+color+"' id=v"+card+" "+s+
+		">"+createContent(card)+"</div>";
 	}else{
-		return "<div class=card id=v"+card+" style='"+s+"'><img src=/back.jpg></div>";
+		return "<div class=card id=v"+card+" "+s+"'><img src=/back.jpg></div>";
 	}
 }
 

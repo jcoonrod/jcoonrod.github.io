@@ -133,7 +133,7 @@ function buildHTML(cascades){ // differs from classic
 		myHTML+="<div  id=c"+j+" class=c>"; // create the column
 		for(let i=0;i<cascade.length;i++) {
 			const card=cascade[i];
-			myHTML+=buildCard(card,j,i*5,true); // create each card in the cascade
+			myHTML+=buildCard(card,j,i*4,true); // create each card in the cascade
 		}
 		myHTML+="</div>"; // end the cascade		
 	}
