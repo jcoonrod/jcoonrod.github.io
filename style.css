@@ -7,7 +7,7 @@
 body {font-family: sans-serif,'Noto Sans Symbols 2'; background:green;
   max-width: 700px;
   margin: 0 auto;
-  padding: 0 16px; /* Adds breathing room on mobile screens */}
+  padding: 0 5px; /* Adds breathing room on mobile screens */}
 p, p>a {color:white;}
 img {width:100%;-webkit-user-drag: none;}
 div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:space-evenly;}
