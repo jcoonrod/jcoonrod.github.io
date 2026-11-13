@@ -85,7 +85,7 @@ function pop(cardno){ // do various things when a card is clicked
 function deal(){
     ndealt=0;
     for(let i=0;i<7;i++){ // i is row
-        const y=15+i*5;
+        const y=10+i*5;
         const x0=xi[i];
 //    console.log("Dealing layer i="+i);
         for (let j=0;j<i+1;j++){
@@ -113,7 +113,7 @@ function next(){ // put the next flipped card into the flip cell
     // check if the next card was already deleted, if so skip them
     while(nuked[ndealt] && ndealt<52) ndealt++;
     if(ndealt>=52) {ndealt=28;while(nuked[ndealt] && ndealt<52) ndealt++;}
-    makeCard(ndealt,13,12);
+    makeCard(ndealt,20,5);
     ndealt++;
     if(ndealt==53)ndealt=28;
 }

@@ -14,8 +14,8 @@ div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:spa
 div.c {height:auto;position:relative;margin:0;border:0;}
 .r {color:red;}
 .b {color:black;}
-h2{padding:0;margin:0;font-weight:bold;position:relative; top:-0.5vw;}
-h1{font-size:4em; line-height:1.2; padding:0;margin:0;font-weight:normal;text-align: center;position:relative; top:-2vw;}
+h2{padding:0;margin:0;line-height:0.9;font-size:1.2em;}
+h1{font-size:4em;text-align:center; font-weight:normal; line-height:0;}
 table {width:100%;}
 td{width:50%;text-align:center;color:yellow;}
 a {text-decoration: none;}
@@ -25,14 +25,13 @@ a {text-decoration: none;}
   padding: .1em; margin:0;
   box-sizing: border-box;
   border-style: solid;
-  border-radius: 1%;
-  border-color:black; border-width:0.5%;
+  border-radius: .5em;
+  border-color:black; border-width: .1em;
   aspect-ratio: 7 / 10;
 }
 .cell {aspect-ratio: 7/10;position:relative;margin:0;border:0;}
 .redborder {border-color:red !important;}
 .blueborder {border-color:blue !important;}
-/* Container needed to position the dropdown content */
 .dropdown {
   position: relative;
   display: inline-block;
