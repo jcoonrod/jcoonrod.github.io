@@ -149,8 +149,8 @@ function buildHTML(cascades,faceups){
 	// First row... cascades 7 to 14
 	let myHTML="<div class=row>"; // this builds everything below the buttons
 	const n7=cascades[7].length; // show the stockpile?
-	if(n7) {myHTML+="<div id=c7 class=card><img src=/back.jpg></div>";}
-	else {myHTML+="<div id=c7 class=card><h2>&nbsp;</h2><h1>♻</h1></div>";}
+	if(n7) {myHTML+="<div id=c7 class='card cell'><img src=/back.jpg></div>";}
+	else {myHTML+="<div id=c7 class='card cell'><h2>&nbsp;</h2><h1>♻</h1></div>";}
 	for(let j=8;j<15;j++) { // show next 3 and foundations if they are there
 		const n=cascades[j].length; // get the top card if any
 		if(n){

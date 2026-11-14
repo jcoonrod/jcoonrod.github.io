@@ -14,13 +14,14 @@ div.row {display:flex; flex-wrap:nowrap; flex-direction:row; justify-content:spa
 div.c {height:auto;position:relative;margin:0;border:0;}
 .r {color:red;}
 .b {color:black;}
-h2{padding:0;margin:0;line-height:0.9;font-size:1.2em;}
-h1{font-size:4em;text-align:center; font-weight:normal; line-height:0;}
+h2{padding:0;margin:0;line-height:0.9;font-size:40cqi;}
+h1{font-size:80cqi;text-align:center; font-weight:normal; line-height:0;}
 table {width:100%;}
 td{width:50%;text-align:center;color:yellow;}
 a {text-decoration: none;}
 
 .card {
+  container-type:inline-size;
   background-color: white;
   padding: .1em; margin:0;
   box-sizing: border-box;

@@ -1,20 +1,49 @@
-// start a slow process of pure functions so solve the bugs
-const ncards=52;
-var nlast=52; //this will decrease as we delete cards from the stack
-var ndealt=0;
+const board=document.getElementById("board");
+board.addEventListener('click', function(event) { // impure click handler
+	const div = event.target.closest('.card'); 
+	if (!div) return;
+	const parent=div.parentElement;
+	const ctype=div.id.substring(0,1);
+	const card=parseInt(div.id.substring(1)); // this should be an integer
+	let moved=false;
+	if(ctype=='v'){ // the playing card ids
+		moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));
+	}else if(div.id='c7'){
+		next3(cascades,faceups);
+		moved=true;
+	}
+	if(moved)repaint();
+});
+
+function repaint(){
+	board.innerHTML=buildHTML(cascades,faceups);
+	processFoundationJumps();
+	tryWin(cascades);
+};
+
+// for timing reasons, these cannot be const arrow functions
+function getSuit(card) {return Math.floor(card/13);}
+function getVal(card){return card % 13;}
+function getColor(card) {return (card<13 || card>38 ? "b" : "r");}
+
+// main game play - no automation here
+const deck=shuffle();
+var cascades=deal(deck); // "cascades" are the 7 rows, 8th reserve and 9th are nukes
 var nclicked=0; // this is the problem - should never exceed 2
 var cardno=-1; // make this global for ease of debugging
 var score=0;
 var click1; // which card was clicked first?
 var click2; // which card was clicked second?
-var nuked=Array(52).fill(false); // this track which cards have been nuked, originally set to false
-const offsets=[1,2,2,3,3,3,4,4,4,4,5,5,5,5,5,6,6,6,6,6,6];
-const xi=[44,38,32,26,20,14,8]; // left of first card;
-const status=document.getElementById("status");
-var tapped=0; // value+1 of first tapped? When it reaches 13 theygo.
-createCards();
-shuffle();
-deal();
+function shuffle(){
+	let deck=[];
+	for (let i=0; i<52; i++) deck[i]=i;
+	for (let i=0; i<52; i++) { // do lots random interchanges
+		const j=Math.floor(Math.random() * 52);
+		[deck[i],deck[j]]=[deck[j],deck[i]];
+    }
+	return deck;
+}
+
 
 function showStatus(s){  // pass in anything beyond score and nclicked
     s2=score+" "+s;

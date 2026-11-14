@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<!-- Pyramid HTML - create cards via absolutelly placed dom nodes -->
-<!-- otherwise new/replay really don't work-->
+<!-- VDOM Pyramid HTML -->
 <html lang=en>
 <head>
 <meta name="google" content="notranslate">
@@ -10,15 +9,18 @@
 <meta name="description" content="Pyramid Solitaire Game by John Coonrod"/>
 <title>Pyramid Solitaire</title>
 <link rel="stylesheet" href="/style.css">
+<style>
+  .card {width:11%;}
+</style>
 <script src="/confetti.browser.min.js"></script>
-<script src="/common.js"></script>
-<script src="pyramid.js" defer></script>
+<script src="pyramid2.js" defer></script>
 </head>
   
 <body tabindex="-1">
 <div class="dropdown">
-  <button class="dropbtn">Pyramid</button>
+  <button class="dropbtn">Test Pyramid</button>
   <div class="dropdown-content">
+    <a href="/test">Test Pyramid</a>
     <a href="/pyramid">Pyramid</a>
     <a href="/classic">Classic</a>
     <a href="/">Freecell</a>
@@ -31,7 +33,7 @@
     <a class="dropbtn" href="help.html" target="_blank">🛈</a> 
     Score: <span id="status">0</span>
 </div>
-<p>&nbsp;</p>
-<div id="stack" class="card" onclick="next();"><img src="/back.jpg"></div>
+<div id="board">
+</div>
 </body>
 </html>
