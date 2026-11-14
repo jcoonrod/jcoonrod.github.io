@@ -10,7 +10,8 @@
 <title>Pyramid Solitaire</title>
 <link rel="stylesheet" href="/style.css">
 <style>
-  .card {width:11%;}
+  .cell {width:14.2cqi;}
+  .card {width:90%;}
 </style>
 <script src="/confetti.browser.min.js"></script>
 <script src="pyramid2.js" defer></script>
@@ -28,12 +29,12 @@
   </div>
 </div>
 <div class="buttons">
-    <button class="dropbtn" onclick="shuffle(); clearBoard(); deal();">New</button>
+    <button class="dropbtn" onclick=";">New</button>
     <button class="dropbtn" onclick="clearBoard();deal();">Replay</button>
     <a class="dropbtn" href="help.html" target="_blank">🛈</a> 
     Score: <span id="status">0</span>
 </div>
-<div id="board">
-</div>
+<article id="board">
+</article>
 </body>
 </html>

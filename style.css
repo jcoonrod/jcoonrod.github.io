@@ -4,7 +4,8 @@
 	src: url('/NotoSansSymbols2-Regular.ttf') format('truetype');
 	font-weight: normal;font-style: normal;font-display: swap;
 }
-body {font-family: sans-serif,'Noto Sans Symbols 2'; background:green;
+body {font-family: sans-serif,'Noto Sans Symbols 2'; 
+  background-color:green;
   max-width: 700px;
   margin: 0 auto;
   padding: 0 5px; /* Adds breathing room on mobile screens */}
@@ -17,6 +18,9 @@ div.c {height:auto;position:relative;margin:0;border:0;}
 h2{padding:0;margin:0;line-height:0.9;font-size:40cqi;}
 h1{font-size:80cqi;text-align:center; font-weight:normal; line-height:0;}
 table {width:100%;}
+article,.board {width:100%;
+  position:relative;
+  container-type:inline-size;}
 td{width:50%;text-align:center;color:yellow;}
 a {text-decoration: none;}
 
@@ -30,7 +34,7 @@ a {text-decoration: none;}
   border-color:black; border-width: .1em;
   aspect-ratio: 7 / 10;
 }
-.cell {aspect-ratio: 7/10;position:relative;margin:0;border:0;}
+.cell {aspect-ratio: 7/10; margin:0;border:0;}
 .redborder {border-color:red !important;}
 .blueborder {border-color:blue !important;}
 .dropdown {
