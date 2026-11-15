@@ -1,15 +1,20 @@
 const board=document.getElementById("board");
+const msg=document.getElementById("status");
+
 var cursor=0; // this keeps track of which card we've just turned over
 var clicked=-1; // if >0 then paint this card yellow
 board.addEventListener('click', function(event) { // impure click handler
+	if (typeof clicked === 'undefined') {
+    window.clicked = -1; // Explicitly attaches to global scope
+  }
 	const div = event.target.closest('.card'); 
 	if (!div) return;
 	const ctype=div.id.substring(0,1);
 	const card=parseInt(div.id.substring(1)); // this should be an integer
 	let moved=false;
 	if(ctype=='v'){ // the playing card ids
-		console.log("Click on",card);
-		moved=tryNuke(pyramid,card,clicked);
+		console.log("Click on",card,"clicked");
+		moved=tryNuke(pyramid,card);
 	}else if(div.id='s0'){ // this is the stock pile
 		console.log("click on s0");
 		cursor=next(deck,cursor);
@@ -18,18 +23,20 @@ board.addEventListener('click', function(event) { // impure click handler
 	if(moved)repaint();
 });
 
-function tryNuke(pyramid,card,clicked){
+function tryNuke(pyramid,card){
 	let moved=false;
 	v1=getVal(card);
-	if(v1==12) {nuke(pyramid,card);moved=true;}
+	console.log("tryNuke card",card,"v1",v1);
+	if(v1==12) {nuke(pyramid,card); moved=true;}
 	if(moved) return moved;
 	if(card==clicked) {clicked=-1; moved=true;}
 	if(moved) return moved;
-	if(!moved && clicked){
+	if(!moved && clicked>-1){
 		const v2=getVal(clicked);
-		if((v1+v2)==13) {nuke(pyramid,card); nuke(pyramid,clicked); moved=true;}		
+		console.lot("try pair v1",v1,"v2",v2);
+		if((v1+v2)==13) {nuke(pyramid,card); nuke(pyramid); moved=true;}		
 	}
-	if(!clicked){clicked=card;moved=true;}
+	if(clicked==-1 && !moved){clicked=card; moved=true;}
 	return moved;
 }
 
@@ -38,6 +45,8 @@ function next(deck,cursor){//handle the flipping over of cards
 	cursor++;
 	if(n>0 && cursor>n) {cursor=0;}
 	if(n==0) cursor=-1;
+	console.log("next",cursor);
+	return cursor;
 }
 
 function nuke(pyramid,card){
@@ -76,19 +85,21 @@ function deal(deck) { // return an array with cards assigned
     }
     return pyramid;
 }
-function buildHTML(pyramid,deck,cursor,clicked) {// returns myHTML
+function buildHTML(pyramid,deck,cursor) {// returns myHTML
     let myHTML="";
     const dx=14; // pct of pyramid for 7 cells and gaps
     let k=0;
     for(let i=0;i<7;i++) { // become iy
         for(let j=0;j<=i;j++) { // becomes ix
-            myHTML+=buildCell(pyramid[k],i,j,clicked);
+            myHTML+=buildCell(pyramid[k],i,j);
             k++;
         }
     }
 	if(cursor>-1) {
 		myHTML+="<div id=s0 class='card cell' style='width:12cqi; position:absolute; top:10cqi; left:0cqi;'><img src=/back.jpg></div>";		
 		const card=deck[cursor];
+		pyramid[28]=card;
+		console.log("flip card",card,"cursor",cursor,"clicked",clicked);
 		const suit=getSuit(card);
 		const color=(suit==0 || suit==3 ? "b" : "r");
 		const yellow=(card==clicked?" background-color:yellow !important;":"");
@@ -100,7 +111,7 @@ function buildHTML(pyramid,deck,cursor,clicked) {// returns myHTML
 function buildCell(card,i,j){
     ix=43-i*7+j*14;
     iy=10+7*i;
-    console.log("buildCell card",card,"i",i,"j",j);
+    //console.log("buildCell card",card,"i",i,"j",j);
     let cell="<div class='cell' style='position:absolute; top:"+iy+"cqi; left:"+ix+"cqi;'>";
     if(card>-1){
 		const suit=getSuit(card);
@@ -125,4 +136,5 @@ function createContent(i){ // i runs 0 to 51
 
 function repaint(){
     board.innerHTML=buildHTML(pyramid,deck,cursor);
+	msg.innerHTML=clicked;
 }
