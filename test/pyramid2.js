@@ -56,6 +56,7 @@ function nuke(pyramid,card){
 	const i=pyramid.indexOf(card);
 	console.log("Nuke",card,"i",i);
 	pyramid[i]=-1;
+	if(card==cursor) deck.splice[cursor,cursor]; // remove it from stack
 }
 
 // for timing reasons, these cannot be const arrow functions
@@ -64,7 +65,7 @@ function getVal(card){return card % 13;}
 function getColor(card) {return (card<13 || card>38 ? "b" : "r");}
 
 // main game play - no automation here
-const deck=shuffle(); // deck is constant for the game but mutated via pops
+var deck=shuffle(); 
 var pyramid=deal(); // pyramid is a collection of absolutely positioned cells 
 repaint();
 

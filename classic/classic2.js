@@ -134,7 +134,7 @@ function tryjump(cascades){
 }
 
 function buildCard(card,j,iy,faceup){ //
-	const s=(j<8 ? "style='position: absolute; top:"+iy+"vw;'" : "");
+	const s=(j<8 ? "style='position: absolute; top:"+iy+"cqi;'" : "");
 	if(faceup){
 		const color=getColor(card);
 		return "<div class='card "+color+"' id=v"+card+" "+s+
