@@ -114,7 +114,7 @@ function showSuits() { // an impure function
 	return suitlist
 }		
 function buildCard(card,j,iy,faceup,nsuit){ // change absolute width
-	const s=(j<10 ? "position: absolute; width:100%; top:"+iy+"vw;" : "");
+	const s=(j<10 ? "position: absolute; width:100%; top:"+iy+"cqi;" : "");
 	if(faceup){
 		const color=getColor(card,nsuit);
 		return "<div class='card "+color+"' id=v"+card+" style='"+s+
