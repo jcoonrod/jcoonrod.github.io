@@ -3,6 +3,7 @@ const msg=document.getElementById("status");
 // main game play - no automation here
 var cursor=99; // this will keep track of which card we've just turned over
 var clicked=-1; // if >0 then paint this card yellow
+var flipped=-1;
 const deck=shuffle();
 console.log("Initial stock",stock);
 var pyramid=deal(); // pyramid is a collection of absolutely positioned cells 
@@ -66,16 +67,21 @@ function next(){//handle the flipping over of cards
 	if(n>0 && cursor>n) {cursor=0;}
 	console.log("next cursor",cursor,"n",n);
 	if(n==0) cursor=-1;
-	if(cursor>-1) pyramid[28]=stock[cursor];
+	if(cursor>-1) {flipped=stock[cursor]; pyramid[28]=flipped;}
 	console.log("next",pyramid[28]);
 	clicked=-1;
 }
 
 function nuke(card){
 	const i=pyramid.indexOf(card); 
-	console.log("Nuke",card,"i",i);
+	console.log("Nuke",card,"i",i,"cursor",i);
 	pyramid[i]=-1;
-	if(card==stock[cursor]){console.log("splice stock card",card,"cursor", cursor)}; stock.splice(cursor,1); console.log(deck); // remove it from stack
+	nukeStock(card);
+}
+
+function nukeStock(card){
+	i=stock.indexOf(card);
+	if(i>-1 && card==flipped)stock.splice(i,1);
 }
 
 // for timing reasons, these cannot be const arrow functions
