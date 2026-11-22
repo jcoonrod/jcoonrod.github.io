@@ -1,7 +1,6 @@
 // Convert spider to virtual dom version like classic
 // Going back and fixing the old spider js
 // The deck of 104 cards may only contain 13, 26 or 52 different cards
-// so we need a second array to be able to map card to 
 if(!localStorage.nsuit) localStorage.nsuit=2;
 const nsuit=localStorage.nsuit;
 showSuits(); // bring and and fix localStorage as needed
@@ -10,7 +9,7 @@ var cascades=deal(deck); // put the first 54 cards in 10 cascades and 50 in casc
 var faceups=initializeFaceups(cascades); // determine faceup status of each card
 const board=document.getElementById("board");
 
-function shuffle(){ 
+function shuffle(){
 	let deck=[];
 	for (let i=0; i<104; i++) deck[i]=i;
 	for (let i=0; i<104; i++) { // do lots random interchanges
@@ -35,7 +34,7 @@ function initializeFaceups(cascades){ // turn the top cards up
 		const cascade=cascades[j];
 		faces[cascade[cascade.length-1]]=true;
 	}
-	return faces; 
+	return faces;
 }
 
 // pure functions mostly replacing the old common.js functions for now
@@ -54,7 +53,7 @@ function createContent(card,nsuit){ // card runs 0 to 103 in this case nsuits 1,
 }
 
 board.addEventListener('click', function(event) { // impure click handler
-	const div = event.target.closest('.card'); 
+	const div = event.target.closest('.card');
 	// If the user clicked the board background instead of a card, exit early
 	if (!div) return;
 	const parent=div.parentElement;
@@ -65,7 +64,7 @@ board.addEventListener('click', function(event) { // impure click handler
 	let moved=false;
 	if(div.id=='c10')moved=next10(cascades,faceups);
 	if(ctype=='v' && faceups[card]){ // the playing card ids
-		if(!moved) moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));	
+		if(!moved) moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));
 	};
 	if(moved)repaint();
 });
@@ -112,7 +111,7 @@ function showSuits() { // an impure function
 	if(localStorage.nsuit==4) suitlist+=suits[2]+suits[3];
 	document.getElementById("suitlist").innerHTML=suitlist;
 	return suitlist
-}		
+}
 function buildCard(card,j,iy,faceup,nsuit){ // change absolute width
 	const s=(j<10 ? "position: absolute; width:100%; top:"+iy+"cqi;" : "");
 	if(faceup){
@@ -125,10 +124,10 @@ function buildCard(card,j,iy,faceup,nsuit){ // change absolute width
 }
 
 // convert the virtual DOM data to html -- must change the column class
-function buildHTML(cascades,faceups,nsuit){ 
+function buildHTML(cascades,faceups,nsuit){
 	let myHTML="<div class=row>\n";
 	if(cascades[10].length) {
-		myHTML+="<div id=c10 class=card><img src=/back.jpg></div>";	
+		myHTML+="<div id=c10 class=card><img src=/back.jpg></div>";
 	}else{myHTML+="<div class=cell></div>";}
 	for(j=11;j<19;j++){
 		myHTML+="<div id=c"+j+" class='card blueborder'>";
@@ -151,7 +150,7 @@ function buildHTML(cascades,faceups,nsuit){
 			const face=faceups[card];
 			myHTML+=buildCard(card,j,i*4,faceups[card],nsuit); // create each card in the cascade
 		}
-		myHTML+="</div>"; // end the cascade		
+		myHTML+="</div>"; // end the cascade
 	}
 	myHTML+="</div>"; // end the row
 	return myHTML;
@@ -169,11 +168,11 @@ function next10(cascades,faceups) { // put the next 10 face up
 	}
 	return true;
 }
-	
+
 function moveUp(cascades,j1) { // move a whole stack of 13 cards to a foundation
 	let j2=11;
 	while(j2<19 && cascades[j2].length>0){
-		//console.log("moveUp j2",j2); 
+		//console.log("moveUp j2",j2);
 		j2++;}
 	if(j2==19) return false; // already full? should be impossible
 	const n1=cascades[j1].length-13; // must be 13 or more
@@ -182,7 +181,7 @@ function moveUp(cascades,j1) { // move a whole stack of 13 cards to a foundation
 	if(n1>0) faceups[cascades[j1][n1-1]]=true;
 	cascades[j2].push(...chunk);
 }
-	
+
 function tryMove(cascades,card,j) {
 	let moved=false; // local variable
 	moved=tryAce(cascades,card,j,nsuit); // can we move a stack up?
@@ -220,7 +219,7 @@ function moveAll(cascades,i1,j1,j2){ // move all the children to reserve
 }
 
 
-function tryAce(cascades,card,j,nsuit){ // try moving up 13 cards 
+function tryAce(cascades,card,j,nsuit){ // try moving up 13 cards
 	let moved=false;
 	const suit=getSuit(card,nsuit);
 	const start=cascades[j].length-13; // start of stack position
