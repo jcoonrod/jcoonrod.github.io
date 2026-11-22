@@ -58,16 +58,16 @@ board.addEventListener('click', function(event) { // impure click handler
 	// If the user clicked the board background instead of a card, exit early
 	if (!div) return;
 	const parent=div.parentElement;
-	//console.log(`Player clicked ${div.id} parent ${parent.id}`);
+	console.log(`Player clicked ${div.id} parent ${parent.id}`);
 	// now do the logic
 	const ctype=div.id.substring(0,1);
 	const card=parseInt(div.id.substring(1)); // this should be an integer
 	let moved=false;
+	if(div.id=='c10')moved=next10(cascades,faceups);
 	if(ctype=='v' && faceups[card]){ // the playing card ids
-		moved=next10(cascades,faceups,card); // tests parent first
 		if(!moved) moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));	
-		if(moved)repaint();
 	};
+	if(moved)repaint();
 });
 
 repaint(); // start the game
@@ -127,7 +127,10 @@ function buildCard(card,j,iy,faceup,nsuit){ // change absolute width
 // convert the virtual DOM data to html -- must change the column class
 function buildHTML(cascades,faceups,nsuit){ 
 	let myHTML="<div class=row>\n";
-	for(j=10;j<19;j++){
+	if(cascades[10].length) {
+		myHTML+="<div id=c10 class=card><img src=/back.jpg></div>";	
+	}else{myHTML+="<div class=cell></div>";}
+	for(j=11;j<19;j++){
 		myHTML+="<div id=c"+j+" class='card blueborder'>";
 		const face=(j>10);
 		//console.log("build j=",j,cascades[j]);
@@ -154,8 +157,9 @@ function buildHTML(cascades,faceups,nsuit){
 	return myHTML;
 }
 
-function next10(cascades,faceups,card) { // put the next 10 face up
-	const i=cascades[10].indexOf(card);
+function next10(cascades,faceups) { // put the next 10 face up
+	const i=cascades[10].length-1;
+	console.log("next10 i",i);
 	if(i<9) return false;
 	for(let i=0;i<10;i++) {
 		j=(i+4)%10;// which column
