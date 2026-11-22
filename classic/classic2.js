@@ -7,7 +7,7 @@ board.addEventListener('click', function(event) { // impure click handler
 	const ctype=div.id.substring(0,1);
 	const card=parseInt(div.id.substring(1)); // this should be an integer
 	let moved=false;
-	if(ctype=='v'){ // the playing card ids
+	if(ctype=='v' && faceups[card]){ // the playing card ids
 		moved=tryMove(cascades,card,parseInt(parent.id.substring(1)));
 	}else if(div.id='c7'){
 		next3(cascades,faceups);
