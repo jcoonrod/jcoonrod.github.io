@@ -6,7 +6,7 @@ var clicked=-1; // if >0 then paint this card yellow
 var flipped=-1;
 const deck=shuffle();
 console.log("Initial stock",stock);
-var pyramid=deal(); // pyramid is a collection of absolutely positioned cells 
+var pyramid=deal(); // pyramid is a collection of absolutely positioned cells
 var stock=deck;
 repaint();
 
@@ -16,12 +16,12 @@ board.addEventListener('click', function(event) { // impure click handler
     window.clicked = -1; // Explicitly attaches to global scope
   	}
 	let moved=false;
-	const div = event.target.closest('.card'); 
+	const div = event.target.closest('.card');
 	if (!div) return;
 	const ctype=div.id.substring(0,1);
 	if(div.id=='s0'){ // this is the stock pile
 		next();
-		moved=true; 
+		moved=true;
 		console.log("s0 moved",moved,"cursor",cursor)
 	}
 	const card=parseInt(div.id.substring(1)); // this should be an integer
@@ -56,7 +56,7 @@ function tryNuke(card){ // make sure the pyramid item is marked as -1 including 
 		const v2=getVal(clicked);
 		console.log("try pair v1",v1,"v2",v2);
 		if((v1+v2)==11) {nuke(card); nuke(clicked); moved=true;}
-		clicked=-1; // clear it if no match	
+		clicked=-1; // clear it if no match
 	}else{if(clicked==-1 && !moved){clicked=card; moved=true;}}
 	return moved;
 }
@@ -73,7 +73,7 @@ function next(){//handle the flipping over of cards
 }
 
 function nuke(card){
-	const i=pyramid.indexOf(card); 
+	const i=pyramid.indexOf(card);
 	console.log("Nuke",card,"i",i,"cursor",i);
 	pyramid[i]=-1;
 	nukeStock(card);
@@ -148,8 +148,9 @@ function buildCell(card,i,j){
 // pure functions mostly replacing the old common.js functions for now
 function createContent(i){ // i runs 0 to 51
 	const suits = ["♠","♥","♦","♣"];
-	const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
-	const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+//	const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
+	const faces = ["💂‍♂️", "👸", "🤴"];
+	const vals = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 	const n=i%13; // index within the suit
 	const value=vals[i%13];
 	const suit=suits[Math.floor(i/13)];

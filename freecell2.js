@@ -2,7 +2,7 @@
 // a moveable stack must be the same suit
 const board=document.getElementById("board");
 board.addEventListener('click', function(event) { // impure click handler
-	const div = event.target.closest('.card'); 
+	const div = event.target.closest('.card');
 	if (!div) return;
 	const parent=div.parentElement;
 	console.log(`Player clicked ${div.id} parent ${parent.id}`);
@@ -31,11 +31,11 @@ const sleep = ms => new Promise(res => setTimeout(res, ms));
 async function processFoundationJumps() {
 	console.log("processFoundationJumps");
     await sleep(200);
-	const moved=tryjump(cascades); 
+	const moved=tryjump(cascades);
     if(moved) {
 		repaint();
 		tryWin(cascades);
-        await processFoundationJumps(); 
+        await processFoundationJumps();
     }
 }
 
@@ -109,7 +109,7 @@ function buildCard(card,j,iy,faceup){ //
 }
 
 // convert the virtual DOM data to html
-function buildHTML(cascades){ // differs from classic 
+function buildHTML(cascades){ // differs from classic
 	// First row... cascades 8 to 15 no iy
 	let myHTML='<div class=row>';
 	for(let j=8;j<16;j++) { // show next 4 and foundations if they are there
@@ -135,7 +135,7 @@ function buildHTML(cascades){ // differs from classic
 			const card=cascade[i];
 			myHTML+=buildCard(card,j,i*5,true); // create each card in the cascade
 		}
-		myHTML+="</div>"; // end the cascade		
+		myHTML+="</div>"; // end the cascade
 	}
 	myHTML+="</div>"; // end the row
 	return myHTML;
@@ -172,7 +172,7 @@ function tryStack(cascades,card,j){
 	let moved=false;
 	if(testStack(cascades,card,j)){
 		const maxStack=getMaxStack(cascades);
-		const j2=scanColumns(cascades,card,j); // is there a place to move the stack? 
+		const j2=scanColumns(cascades,card,j); // is there a place to move the stack?
 		if(j2!==j) { // fail in scan returns j2==j
 			const ii=cascades[j].indexOf(card);
 			const n=cascades[j].length-ii;
@@ -188,9 +188,9 @@ function tryStack(cascades,card,j){
 // this needs to work for both tableau (j<8) and free cells
 // if it scans all 8 columns, it won't move to itself - that's simpler
 function scanColumns(cascades,card,j){ // return destination of j if none
-	const val=getVal(card); 
+	const val=getVal(card);
 	const color=getColor(card);
-	let i=0; // scan 0 through 7 
+	let i=0; // scan 0 through 7
 	let j2=0; // make sure it isn't scoped inside loop
 	let moveable=false;
 	const joffset=(j>7 ? 0 : j+1); // make sure to move to the right
@@ -215,10 +215,10 @@ function testStack(cascades,card,j){ //
 	//does the stack follow the color/alternate and value rules?
 	const i=cascades[j].indexOf(card);
 	const n=cascades[j].length;
-	let legit=true; let k=i; 
+	let legit=true; let k=i;
 	while(legit && k<(n-1)){
 		let l=k+1;
-		legit=(getVal(cascades[j][k])==getVal(cascades[j][l]+1) 
+		legit=(getVal(cascades[j][k])==getVal(cascades[j][l]+1)
 			&& getColor(cascades[j][k])!==getColor(cascades[j][l]) );
 		k++;
 	}
@@ -234,7 +234,7 @@ function tryCascade(cascades,card,j){ // returns moved
 	return false;
 }
 
-function moveAll(cascades,i1,j1,j2){ // move all the j1 children to j2 
+function moveAll(cascades,i1,j1,j2){ // move all the j1 children to j2
 	const chunk=cascades[j1].splice(i1);
 	console.log("moveAll",i1,j1,j2,"chunk=",chunk);
 	cascades[j2].push(...chunk);
@@ -252,7 +252,7 @@ function tryAce(cascades,card,j){
 	const suit=getSuit(card);
 	const j2=12+suit;
 	const n2=cascades[j2].length;
-	foundation_level=(n2 ? getVal(cascades[j2][n2-1]) :-1); 
+	foundation_level=(n2 ? getVal(cascades[j2][n2-1]) :-1);
 	console.log("tryAce suit=",suit,"value=",value,'foundation_level',foundation_level);
 	if(value==(foundation_level+1)) {
 		cascades[j2].push(cascades[j].pop());
@@ -273,8 +273,9 @@ function tryWin(cascades){
 // pure functions mostly replacing the old common.js functions for now
 function createContent(i){ // i runs 0 to 51
 	const suits = ["♠","♥","♦","♣"];
-	const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
-	const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+//	const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
+	const faces = ["💂‍♂️", "👸", "🤴"];
+	const vals = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 	const n=i%13; // index within the suit
 	const value=vals[i%13];
 	const suit=suits[Math.floor(i/13)];

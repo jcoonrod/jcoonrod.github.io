@@ -1,7 +1,7 @@
 // Classic in virtual DOM
 const board=document.getElementById("board");
 board.addEventListener('click', function(event) { // impure click handler
-	const div = event.target.closest('.card'); 
+	const div = event.target.closest('.card');
 	if (!div) return;
 	const parent=div.parentElement;
 	const ctype=div.id.substring(0,1);
@@ -35,10 +35,10 @@ const sleep = ms => new Promise(res => setTimeout(res, ms));
 
 async function processFoundationJumps() {
     await sleep(200);
-	const moved=tryjump(cascades); 
+	const moved=tryjump(cascades);
     if(moved) {
 		repaint();
-        await processFoundationJumps(); 
+        await processFoundationJumps();
     }
 }
 
@@ -61,7 +61,7 @@ function tryAce(cascades,faceups,card,j){
 	const suit=getSuit(card);
 	const j2=11+suit;
 	const n2=cascades[j2].length;
-	foundation_level=(n2 ? getVal(cascades[j2][n2-1]) :-1); 
+	foundation_level=(n2 ? getVal(cascades[j2][n2-1]) :-1);
 	if(value==(foundation_level+1)) {
 		cascades[j2].push(cascades[j].pop());
 		faceUp(cascades,faceups,j);
@@ -109,7 +109,7 @@ function initializeFaceups(cascades){
 		const cascade=cascades[j];
 		faces[cascade[j]]=true;
 	}
-	return faces; 
+	return faces;
 }
 
 function tryjump(cascades){
@@ -145,7 +145,7 @@ function buildCard(card,j,iy,faceup){ //
 }
 
 // convert the virtual DOM data to html
-function buildHTML(cascades,faceups){ 
+function buildHTML(cascades,faceups){
 	// First row... cascades 7 to 14
 	let myHTML="<div class=row>"; // this builds everything below the buttons
 	const n7=cascades[7].length; // show the stockpile?
@@ -169,7 +169,7 @@ function buildHTML(cascades,faceups){
 			const face=faceups[card];
 			myHTML+=buildCard(card,j,i*5,faceups[card]); // create each card in the cascade
 		}
-		myHTML+="</div>"; // end the cascade		
+		myHTML+="</div>"; // end the cascade
 	}
 	myHTML+="</div>"; // end the row
 	return myHTML;
@@ -220,7 +220,7 @@ function next3(cascades,faceups){
 			cascades[8+i].push(card);
 			i++;
 		}
-		processFoundationJumps(); 
+		processFoundationJumps();
 	}
 }
 
@@ -228,8 +228,9 @@ function next3(cascades,faceups){
 // pure functions mostly replacing the old common.js functions for now
 function createContent(i){ // i runs 0 to 51
 	const suits = ["♠","♥","♦","♣"];
-	const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
-	const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+//	const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
+	const faces = ["💂‍♂️", "👸", "🤴"];
+	const vals = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 	const n=i%13; // index within the suit
 	const value=vals[i%13];
 	const suit=suits[Math.floor(i/13)];
@@ -248,5 +249,3 @@ function shuffle(){
     }
 	return deck;
 }
-
-
