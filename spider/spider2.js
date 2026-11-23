@@ -1,13 +1,14 @@
 // Convert spider to virtual dom version like classic
 // Going back and fixing the old spider js
 // The deck of 104 cards may only contain 13, 26 or 52 different cards
+// Latest - make the foundations static not moveable.
 if(!localStorage.nsuit) localStorage.nsuit=2;
 const nsuit=localStorage.nsuit;
 showSuits(); // bring and and fix localStorage as needed
 const deck=shuffle(); // new pure function creates a shuffled 104 cards set by suits;
 var cascades=deal(deck); // put the first 54 cards in 10 cascades and 50 in cascade[10];
 var faceups=initializeFaceups(cascades); // determine faceup status of each card
-const board=document.getElementById("board");
+const board = document.getElementById("board");
 
 function shuffle(){
 	let deck=[];
@@ -40,8 +41,8 @@ function initializeFaceups(cascades){ // turn the top cards up
 // pure functions mostly replacing the old common.js functions for now
 function createContent(card,nsuit){ // card runs 0 to 103 in this case nsuits 1, 2 or 4
 	const suits = ["♠","♥","♦","♣"];
-	const faces = ["♖","♕","♔"]; // emojis v1.1 for facecards
-	const vals = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+	const faces = ["💂‍♂️", "👸", "🤴"];
+	const vals = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 	const ival=getVal(card);
 	const sval=vals[ival]; // symbolic value
 	const isuit=getSuit(card,nsuit);
@@ -125,24 +126,20 @@ function buildCard(card,j,iy,faceup,nsuit){ // change absolute width
 
 // convert the virtual DOM data to html -- must change the column class
 function buildHTML(cascades,faceups,nsuit){
-	let myHTML="<div class=row>\n";
-	if(cascades[10].length) {
+	let myHTML = "<div class=row>\n";
+	// set up the foundations
+	if (cascades[10].length) {
 		myHTML+="<div id=c10 class=card><img src=/back.jpg></div>";
 	}else{myHTML+="<div class=cell></div>";}
-	for(j=11;j<19;j++){
-		myHTML+="<div id=c"+j+" class='card blueborder'>";
-		const face=(j>10);
-		//console.log("build j=",j,cascades[j]);
-		const n=cascades[j].length;
-		if(n) {
-			card=cascades[j][n-1];
-			myHTML+=buildCard(card,j,0,face,nsuit);
-		}
-		myHTML+="</div>\n";
+	for (j = 11; j < 19; j++) {
+		myHTML += "<div class=card>";
+		if (cascades[j].length) myHTML += createContent(cascades[j][12], nsuit);
+		myHTML += "</div>";
 	}
 	myHTML+="</div><div class=row><table><tr><td>Stock pile +8 foundations</td>"
 	+"</td></tr></table></div><div class=row>";
-	for(let j=0;j<10;j++){
+// Then crreate the tableau
+	for (let j = 0; j < 10; j++){
 		const cascade=cascades[j];
 		myHTML+="<div id=c"+j+" class=c>"; // create the column
 		for(let i=0;i<cascade.length;i++) {
