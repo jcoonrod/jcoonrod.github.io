@@ -4,12 +4,24 @@ const msg=document.getElementById("status");
 var cursor=99; // this will keep track of which card we've just turned over
 var clicked=-1; // if >0 then paint this card yellow
 var flipped=-1;
-const deck=shuffle();
+const deck = shuffle();
+const backup = [...deck]; // used for a replay
 console.log("Initial stock",stock);
 var pyramid=deal(); // pyramid is a collection of absolutely positioned cells
 var stock=deck;
 repaint();
 
+function replay() {
+	// actions to recreate the game without shuffling
+	deck.splice(0, deck.length, ...backup);
+	pyramid = deal();
+	stock = deck;
+	console.log("replay deck", deck);
+	cursor = 99;
+	clicked = -1;
+	flipped = -1;
+	repaint();
+}
 
 board.addEventListener('click', function(event) { // impure click handler
 	if (typeof clicked === 'undefined') {

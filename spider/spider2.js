@@ -2,13 +2,23 @@
 // Going back and fixing the old spider js
 // The deck of 104 cards may only contain 13, 26 or 52 different cards
 // Latest - make the foundations static not moveable.
+// Unlike pyramid, we will backup the cascades
 if(!localStorage.nsuit) localStorage.nsuit=2;
 const nsuit=localStorage.nsuit;
 showSuits(); // bring and and fix localStorage as needed
-const deck=shuffle(); // new pure function creates a shuffled 104 cards set by suits;
-var cascades=deal(deck); // put the first 54 cards in 10 cascades and 50 in cascade[10];
-var faceups=initializeFaceups(cascades); // determine faceup status of each card
+const deck = shuffle(); // new pure function creates a shuffled 104 cards set by suits;
+var cascades=deal(); // put the first 54 cards in 10 cascades and 50 in cascade[10];
+var backup = structuredClone(cascades);
+var faceups = initializeFaceups(cascades); // determine faceup status of each card
 const board = document.getElementById("board");
+
+function replay() {
+	// actions to recreate the game without shuffling
+	deck.splice(0, deck.length, ...backup);
+	cascades.splice(0, cascades.length, ...structuredClone(backup));
+	faceups.splice(0, faceups.length,...initializeFaceups());
+	repaint();
+}
 
 function shuffle(){
 	let deck=[];
@@ -20,7 +30,7 @@ function shuffle(){
 	return deck;
 }
 
-function deal(deck){
+function deal(){
 	let cascades=[];
 	for(let j=0; j<19; j++) cascades[j]=[]; // Make it a 2d array
 	for(let i=0; i<54; i++) {j=i%10; cascades[j].push(deck[i]);}
@@ -28,7 +38,7 @@ function deal(deck){
 	return cascades;
 }
 
-function initializeFaceups(cascades){ // turn the top cards up
+function initializeFaceups(){ // turn the top cards up
 	let faces=[];
 	for(i=0;i<104;i++) faces[i]=false;
 	for(j=0;j<10;j++) {
