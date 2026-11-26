@@ -35,6 +35,17 @@ a {text-decoration: none;}
   border-color:black; border-width: .1em;
   aspect-ratio: 7 / 10;
 }
+.tile {
+	display:flex;
+	align-items:center;
+	width:7cqi; height:8cqi;
+	container-type:inline-size;
+  background-color: white;
+  font-size:10cqi;
+  padding: .1em; margin:0;
+  box-sizing: border-box;
+  aspect-ratio: 1 / 1;
+}
 .cell {aspect-ratio: 7/10; margin:0;border:0;}
 .redborder {border-color:red !important;}
 .blueborder {border-color:blue !important;}
